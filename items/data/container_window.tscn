@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://own7u54wgyj"]
+
+[ext_resource type="Script" uid="uid://ckrpkj4vskeu4" path="res://container_window.gd" id="1_ilmwu"]
+[ext_resource type="PackedScene" uid="uid://god5bgbp0ki2" path="res://items/item_slot_ui.tscn" id="2_rx6q2"]
+
+[node name="ContainerWindow" type="Panel" unique_id=957782405]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 47.0
+offset_right = 127.0
+offset_bottom = 64.0
+grow_horizontal = 2
+script = ExtResource("1_ilmwu")
+slot_scene = ExtResource("2_rx6q2")
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=641105497]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 64.0
+
+[node name="CloseButton" type="Button" parent="Header" unique_id=1762856948]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "clb"
+
+[node name="Title" type="Label" parent="Header" unique_id=1701895313]
+layout_mode = 2
+text = "conta"
+
+[node name="Slots" type="GridContainer" parent="." unique_id=2081745499]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 1.0
+offset_top = 67.0
+offset_right = 65.0
+offset_bottom = 131.0
+columns = 4

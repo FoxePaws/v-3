@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://god5bgbp0ki2"]
+
+[ext_resource type="Script" uid="uid://c4umom4qojvvo" path="res://items/item_slot_ui.gd" id="1_qqaqf"]
+
+[node name="ItemSlotUI" type="Panel" unique_id=1205559359]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_qqaqf")
+slot_kind = null
+slot_id = null
+slot_index = null
+metadata/_custom_type_script = "uid://c4umom4qojvvo"
+
+[node name="Label" type="Label" parent="." unique_id=988964760]
+z_index = 1
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "sll"
+
+[node name="I" type="TextureRect" parent="." unique_id=1144845480]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+expand_mode = 2
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1554894633]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+expand_mode = 2

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bnyr7aipx1a0e"]
+
+[ext_resource type="Texture2D" uid="uid://bfyafyeeabueh" path="res://textures/ui ic/ui_PL.png" id="1_kvu0t"]
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_qqmqd"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="2_kvu0t"]
+[ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/data/Sw.tscn" id="3_qqmqd"]
+
+[sub_resource type="Resource" id="Resource_2cqfq"]
+script = ExtResource("1_qqmqd")
+shape_name = &"Breast Bra Squish"
+metadata/_custom_type_script = "uid://bqvfbbv2ky2ya"
+
+[resource]
+script = ExtResource("2_kvu0t")
+item_id = &"Sweater"
+display_name = "Sweater"
+item_scene = ExtResource("3_qqmqd")
+icon = ExtResource("1_kvu0t")
+item_type = 1
+equipment_slot = &"Shirt"
+clothing_visual_id = &"Sweater"
+hide_clothing_visuals = Array[StringName]([&"Bra"])
+bone_name = &"Head"
+body_shape_keys = Array[ExtResource("1_qqmqd")]([SubResource("Resource_2cqfq")])

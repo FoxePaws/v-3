@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b7v4hkv3hgvoq"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_4voqa"]
+[ext_resource type="PackedScene" uid="uid://oo6qsa1hu3tj" path="res://items/data/flas.tscn" id="1_k812o"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="2_4voqa"]
+
+[resource]
+script = ExtResource("2_4voqa")
+item_id = &"flas"
+display_name = "flas"
+item_scene = ExtResource("1_k812o")
+is_heavy = true

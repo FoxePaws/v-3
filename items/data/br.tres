@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dbbl4w26tooho"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_fa5sa"]
+[ext_resource type="PackedScene" uid="uid://d0qjli0sj4rpe" path="res://items/data/Br.tscn" id="2_blqqy"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="3_kmhg8"]
+
+[sub_resource type="Resource" id="Resource_n358b"]
+script = ExtResource("1_fa5sa")
+shape_name = &"Breast Bra Squish"
+value = 1.0
+metadata/_custom_type_script = "uid://bqvfbbv2ky2ya"
+
+[resource]
+script = ExtResource("3_kmhg8")
+item_id = &"br"
+display_name = "bra"
+item_scene = ExtResource("2_blqqy")
+item_type = 1
+equipment_slot = &"Bra"
+clothing_visual_id = &"Bra"
+body_shape_keys = Array[ExtResource("1_fa5sa")]([SubResource("Resource_n358b")])

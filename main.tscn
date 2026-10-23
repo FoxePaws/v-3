@@ -1,0 +1,184 @@
+[gd_scene format=3 uid="uid://bcwdwa041bmh"]
+
+[ext_resource type="Texture2D" uid="uid://b505r7n6wra36" path="res://textures/th-2126056594.jpg" id="2_dg77c"]
+[ext_resource type="Texture2D" uid="uid://b3ssn0ps1ec7g" path="res://textures/pesok.png" id="2_kek77"]
+[ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="3_4c57u"]
+[ext_resource type="PackedScene" uid="uid://datumxyio33qi" path="res://Props/rat.tscn" id="3_efxa6"]
+[ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
+[ext_resource type="Resource" uid="uid://b7v4hkv3hgvoq" path="res://items/data/flas.tres" id="4_1bvp3"]
+[ext_resource type="Resource" uid="uid://iuswp188omqg" path="res://items/data/Stick.tres" id="5_lquwl"]
+[ext_resource type="Resource" uid="uid://nbyewndav4kn" path="res://items/data/leuka2_s.tres" id="6_7mycd"]
+[ext_resource type="Resource" uid="uid://b26djfr6je75u" path="res://items/data/Sponge.tres" id="6_efxa6"]
+[ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://Props/static_bodylove_3d.tscn" id="7_272bh"]
+[ext_resource type="Resource" uid="uid://bnyr7aipx1a0e" path="res://items/data/Sweater.tres" id="8_dg77c"]
+[ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
+[ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
+[ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_dg77c"]
+panorama = ExtResource("2_dg77c")
+
+[sub_resource type="Sky" id="Sky_efxa6"]
+sky_material = SubResource("PanoramaSkyMaterial_dg77c")
+
+[sub_resource type="Environment" id="Environment_nb5cy"]
+background_mode = 2
+sky = SubResource("Sky_efxa6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sqlk1"]
+emission_shape = 1
+emission_sphere_radius = 23.97
+inherit_velocity_ratio = 0.089
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 62.5
+initial_velocity_max = 164.06
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nb5cy"]
+transparency = 1
+albedo_color = Color(0.84313726, 0.9137255, 0.98039216, 0.49803922)
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+material = SubResource("StandardMaterial3D_nb5cy")
+radius = 0.01
+height = 0.05
+radial_segments = 4
+rings = 3
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_l6bgn"]
+emission_shape = 1
+emission_sphere_radius = 22.33
+angle_min = -438.8
+angle_max = 315.2
+direction = Vector3(0, -1, 0)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5i8rw"]
+radius = 0.05
+height = 0.01
+radial_segments = 4
+rings = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o6ud7"]
+albedo_texture = ExtResource("2_kek77")
+uv1_scale = Vector3(100, 100, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nb5cy"]
+material = SubResource("StandardMaterial3D_o6ud7")
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_onkwe"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nb5cy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_as5ja"]
+albedo_texture = ExtResource("3_4c57u")
+uv1_scale = Vector3(1.71, 1.71, 1.71)
+uv1_offset = Vector3(-0.52, 0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_onkwe"]
+material = SubResource("StandardMaterial3D_as5ja")
+
+[node name="World" type="Node3D" unique_id=633478889]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
+environment = SubResource("Environment_nb5cy")
+
+[node name="WeatherTimer" type="Timer" parent="." unique_id=326775624]
+wait_time = 60.0
+autostart = true
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1346481109]
+transform = Transform3D(0.85992616, 0.26431903, -0.43664923, 0, 0.85547286, 0.51784766, 0.51041853, -0.4453107, 0.7356435, 0, 23.747242, 0)
+light_color = Color(0.8945121, 0.72392356, 0.6534609, 1)
+light_angular_distance = 1.0
+
+[node name="Weather" type="Node3D" parent="." unique_id=1146020165]
+visible = false
+
+[node name="Rain" type="GPUParticles3D" parent="Weather" unique_id=1576136053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 67.42918, 0)
+emitting = false
+amount = 1000
+process_material = SubResource("ParticleProcessMaterial_sqlk1")
+draw_pass_1 = SubResource("SphereMesh_onkwe")
+
+[node name="Snow" type="GPUParticles3D" parent="Weather" unique_id=312004370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 59.826576, 0)
+emitting = false
+amount = 100
+process_material = SubResource("ParticleProcessMaterial_l6bgn")
+draw_pass_1 = SubResource("SphereMesh_5i8rw")
+
+[node name="ground" type="Node3D" parent="." unique_id=952771900]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground" unique_id=1541148545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/StaticBody3D" unique_id=1861206044]
+mesh = SubResource("BoxMesh_nb5cy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D" unique_id=1353919522]
+shape = SubResource("BoxShape3D_onkwe")
+
+[node name="RigidBody3D" parent="ground/StaticBody3D" unique_id=1367486579 instance=ExtResource("3_efxa6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.251112, 0.49999976, -10.457365)
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="ground" unique_id=1439521744]
+transform = Transform3D(2.997795, -4.0016527, 0, 4.0016527, 2.997795, 0, 0, 0, 5, 9.151661, -1.0860686, -16.621857)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D2" unique_id=308793884]
+shape = SubResource("BoxShape3D_nb5cy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/StaticBody3D2" unique_id=1464021320]
+mesh = SubResource("BoxMesh_onkwe")
+
+[node name="ItemSpawner5" parent="." unique_id=1290192550 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.504463, 0.124922335, -5.4139047)
+item_data = ExtResource("8_dg77c")
+
+[node name="ItemSpawner4" parent="." unique_id=1743032417 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6462502, 0.17278421, -2.9897919)
+item_data = ExtResource("6_efxa6")
+
+[node name="ItemSpawner" parent="." unique_id=886245822 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8231251, -0.00999999, -1.4948959)
+item_data = ExtResource("4_1bvp3")
+
+[node name="ItemSpawner2" parent="." unique_id=1765085527 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0272546, 0.9385525, 5.826148)
+item_data = ExtResource("5_lquwl")
+
+[node name="ItemSpawner3" parent="." unique_id=302078809 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.970517, -0.009999752, 2.3047128)
+item_data = ExtResource("6_7mycd")
+
+[node name="bodylove" parent="." unique_id=1890260861 instance=ExtResource("7_272bh")]
+transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 0, 1, -4.2001705, 0.6435559, 8.317532)
+
+[node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("10_4c57u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+prone_speed = null
+slow_walk_multiplier = null
+jump_velocity = null
+gravity = null
+ground_acceleration = null
+ground_deceleration = null
+air_control = null
+body_turn_speed = null
+body_turn_acceleration = null
+mouse_sensitivity = null
+min_pitch = null
+max_pitch = null
+crouch_root_pitch = null
+lying_root_offset = null
+lying_root_pitch = null
+body_pose_speed = null
+heavy_support_smoothing = null
+
+[node name="ItemSpawner6" parent="." unique_id=2120406206 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0825243, 0.124922335, -5.4139047)
+item_data = ExtResource("13_w48qg")
+
+[node name="ItemSpawner7" parent="." unique_id=267184787 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.232813, 0.124922335, -5.4139047)
+item_data = ExtResource("14_vivmo")

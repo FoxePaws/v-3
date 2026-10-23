@@ -1,0 +1,421 @@
+class_name Player
+extends CharacterBody3D
+
+
+@export_category("Movement")
+@export var walk_speed: float = 4.0
+@export var sprint_speed: float = 7.0
+@export var crouch_speed: float = 2.0
+@export var jump_velocity: float = 5.0
+@export var gravity: float = 18.0
+
+@export_category("Body Rotation")
+@export var camera_dead_zone: float = 35.0
+@export var body_turn_speed: float = 5.0
+@export var body_turn_acceleration: float = 12.0
+
+
+@export_category("Camera")
+@export var mouse_sensitivity: float = 0.0025
+@export var min_pitch: float = deg_to_rad(-85.0)
+@export var max_pitch: float = deg_to_rad(85.0)
+
+
+
+@onready var camera_pivot: Node3D = $CameraPivot
+@onready var camera: Camera3D = $CameraPivot/Camera3D
+@onready var primary_hand: PrimaryHand = (
+	$CameraPivot/Camera3D/PrimaryHand
+)
+@onready var secondary_hand: SecondaryHand = (
+	$SecondaryPoint/SecondaryHand
+)
+
+
+var pitch: float = 0.0
+var is_crouching: bool = false
+var hand_rotation_mode: bool = false
+
+
+func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+	primary_hand.player = self
+	primary_hand.secondary_hand = secondary_hand
+
+	secondary_hand.player = self
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_button_event: InputEventMouseButton = (
+			event as InputEventMouseButton
+		)
+
+		if mouse_button_event.button_index == MOUSE_BUTTON_MIDDLE:
+			hand_rotation_mode = mouse_button_event.pressed
+
+			primary_hand.set_rotation_mode(
+				hand_rotation_mode
+			)
+
+			if hand_rotation_mode:
+				Input.mouse_mode = (
+					Input.MOUSE_MODE_CAPTURED
+				)
+
+			get_viewport().set_input_as_handled()
+
+	if event is InputEventMouseMotion:
+		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			return
+		var mouse_motion_event: InputEventMouseMotion = (
+			event as InputEventMouseMotion
+		)
+
+		if hand_rotation_mode:
+			primary_hand.rotate_by_mouse(
+				mouse_motion_event.relative
+			)
+		else:
+			_rotate_camera_by_mouse(
+				mouse_motion_event.relative
+			)
+
+	if event.is_action_pressed("ui_cancel"):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _physics_process(delta: float) -> void:
+	_apply_gravity(delta)
+
+	var is_moving := has_movement_input()
+
+	_update_body_rotation(
+		delta,
+		is_moving
+	)
+
+	_handle_movement()
+	_handle_crouch()
+
+	move_and_slide()
+
+
+func _process(_delta: float) -> void:
+	_update_secondary_hand_support()
+
+func _rotate_camera_by_mouse(relative: Vector2) -> void:
+	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		return
+
+	camera_pivot.rotation.y -= relative.x * mouse_sensitivity
+
+	pitch -= relative.y * mouse_sensitivity
+	pitch = clamp(pitch, min_pitch, max_pitch)
+
+	camera_pivot.rotation.x = pitch
+
+
+func _apply_gravity(delta: float) -> void:
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	elif Input.is_action_just_pressed("jump") and not is_crouching:
+		velocity.y = jump_velocity
+
+func _handle_movement() -> void:
+	var input_vector := Input.get_vector(
+		"move_left",
+		"move_right",
+		"move_forward",
+		"move_backward"
+	)
+
+	var camera_forward := -camera.global_transform.basis.z
+	var camera_right := camera.global_transform.basis.x
+
+	camera_forward.y = 0.0
+	camera_right.y = 0.0
+
+	camera_forward = camera_forward.normalized()
+	camera_right = camera_right.normalized()
+
+	var move_direction := (
+		camera_right * input_vector.x
+		+ camera_forward * (-input_vector.y)
+	)
+
+	if move_direction.length_squared() > 0.0:
+		move_direction = move_direction.normalized()
+
+	var current_speed := walk_speed
+
+	if is_crouching:
+		current_speed = crouch_speed
+	elif Input.is_action_pressed("sprint"):
+		current_speed = sprint_speed
+
+	if move_direction != Vector3.ZERO:
+		velocity.x = move_direction.x * current_speed
+		velocity.z = move_direction.z * current_speed
+	else:
+		velocity.x = move_toward(
+			velocity.x,
+			0.0,
+			current_speed
+		)
+
+		velocity.z = move_toward(
+			velocity.z,
+			0.0,
+			current_speed
+		)
+
+
+
+func _handle_crouch() -> void:
+	is_crouching = Input.is_action_pressed("crouch")
+
+
+func _update_secondary_hand_support() -> void:
+	var item: ItemInstance = primary_hand.held_item
+
+	# В основной руке ничего нет.
+	if item == null:
+		if secondary_hand.supporting_heavy_item != null:
+			secondary_hand.clear_support()
+
+		return
+
+	# Предмет не является тяжёлым.
+	if not item.is_heavy():
+		if secondary_hand.supporting_heavy_item != null:
+			secondary_hand.clear_support()
+
+		return
+
+	# У тяжёлого предмета не назначена точка второй руки.
+	if item.secondary_grip_point == null:
+		if secondary_hand.supporting_heavy_item != null:
+			secondary_hand.clear_support()
+
+		return
+
+	# Если предмет тяжёлый, вторая рука его поддерживает.
+	secondary_hand.support_item(item)
+
+
+func transfer_item() -> void:
+	var primary_item: ItemInstance = primary_hand.held_item
+	var secondary_item: ItemInstance = secondary_hand.held_item
+
+	# Предмет только в основной руке.
+	if primary_item != null and secondary_item == null:
+		if primary_item.is_heavy():
+			return
+
+		_move_primary_to_secondary()
+		return
+
+	# Предмет только во второй руке.
+	if primary_item == null and secondary_item != null:
+		if secondary_item.is_heavy():
+			return
+
+		_move_secondary_to_primary()
+		return
+
+	# В обеих руках есть предметы.
+	if primary_item != null and secondary_item != null:
+		if primary_item.is_heavy():
+			return
+
+		if secondary_item.is_heavy():
+			return
+
+		_swap_hands()
+
+
+func _move_primary_to_secondary() -> void:
+	var item: ItemInstance = primary_hand.held_item
+
+	if item == null:
+		return
+
+	secondary_hand.clear_support()
+
+	primary_hand.held_item = null
+	secondary_hand.held_item = item
+
+	item.reparent(
+		secondary_hand.held_item_point,
+		false
+	)
+
+	_attach_item_to_hand(
+		item,
+		secondary_hand.held_item_point
+	)
+
+	item.current_hand = secondary_hand
+
+
+func _move_secondary_to_primary() -> void:
+	var item: ItemInstance = secondary_hand.held_item
+
+	if item == null:
+		return
+
+	secondary_hand.clear_support()
+
+	secondary_hand.held_item = null
+	primary_hand.held_item = item
+
+	item.reparent(
+		primary_hand.held_item_point,
+		false
+	)
+
+	_attach_item_to_hand(
+		item,
+		primary_hand.held_item_point
+	)
+
+	item.current_hand = primary_hand
+
+
+func _swap_hands() -> void:
+	var primary_item: ItemInstance = primary_hand.held_item
+	var secondary_item: ItemInstance = secondary_hand.held_item
+
+	if primary_item == null:
+		return
+
+	if secondary_item == null:
+		return
+
+	secondary_hand.clear_support()
+
+	primary_hand.held_item = secondary_item
+	secondary_hand.held_item = primary_item
+
+	secondary_item.reparent(
+		primary_hand.held_item_point,
+		false
+	)
+
+	_attach_item_to_hand(
+		secondary_item,
+		primary_hand.held_item_point
+	)
+
+	secondary_item.current_hand = primary_hand
+
+	primary_item.reparent(
+		secondary_hand.held_item_point,
+		false
+	)
+
+	_attach_item_to_hand(
+		primary_item,
+		secondary_hand.held_item_point
+	)
+
+	primary_item.current_hand = secondary_hand
+
+
+func _attach_item_to_hand(
+	item: ItemInstance,
+	hand_point: Marker3D
+) -> void:
+	if item == null:
+		return
+
+	if hand_point == null:
+		return
+
+	# Если у предмета нет точки основной руки,
+	# используется его корневой Transform.
+	if item.primary_grip_point == null:
+		item.global_transform = (
+			hand_point.global_transform
+		)
+		return
+
+	# Совмещаем PrimaryGripPoint предмета
+	# с HeldItemPoint руки.
+	var grip_transform: Transform3D = (
+		item.primary_grip_point.transform
+	)
+
+	item.global_transform = (
+		hand_point.global_transform
+		* grip_transform.affine_inverse()
+	)
+
+func _update_body_rotation(
+	delta: float,
+	is_moving: bool
+) -> void:
+	var camera_offset := wrapf(
+		camera_pivot.rotation.y,
+		-PI,
+		PI
+	)
+
+	var dead_zone := deg_to_rad(camera_dead_zone)
+
+	# Во время движения тело следует за камерой полностью
+	if is_moving:
+		dead_zone = 0.0
+
+	if abs(camera_offset) <= dead_zone:
+		return
+
+	# Учитываем только угол за пределами мёртвой зоны
+	var rotation_needed := camera_offset
+
+	if camera_offset > 0.0:
+		rotation_needed -= dead_zone
+	else:
+		rotation_needed += dead_zone
+
+	# Чем больше угол, тем выше скорость поворота
+	var angle_factor :float= abs(rotation_needed)
+
+	var current_turn_speed := (
+		body_turn_speed
+		+ angle_factor * body_turn_acceleration
+	)
+
+	var rotation_step := current_turn_speed * delta
+
+	var body_rotation_delta :float= clamp(
+		rotation_needed,
+		-rotation_step,
+		rotation_step
+	)
+
+	rotation.y += body_rotation_delta
+
+	# Сохраняем направление взгляда камеры
+	camera_pivot.rotation.y -= body_rotation_delta
+
+	camera_pivot.rotation.y = wrapf(
+		camera_pivot.rotation.y,
+		-PI,
+		PI
+	)
+
+
+func has_movement_input() -> bool:
+	var input_vector := Input.get_vector(
+		"move_left",
+		"move_right",
+		"move_forward",
+		"move_backward"
+	)
+
+	return input_vector.length_squared() > 0.0

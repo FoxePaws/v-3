@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://iuswp188omqg"]
+
+[ext_resource type="PackedScene" uid="uid://bmxuh4swu04u2" path="res://items/data/Stick.tscn" id="1_6u6vm"]
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_vvojr"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="2_vvojr"]
+
+[resource]
+script = ExtResource("2_vvojr")
+item_id = &"Stick"
+display_name = "Stick"
+item_scene = ExtResource("1_6u6vm")

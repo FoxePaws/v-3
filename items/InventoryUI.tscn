@@ -1,0 +1,234 @@
+[gd_scene format=3 uid="uid://d30cl2vuo7ulx"]
+
+[ext_resource type="Script" uid="uid://byjee8ykm6hi5" path="res://items/inventory_ui.gd" id="1_wlaer"]
+[ext_resource type="PackedScene" uid="uid://own7u54wgyj" path="res://items/data/container_window.tscn" id="2_rqr2y"]
+[ext_resource type="Script" uid="uid://c4umom4qojvvo" path="res://items/item_slot_ui.gd" id="3_ohugl"]
+[ext_resource type="Texture2D" uid="uid://b6ormepjxa8ay" path="res://textures/ui ic/ui_H.png" id="4_d48y1"]
+[ext_resource type="Texture2D" uid="uid://503c5461edst" path="res://textures/ui ic/ui_E.png" id="5_wmq11"]
+[ext_resource type="Texture2D" uid="uid://bgab1nosu7yyq" path="res://textures/ui ic/ui_b.png" id="6_lps7h"]
+[ext_resource type="Texture2D" uid="uid://dg5dgbyj4ccgl" path="res://textures/ui ic/ui_bb.png" id="7_qgsk5"]
+[ext_resource type="Texture2D" uid="uid://drhn1nvycefq" path="res://textures/ui ic/ui_Ears.png" id="8_i8hee"]
+[ext_resource type="Texture2D" uid="uid://ckdaonq532i0o" path="res://textures/ui ic/ui_F.png" id="10_3ek1j"]
+[ext_resource type="Texture2D" uid="uid://cquvfj8620xma" path="res://textures/ui ic/ui_Bust.png" id="11_em5ex"]
+[ext_resource type="Texture2D" uid="uid://gvweykgnaoqg" path="res://textures/ui ic/ui_V.png" id="12_1gioo"]
+[ext_resource type="Texture2D" uid="uid://chn7ehadwgtcm" path="res://textures/ui ic/ui_T.png" id="13_da263"]
+[ext_resource type="Texture2D" uid="uid://bfyafyeeabueh" path="res://textures/ui ic/ui_PL.png" id="14_uwtwp"]
+[ext_resource type="Texture2D" uid="uid://rd8g7wf2vldf" path="res://textures/ui ic/ui_Pant.png" id="15_rbott"]
+[ext_resource type="Texture2D" uid="uid://dkkw41bq1e1ft" path="res://textures/ui ic/ui_Butt.png" id="16_mrt4d"]
+[ext_resource type="Texture2D" uid="uid://dyeywm8epieif" path="res://textures/ui ic/ui_SH.png" id="17_iiuqj"]
+[ext_resource type="PackedScene" uid="uid://god5bgbp0ki2" path="res://items/item_slot_ui.tscn" id="17_t3n1z"]
+[ext_resource type="Texture2D" uid="uid://csml2mm18nddb" path="res://textures/ui ic/ui_P.png" id="18_ntcqj"]
+
+[node name="InventoryUI" type="CanvasLayer" unique_id=2047850519 node_paths=PackedStringArray("hand_slots", "equipment_slots")]
+script = ExtResource("1_wlaer")
+container_window_scene = ExtResource("2_rqr2y")
+hand_slots = [NodePath("PlayerWindow/HBoxContainer/RightHandSlot"), NodePath("PlayerWindow/HBoxContainer/LeftHandSlot")]
+equipment_slots = [NodePath("PlayerWindow/GridContainer/Head"), NodePath("PlayerWindow/GridContainer/Eyes"), NodePath("PlayerWindow/GridContainer/Bakpack"), NodePath("PlayerWindow/GridContainer/Bu"), NodePath("PlayerWindow/GridContainer/Ears"), NodePath("PlayerWindow/GridContainer/Mask"), NodePath("PlayerWindow/GridContainer/Bra"), NodePath("PlayerWindow/GridContainer/Va"), NodePath("PlayerWindow/GridContainer/Shirt"), NodePath("PlayerWindow/GridContainer/Appar"), NodePath("PlayerWindow/GridContainer/Pants"), NodePath("PlayerWindow/GridContainer/Ass"), NodePath("PlayerWindow/GridContainer/Foot"), NodePath("PlayerWindow/GridContainer/Pans"), NodePath("PlayerWindow/GridContainer/Eee")]
+
+[node name="PlayerWindow" type="Panel" parent="." unique_id=107057571]
+custom_minimum_size = Vector2(420, 400)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CloseButton" type="Button" parent="PlayerWindow" unique_id=1662354254]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 351.0
+offset_top = 213.0
+offset_right = 415.0
+offset_bottom = 277.0
+text = "clb
+"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerWindow" unique_id=903279585]
+layout_mode = 0
+offset_left = 285.0
+offset_top = 3.0
+offset_right = 417.0
+offset_bottom = 67.0
+
+[node name="LeftHandSlot" parent="PlayerWindow/HBoxContainer" unique_id=720572908 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 0
+slot_id = &"LeftHandSlot"
+slot_index = 1
+
+[node name="RightHandSlot" parent="PlayerWindow/HBoxContainer" unique_id=1205559359 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 0
+slot_id = &"RightHandSlot"
+
+[node name="GridContainer" type="GridContainer" parent="PlayerWindow" unique_id=892741722]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 3.0
+offset_right = 272.0
+offset_bottom = 271.0
+columns = 4
+
+[node name="Head" parent="PlayerWindow/GridContainer" unique_id=1952767757 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Head"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Head" index="1" unique_id=1144845480]
+texture = ExtResource("4_d48y1")
+
+[node name="Eyes" parent="PlayerWindow/GridContainer" unique_id=1701510437 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Eyes"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Eyes" index="1" unique_id=1144845480]
+texture = ExtResource("5_wmq11")
+
+[node name="Bakpack" parent="PlayerWindow/GridContainer" unique_id=1746513994 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Bakpack"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Bakpack" index="1" unique_id=1144845480]
+texture = ExtResource("6_lps7h")
+
+[node name="Bu" parent="PlayerWindow/GridContainer" unique_id=609547242 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Bu"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Bu" index="1" unique_id=1144845480]
+texture = ExtResource("7_qgsk5")
+
+[node name="Ears" parent="PlayerWindow/GridContainer" unique_id=1794258597 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Ears"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Ears" index="1" unique_id=1144845480]
+texture = ExtResource("8_i8hee")
+
+[node name="Mask" type="Panel" parent="PlayerWindow/GridContainer" unique_id=2118401784]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("3_ohugl")
+slot_kind = 1
+slot_id = &"Mask"
+slot_index = 3
+metadata/_custom_type_script = "uid://c4umom4qojvvo"
+
+[node name="Label" type="Label" parent="PlayerWindow/GridContainer/Mask" unique_id=988964760]
+z_index = 1
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "sll"
+
+[node name="I" type="TextureRect" parent="PlayerWindow/GridContainer/Mask" unique_id=982130926]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+texture = ExtResource("10_3ek1j")
+expand_mode = 2
+
+[node name="Icon" type="TextureRect" parent="PlayerWindow/GridContainer/Mask" unique_id=1554894633]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+expand_mode = 2
+
+[node name="Bra" parent="PlayerWindow/GridContainer" unique_id=2104889669 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Bra"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Bra" index="1" unique_id=1144845480]
+texture = ExtResource("11_em5ex")
+
+[node name="Va" parent="PlayerWindow/GridContainer" unique_id=307699213 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Va"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Va" index="1" unique_id=1144845480]
+texture = ExtResource("12_1gioo")
+
+[node name="Shirt" parent="PlayerWindow/GridContainer" unique_id=1270722589 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Shirt"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Shirt" index="1" unique_id=1144845480]
+texture = ExtResource("13_da263")
+
+[node name="Appar" parent="PlayerWindow/GridContainer" unique_id=1525510581 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Appar"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Appar" index="1" unique_id=1144845480]
+texture = ExtResource("14_uwtwp")
+
+[node name="Pants" parent="PlayerWindow/GridContainer" unique_id=1499968016 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Pants"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Pants" index="1" unique_id=1144845480]
+texture = ExtResource("15_rbott")
+
+[node name="Ass" parent="PlayerWindow/GridContainer" unique_id=967878525 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Ass"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Ass" index="1" unique_id=1144845480]
+texture = ExtResource("16_mrt4d")
+
+[node name="Foot" parent="PlayerWindow/GridContainer" unique_id=1056817418 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Foot"
+slot_index = 3
+
+[node name="I" parent="PlayerWindow/GridContainer/Foot" index="1" unique_id=1144845480]
+texture = ExtResource("17_iiuqj")
+
+[node name="Pans" parent="PlayerWindow/GridContainer" unique_id=244270043 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+
+[node name="I" parent="PlayerWindow/GridContainer/Pans" index="1" unique_id=1144845480]
+texture = ExtResource("18_ntcqj")
+
+[node name="Eee" parent="PlayerWindow/GridContainer" unique_id=221324008 instance=ExtResource("17_t3n1z")]
+layout_mode = 2
+slot_kind = 1
+slot_id = &"Eee"
+slot_index = 3
+
+[editable path="PlayerWindow/GridContainer/Head"]
+[editable path="PlayerWindow/GridContainer/Eyes"]
+[editable path="PlayerWindow/GridContainer/Bakpack"]
+[editable path="PlayerWindow/GridContainer/Bu"]
+[editable path="PlayerWindow/GridContainer/Ears"]
+[editable path="PlayerWindow/GridContainer/Bra"]
+[editable path="PlayerWindow/GridContainer/Va"]
+[editable path="PlayerWindow/GridContainer/Shirt"]
+[editable path="PlayerWindow/GridContainer/Appar"]
+[editable path="PlayerWindow/GridContainer/Pants"]
+[editable path="PlayerWindow/GridContainer/Ass"]
+[editable path="PlayerWindow/GridContainer/Foot"]
+[editable path="PlayerWindow/GridContainer/Pans"]
+[editable path="PlayerWindow/GridContainer/Eee"]

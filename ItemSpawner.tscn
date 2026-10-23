@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cnr5cm15ysi40"]
+
+[ext_resource type="Script" uid="uid://d2dpbmsjud5kb" path="res://item_spawner.gd" id="1_ctm2s"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_nb5cy"]
+
+[node name="ItemSpawner" type="Node3D" unique_id=1743032417 node_paths=PackedStringArray("spawn_parent")]
+script = ExtResource("1_ctm2s")
+spawn_parent = NodePath(".")
+
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=1716514524]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=772369943]
+transform = Transform3D(0.28046304, 0, 0, 0, 1, 0, 0, 0, 0.39826137, 0, 0.53271484, 0)
+mesh = SubResource("PrismMesh_nb5cy")

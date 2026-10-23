@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://bcwdwa041bmh"]
+
+[ext_resource type="Texture2D" uid="uid://b505r7n6wra36" path="res://textures/th-2126056594.jpg" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
+[ext_resource type="Resource" uid="uid://b7v4hkv3hgvoq" path="res://items/data/flas.tres" id="4_1bvp3"]
+[ext_resource type="Resource" uid="uid://iuswp188omqg" path="res://items/data/Stick.tres" id="5_lquwl"]
+[ext_resource type="Resource" uid="uid://nbyewndav4kn" path="res://new folder/leuka2_s.tres" id="6_7mycd"]
+[ext_resource type="PackedScene" uid="uid://dcv7nk0md4kjy" path="res://player/playermal.tscn" id="7_5vw27"]
+[ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://new folder/static_bodylove_3d.tscn" id="7_272bh"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_sqlk1"]
+panorama = ExtResource("1_0xm2m")
+
+[sub_resource type="Sky" id="Sky_nb5cy"]
+sky_material = SubResource("PanoramaSkyMaterial_sqlk1")
+
+[sub_resource type="Environment" id="Environment_onkwe"]
+background_mode = 2
+sky = SubResource("Sky_nb5cy")
+
+[sub_resource type="BoxMesh" id="BoxMesh_nb5cy"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_onkwe"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nb5cy"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_onkwe"]
+
+[node name="Node3D" type="Node3D" unique_id=633478889]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1943477385]
+environment = SubResource("Environment_onkwe")
+
+[node name="ground" type="Node3D" parent="." unique_id=952771900]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="ground" unique_id=1541148545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/StaticBody3D" unique_id=1861206044]
+mesh = SubResource("BoxMesh_nb5cy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D" unique_id=1353919522]
+shape = SubResource("BoxShape3D_onkwe")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="ground" unique_id=1439521744]
+transform = Transform3D(2.997795, -4.0016527, 0, 4.0016527, 2.997795, 0, 0, 0, 5, 9.151661, -1.0860686, -16.621857)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D2" unique_id=308793884]
+shape = SubResource("BoxShape3D_nb5cy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/StaticBody3D2" unique_id=1464021320]
+mesh = SubResource("BoxMesh_onkwe")
+
+[node name="ItemSpawner" parent="." unique_id=1743032417 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8231251, -0.00999999, -1.4948959)
+item_data = ExtResource("4_1bvp3")
+
+[node name="ItemSpawner2" parent="." unique_id=1765085527 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0272546, 0.9385525, 5.826148)
+item_data = ExtResource("5_lquwl")
+
+[node name="ItemSpawner3" parent="." unique_id=302078809 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.970517, -0.009999752, 2.3047128)
+item_data = ExtResource("6_7mycd")
+
+[node name="StaticBody3D" parent="." unique_id=1890260861 instance=ExtResource("7_272bh")]
+transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 0, 1, -4.2001705, 0.6435559, 8.317532)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=106957202]
+transform = Transform3D(-0.73341537, -0.56077635, -0.38422912, 0.2513502, -0.7488753, 0.6131955, -0.6316052, 0.35315084, 0.69018793, 0, 9.97913, 9.754644)
+
+[node name="Player" parent="." unique_id=1530685651 instance=ExtResource("7_5vw27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

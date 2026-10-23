@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b26djfr6je75u"]
+
+[ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/data/sponge.tscn" id="1_ixpdl"]
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_nwvhl"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="2_nwvhl"]
+
+[resource]
+script = ExtResource("2_nwvhl")
+item_id = &"Sponge"
+display_name = "Sponge"
+item_scene = ExtResource("1_ixpdl")

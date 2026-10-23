@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://drjtvawg4ta0c"]
+
+[ext_resource type="Script" uid="uid://dgls32hf2yal5" path="res://Props/HitReceiver.gd" id="1_28uwr"]
+[ext_resource type="Script" uid="uid://f07vidkccx2b" path="res://Props/HeartHitEffect.gd" id="2_cveye"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_onkwe"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_nb5cy"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nb5cy"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_onkwe"]
+direction = Vector3(0, 1, 0)
+spread = 11.549
+initial_velocity_min = 6.54
+initial_velocity_max = 14.799999
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sqlk1"]
+transparency = 1
+albedo_color = Color(0.90588236, 0.41568628, 0.77254903, 0.60784316)
+
+[sub_resource type="TorusMesh" id="TorusMesh_nb5cy"]
+material = SubResource("StandardMaterial3D_sqlk1")
+inner_radius = 0.02
+outer_radius = 0.292
+rings = 4
+ring_segments = 4
+
+[node name="StaticBody3D" type="StaticBody3D" unique_id=1890260861]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=92537306]
+shape = SubResource("BoxShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1355918316]
+mesh = SubResource("BoxMesh_nb5cy")
+
+[node name="HitReceiver" type="Area3D" parent="." unique_id=611100375]
+script = ExtResource("1_28uwr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitReceiver" unique_id=1445604443]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("BoxShape3D_nb5cy")
+
+[node name="HeartHitEffect" type="Node3D" parent="HitReceiver" unique_id=549189017 node_paths=PackedStringArray("hit_receiver", "particles")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6966381, 0.74741966, 0)
+script = ExtResource("2_cveye")
+hit_receiver = NodePath("..")
+particles = NodePath("GPUParticles3D")
+effect_offset = null
+restart_on_new_hit = null
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="HitReceiver/HeartHitEffect" unique_id=1696349683]
+emitting = false
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_onkwe")
+draw_pass_1 = SubResource("TorusMesh_nb5cy")
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="." unique_id=1120393963]

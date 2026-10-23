@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://5etdi4rh1jou"]
+
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_ovdhr"]
+[ext_resource type="Texture2D" uid="uid://rd8g7wf2vldf" path="res://textures/ui ic/ui_Pant.png" id="2_vn14l"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u684e"]
+albedo_texture = ExtResource("2_vn14l")
+uv1_scale = Vector3(5, 5, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_onkwe"]
+material = SubResource("StandardMaterial3D_u684e")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nb5cy"]
+
+[node name="Pa" type="RigidBody3D" unique_id=715328478 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
+script = ExtResource("1_ovdhr")
+primary_grip_point = NodePath("PrimaryGripPoint")
+secondary_grip_point = NodePath("SecondaryGripPoint")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2063148838]
+mesh = SubResource("BoxMesh_onkwe")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=836389503]
+shape = SubResource("BoxShape3D_nb5cy")
+
+[node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=277796513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.51937973, 0)
+
+[node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=1341223856]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.51937973, 0)
+
+[node name="AttachPoint" type="Marker3D" parent="." unique_id=1451120272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.51937973, 0)

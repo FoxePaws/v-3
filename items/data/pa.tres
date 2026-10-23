@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bws3wcm57x01w"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_438jn"]
+[ext_resource type="PackedScene" uid="uid://5etdi4rh1jou" path="res://items/data/Pa.tscn" id="2_8or6q"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="3_xtwst"]
+
+[resource]
+script = ExtResource("3_xtwst")
+item_id = &"pa"
+display_name = "Panties"
+item_scene = ExtResource("2_8or6q")
+item_type = 1
+equipment_slot = &"Pants"
+clothing_visual_id = &"Panties"

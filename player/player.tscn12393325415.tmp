@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://dsnoyxm4hy5j1"]
+
+[ext_resource type="Script" uid="uid://cxo42ntpfsvye" path="res://player/player.gd" id="1_oul6g"]
+[ext_resource type="Script" uid="uid://b3nhxb3tyvxqh" path="res://player/primary_hand.gd" id="2_rkbax"]
+[ext_resource type="Script" uid="uid://dvka66i8etb0t" path="res://player/secondary_hand.gd" id="3_g1dw6"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onkwe"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nb5cy"]
+
+[sub_resource type="TorusMesh" id="TorusMesh_onkwe"]
+rings = 8
+ring_segments = 4
+
+[sub_resource type="TorusMesh" id="TorusMesh_rkbax"]
+rings = 8
+ring_segments = 4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
+radius = 0.1
+
+[node name="Player" type="CharacterBody3D" unique_id=1530685651]
+collision_layer = 2
+script = ExtResource("1_oul6g")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=751413057]
+shape = SubResource("CapsuleShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=695457770]
+mesh = SubResource("CapsuleMesh_nb5cy")
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=1858352272]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=361342548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0.0016725659)
+
+[node name="PrimaryHand" type="Node3D" parent="CameraPivot/Camera3D" unique_id=594048193 node_paths=PackedStringArray("held_item_point", "heavy_support_point", "hand_collision_cast")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4071321, -0.26802087, -0.75585836)
+script = ExtResource("2_rkbax")
+held_item_point = NodePath("HeldItemPoint")
+heavy_support_point = NodePath("HeavySupportPoint")
+hand_collision_cast = NodePath("HandCollisionCast")
+hand_distance = 0.5
+min_hand_distance = 0.3
+max_hand_distance = 1.0
+collision_margin = 0.012
+
+[node name="HandMesh" type="MeshInstance3D" parent="CameraPivot/Camera3D/PrimaryHand" unique_id=2071022830]
+transform = Transform3D(0.1, 0, 0, 0, -4.371139e-09, -0.1, 0, 0.1, -4.371139e-09, 0.031912982, 0, 0.060782343)
+mesh = SubResource("TorusMesh_onkwe")
+
+[node name="HandMesh" type="MeshInstance3D" parent="CameraPivot/Camera3D/PrimaryHand/HandMesh" unique_id=1947320618]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, -0.65718555, 0)
+mesh = SubResource("TorusMesh_rkbax")
+
+[node name="HeldItemPoint" type="Marker3D" parent="CameraPivot/Camera3D/PrimaryHand" unique_id=1884359382]
+
+[node name="HandCollisionCast" type="ShapeCast3D" parent="CameraPivot/Camera3D/PrimaryHand" unique_id=1070797418]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.009844542)
+shape = SubResource("SphereShape3D_onkwe")
+target_position = Vector3(0, 0, -1)
+max_results = 64
+
+[node name="HeavySupportPoint" type="Marker3D" parent="CameraPivot/Camera3D/PrimaryHand" unique_id=1747568712]
+
+[node name="SecondaryHand" type="Node3D" parent="." unique_id=2140900446]
+script = ExtResource("3_g1dw6")
+
+[node name="HeldItemPoint" type="Marker3D" parent="SecondaryHand" unique_id=1437776206]
+
+[node name="GroundRay" type="RayCast3D" parent="." unique_id=325615559]

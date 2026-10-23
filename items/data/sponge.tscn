@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dmo1ghbwifhf6"]
+
+[ext_resource type="Script" uid="uid://2k87ppagagdj" path="res://items/data/sponge.gd" id="1_ul3mm"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onkwe"]
+radius = 0.05
+height = 0.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nb5cy"]
+radius = 0.05
+height = 0.2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_onkwe"]
+lightmap_size_hint = Vector2i(2, 3)
+size = Vector2(0.1, 0.2)
+
+[node name="Sponge" type="RigidBody3D" unique_id=1831414451 node_paths=PackedStringArray("sponge_surface_cast", "primary_grip_point")]
+script = ExtResource("1_ul3mm")
+attach_distance = 0.8
+max_surface_slide_distance = 0.5
+reverse_surface_direction = true
+grip_forward_axis = Vector3(-1, 0, 0)
+grip_up_axis = Vector3(-1, 0, 0)
+sponge_surface_cast = NodePath("SpongeSurfaceCast")
+primary_grip_point = NodePath("PrimaryGripPoint")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1875837778]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2063294756]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_nb5cy")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=848728604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.041385423, 0)
+mesh = SubResource("PlaneMesh_onkwe")
+
+[node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=463057332]
+transform = Transform3D(-0.00076161616, 0.9999997, 0, -0.9999997, -0.00076161616, 0, 0, 0, 1, 0, 0.043582276, 0)
+
+[node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=744807932]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.043582276, 0)
+
+[node name="SpongeSurfaceCast" type="RayCast3D" parent="." unique_id=400868476]
