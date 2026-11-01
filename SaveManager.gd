@@ -31,11 +31,49 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 	var records: Array[Dictionary] = []
 	for item: ItemInstance in _find_items(scene):
 		if item.data == null:
+			push_warning("SaveManager: пропущен предмет без ItemData: %s" % item.get_path())
 			continue
-		records.append(_make_record(item, player))
 
-	# Здесь создание каталога, открытие файла и запись records.
-	# Вызов JSON.stringify должен быть внутри этой функции.
+		if item.data.resource_path.is_empty():
+			push_warning("SaveManager: у ItemData нет resource_path: %s" % item.get_path())
+			continue
+
+		var record: Dictionary = _make_record(item, player)
+		record["instance_id"] = item.instance_id
+		record["durability"] = item.durability
+		record["flags"] = item.flags.duplicate(true)
+		records.append(record)
+
+	var save_path: String = _get_save_path(slot_name)
+	var directory_error: Error = DirAccess.make_dir_recursive_absolute(
+		ProjectSettings.globalize_path(SAVE_DIRECTORY)
+	)
+	if directory_error != OK:
+		push_error("SaveManager: не удалось создать каталог сохранений: %s" % error_string(directory_error))
+		return false
+
+	var file: FileAccess = FileAccess.open(save_path, FileAccess.WRITE)
+	if file == null:
+		push_error("SaveManager: не удалось открыть файл для записи: %s (%s)" % [
+			save_path,
+			error_string(FileAccess.get_open_error())
+		])
+		return false
+
+	var save_data: Dictionary = {
+		"version": 1,
+		"items": records,
+	}
+	file.store_string(JSON.stringify(save_data, "\t"))
+	file.flush()
+
+	var write_error: Error = file.get_error()
+	file.close()
+	if write_error != OK:
+		push_error("SaveManager: ошибка записи %s: %s" % [save_path, error_string(write_error)])
+		return false
+
+	print("SaveManager: сохранено предметов: %d; слот: %s" % [records.size(), save_path])
 	return true
 
 
@@ -50,11 +88,84 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 		push_error("SaveManager: Player не найден")
 		return false
 
-	# Здесь чтение и проверка JSON.
-	# После разбора файла:
+	var save_path: String = _get_save_path(slot_name)
+	if not FileAccess.file_exists(save_path):
+		push_error("SaveManager: файл сохранения не найден: %s" % save_path)
+		return false
+
+	var file: FileAccess = FileAccess.open(save_path, FileAccess.READ)
+	if file == null:
+		push_error("SaveManager: не удалось открыть файл: %s (%s)" % [
+			save_path,
+			error_string(FileAccess.get_open_error())
+		])
+		return false
+
+	var json_text: String = file.get_as_text()
+	file.close()
+
+	var json: JSON = JSON.new()
+	var parse_error: Error = json.parse(json_text)
+	if parse_error != OK:
+		push_error("SaveManager: ошибка JSON в строке %d: %s" % [
+			json.get_error_line(),
+			json.get_error_message()
+		])
+		return false
+
+	var parsed_data: Variant = json.data
+	if not parsed_data is Dictionary:
+		push_error("SaveManager: корень файла сохранения должен быть Dictionary")
+		return false
+
+	var save_data: Dictionary = parsed_data as Dictionary
+	var raw_records: Variant = save_data.get("items", [])
+	if not raw_records is Array:
+		push_error("SaveManager: поле 'items' должно быть Array")
+		return false
+
+	var records: Array[Dictionary] = []
+	for raw_record: Variant in raw_records:
+		if raw_record is Dictionary:
+			records.append(raw_record as Dictionary)
+		else:
+			push_warning("SaveManager: пропущена некорректная запись предмета")
+
+	# Удаляем текущие предметы только после успешного чтения и проверки JSON.
 	await _clear_existing_items(scene, player)
 
-	# Здесь создание и восстановление предметов.
+	# Создаём сначала все экземпляры, чтобы предметы-контейнеры уже
+	# существовали к моменту восстановления вложенных в них предметов.
+	var instances: Dictionary[String, ItemInstance] = {}
+	var restored_items: Array[ItemInstance] = []
+	var item_locations: Array[Dictionary] = []
+
+	for record: Dictionary in records:
+		var item: ItemInstance = _create_item_from_record(record)
+		if item == null:
+			continue
+
+		scene.add_child(item)
+		restored_items.append(item)
+		item_locations.append(record.get("location", {}) as Dictionary)
+
+		var id: String = str(record.get("instance_id", item.instance_id))
+		if not id.is_empty():
+			instances[id] = item
+
+	# Ждём _ready() созданных сцен: у контейнеров к этому моменту
+	# должны быть готовы узлы и массивы слотов.
+	await get_tree().process_frame
+
+	for index: int in range(restored_items.size()):
+		var item: ItemInstance = restored_items[index]
+		var location: Dictionary = item_locations[index]
+		_restore_location(item, location, instances, player, scene)
+
+	print("SaveManager: восстановлено предметов: %d; слот: %s" % [
+		restored_items.size(),
+		save_path
+	])
 	return true
 
 
@@ -236,3 +347,29 @@ func _array_to_vector(value: Variant, fallback: Vector3) -> Vector3:
 		float(value[1]),
 		float(value[2])
 	)
+
+func _create_item_from_record(record: Dictionary) -> ItemInstance:
+	var data_path: String = str(record.get("item_data_path", ""))
+	if data_path.is_empty():
+		push_warning("SaveManager: у записи предмета нет item_data_path")
+		return null
+
+	var loaded_resource: Resource = load(data_path)
+	if loaded_resource == null or not loaded_resource is ItemData:
+		push_warning("SaveManager: не удалось загрузить ItemData: %s" % data_path)
+		return null
+
+	var item_data: ItemData = loaded_resource as ItemData
+	var instance_state: Dictionary = {
+		"instance_id": str(record.get("instance_id", "")),
+		"state": record.get("state", {}),
+		"durability": record.get("durability", item_data.max_durability),
+		"flags": record.get("flags", {}),
+	}
+
+	var item: ItemInstance = ItemFactory.create_item(item_data, instance_state)
+	if item == null:
+		push_warning("SaveManager: ItemFactory не создала предмет из %s" % data_path)
+		return null
+
+	return item
