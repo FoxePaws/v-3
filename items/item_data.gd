@@ -45,6 +45,9 @@ enum ItemType {
 @export var head_shape_keys: Array[BlendShapeSetting] = []
 @export var sweater_shape_keys: Array[BlendShapeSetting] = []
 
+@export_category("Durability")
+@export_range(0.0, 100000.0, 0.1) var max_durability: float = 100.0
+
 @export_category("Collision")
 @export_flags_3d_physics var collision_layer: int = 8
 @export_flags_3d_physics var collision_mask: int = 1

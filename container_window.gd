@@ -12,9 +12,12 @@ signal closed
 var player: Player
 var container: ItemContainer
 
-
 func _ready() -> void:
-	close_button.pressed.connect(close_window)
+	if not close_button.pressed.is_connected(close_window):
+		close_button.pressed.connect(close_window)
+
+	if container != null:
+		_setup_window()
 
 
 func setup(new_container: ItemContainer, new_player: Player) -> void:

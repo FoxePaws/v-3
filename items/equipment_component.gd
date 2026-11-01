@@ -283,3 +283,30 @@ func _apply_winning_settings(
 			continue
 
 		mesh_instance.set_blend_shape_value(shape_index, setting.value)
+
+func get_slot_contents() -> Dictionary:
+	var result: Dictionary = {}
+
+	for slot_id: StringName in slot_ids:
+		var item: ItemInstance = get_item(slot_id) as ItemInstance
+		if item != null:
+			result[slot_id] = item
+
+	return result
+
+
+func restore_item(item: ItemInstance, slot_id: StringName) -> bool:
+	if not slots.has(slot_id):
+		return false
+	return equip(item, slot_id)
+
+
+func clear_slots_for_load() -> void:
+	for slot_id: StringName in slot_ids:
+		slots[slot_id] = null
+
+	_refresh_clothing_visibility()
+	refresh_equipment_blend_shapes()
+
+	if player != null:
+		player.recalculate_equipment_stats()
