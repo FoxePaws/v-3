@@ -59,9 +59,20 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 			error_string(FileAccess.get_open_error())
 		])
 		return false
+	var player_transform: Transform3D = player.global_transform
+	var player_rotation: Quaternion = player_transform.basis.get_rotation_quaternion()
 
 	var save_data: Dictionary = {
 		"version": 1,
+		"player": {
+			"position": _vector_to_array(player_transform.origin),
+			"rotation": [
+				player_rotation.x,
+				player_rotation.y,
+				player_rotation.z,
+				player_rotation.w,
+			],
+		},
 		"items": records,
 	}
 	file.store_string(JSON.stringify(save_data, "\t"))
@@ -131,9 +142,19 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 		else:
 			push_warning("SaveManager: пропущена некорректная запись предмета")
 
+
+	var raw_player_data: Variant = save_data.get("player", {})
+	if not raw_player_data is Dictionary:
+		push_error("SaveManager: поле 'player' должно быть Dictionary")
+		return false
+
+	var player_data: Dictionary = raw_player_data as Dictionary
+
 	# Удаляем текущие предметы только после успешного чтения и проверки JSON.
 	await _clear_existing_items(scene, player)
 
+	_restore_player_transform(player, player_data)
+	
 	# Создаём сначала все экземпляры, чтобы предметы-контейнеры уже
 	# существовали к моменту восстановления вложенных в них предметов.
 	var instances: Dictionary[String, ItemInstance] = {}
@@ -373,3 +394,30 @@ func _create_item_from_record(record: Dictionary) -> ItemInstance:
 		return null
 
 	return item
+
+
+func _restore_player_transform(player: Player, player_data: Dictionary) -> void:
+	var position: Vector3 = _array_to_vector(
+		player_data.get("position", []),
+		player.global_position
+	)
+
+	var raw_rotation: Variant = player_data.get("rotation", [])
+	if not raw_rotation is Array or raw_rotation.size() != 4:
+		push_warning("SaveManager: rotation игрока отсутствует или некорректна")
+		player.global_position = position
+		return
+
+	var rotation_data: Array = raw_rotation as Array
+	var rotation: Quaternion = Quaternion(
+		float(rotation_data[0]),
+		float(rotation_data[1]),
+		float(rotation_data[2]),
+		float(rotation_data[3])
+	).normalized()
+
+	player.velocity = Vector3.ZERO
+	player.global_transform = Transform3D(
+		Basis(rotation),
+		position
+	)
