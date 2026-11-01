@@ -37,12 +37,7 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 		if item.data.resource_path.is_empty():
 			push_warning("SaveManager: у ItemData нет resource_path: %s" % item.get_path())
 			continue
-
-		var record: Dictionary = _make_record(item, player)
-		record["instance_id"] = item.instance_id
-		record["durability"] = item.durability
-		record["flags"] = item.flags.duplicate(true)
-		records.append(record)
+		records.append(_make_record(item, player))
 
 	var save_path: String = _get_save_path(slot_name)
 	var directory_error: Error = DirAccess.make_dir_recursive_absolute(
@@ -202,11 +197,13 @@ func _get_save_path(slot_name: String) -> String:
 
 	return "%s/%s.json" % [SAVE_DIRECTORY, safe_name]
 
-
 func _make_record(item: ItemInstance, player: Player) -> Dictionary:
 	return {
 		"item_data_path": item.data.resource_path,
-		"state": item.make_state_dict(),
+		"instance_id": item.instance_id,
+		"durability": item.durability,
+		"flags": item.flags.duplicate(true),
+		"state": item.state.duplicate(true),
 		"location": _get_location(item, player),
 	}
 
@@ -381,11 +378,19 @@ func _create_item_from_record(record: Dictionary) -> ItemInstance:
 		return null
 
 	var item_data: ItemData = loaded_resource as ItemData
+	var saved_custom_state: Variant = record.get("state", {})
+	var saved_flags: Variant = record.get("flags", {})
+
+	if not saved_custom_state is Dictionary:
+		saved_custom_state = {}
+	if not saved_flags is Dictionary:
+		saved_flags = {}
+
 	var instance_state: Dictionary = {
 		"instance_id": str(record.get("instance_id", "")),
-		"state": record.get("state", {}),
 		"durability": record.get("durability", item_data.max_durability),
-		"flags": record.get("flags", {}),
+		"flags": (saved_flags as Dictionary).duplicate(true),
+		"state": (saved_custom_state as Dictionary).duplicate(true),
 	}
 
 	var item: ItemInstance = ItemFactory.create_item(item_data, instance_state)
