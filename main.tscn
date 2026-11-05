@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bcwdwa041bmh"]
 
 [ext_resource type="Script" uid="uid://cb8gve05hvg7p" path="res://main.gd" id="1_vivmo"]
-[ext_resource type="Texture2D" uid="uid://b505r7n6wra36" path="res://textures/th-2126056594.jpg" id="2_dg77c"]
 [ext_resource type="Texture2D" uid="uid://b3ssn0ps1ec7g" path="res://textures/pesok.png" id="2_kek77"]
+[ext_resource type="Shader" uid="uid://bjjg308nydhpe" path="res://world_sky.gdshader" id="2_vivmo"]
 [ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="3_4c57u"]
 [ext_resource type="PackedScene" uid="uid://datumxyio33qi" path="res://Props/rat.tscn" id="3_efxa6"]
 [ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
@@ -16,15 +16,22 @@
 [ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
 [ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_dg77c"]
-panorama = ExtResource("2_dg77c")
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2cqfq"]
+shader = ExtResource("2_vivmo")
+shader_parameter/cloud_coverage = 0.25
+shader_parameter/cloud_scale = 3.0
+shader_parameter/cloud_wind_angle = 0.0
+shader_parameter/star_rotation = 0.0
+shader_parameter/star_intensity = 1.0
+shader_parameter/moon_direction = Vector3(0, -0.5, 0)
+shader_parameter/moon_intensity = 0.8
 
-[sub_resource type="Sky" id="Sky_efxa6"]
-sky_material = SubResource("PanoramaSkyMaterial_dg77c")
+[sub_resource type="Sky" id="Sky_yaehf"]
+sky_material = SubResource("ShaderMaterial_2cqfq")
 
-[sub_resource type="Environment" id="Environment_nb5cy"]
+[sub_resource type="Environment" id="Environment_2cqfq"]
 background_mode = 2
-sky = SubResource("Sky_efxa6")
+sky = SubResource("Sky_yaehf")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sqlk1"]
 emission_shape = 1
@@ -81,9 +88,13 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
+day_length_seconds = 30.01
+cloud_coverage = 0.51
+wind_direction = Vector2(1.32, 11)
+wind_speed = 4.54
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
-environment = SubResource("Environment_nb5cy")
+environment = SubResource("Environment_2cqfq")
 
 [node name="WeatherTimer" type="Timer" parent="." unique_id=326775624]
 wait_time = 60.0
@@ -93,9 +104,9 @@ autostart = true
 transform = Transform3D(0.85992616, 0.26431903, -0.43664923, 0, 0.85547286, 0.51784766, 0.51041853, -0.4453107, 0.7356435, 0, 23.747242, 0)
 light_color = Color(0.8945121, 0.72392356, 0.6534609, 1)
 light_angular_distance = 1.0
+shadow_enabled = true
 
 [node name="Weather" type="Node3D" parent="." unique_id=1146020165]
-visible = false
 
 [node name="Rain" type="GPUParticles3D" parent="Weather" unique_id=1576136053]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 67.42918, 0)

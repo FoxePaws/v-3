@@ -1,70 +1,131 @@
 shader_type sky;
 
-uniform vec3 sun_direction = vec3(0.0, 0.5, 0.0);
-uniform vec3 moon_direction = vec3(0.0, -0.5, 0.0);
-
 uniform float cloud_coverage : hint_range(0.0, 1.0) = 0.25;
-uniform float cloud_scale : hint_range(0.1, 20.0) = 3.0;
-uniform vec2 wind_offset = vec2(0.0);
+uniform float cloud_scale : hint_range(1.0, 30.0) = 8.0;
+uniform float cloud_wind_angle = 0.0;
 
-uniform float star_intensity : hint_range(0.0, 3.0) = 1.0;
-uniform float moon_intensity : hint_range(0.0, 3.0) = 0.8;
+uniform float star_rotation = 0.0;
+uniform float star_intensity : hint_range(0.0, 3.0) = 0.7;
 
-uniform sampler2D cloud_noise : repeat_enable, filter_linear;
+uniform vec3 moon_direction = vec3(0.0, 1.0, 0.0);
+uniform float moon_intensity : hint_range(0.0, 3.0) = 0.7;
 
-float hash21(vec2 p) {
-	p = fract(p * vec2(123.34, 456.21));
-	p += dot(p, p + 45.32);
-	return fract(p.x * p.y);
+
+float hash31(vec3 p) {
+	p = fract(p * 0.1031);
+	p += dot(p, p.yzx + 33.33);
+	return fract((p.x + p.y) * p.z);
 }
 
-void sky() {
-	vec2 uv = SKY_COORDS;
-	vec3 direction = vec3(
-		cos((uv.y - 0.5) * PI) * sin(uv.x * TAU),
-		sin((uv.y - 0.5) * PI),
-		cos((uv.y - 0.5) * PI) * cos(uv.x * TAU)
-	);
 
-	float daylight = smoothstep(-0.12, 0.2, sun_direction.y);
-	vec3 night_color = vec3(0.008, 0.012, 0.035);
-	vec3 day_color = vec3(0.22, 0.48, 0.78);
+float noise3d(vec3 p) {
+	vec3 cell = floor(p);
+	vec3 local_pos = fract(p);
+
+	local_pos = local_pos * local_pos * (3.0 - 2.0 * local_pos);
+
+	float n000 = hash31(cell + vec3(0.0, 0.0, 0.0));
+	float n100 = hash31(cell + vec3(1.0, 0.0, 0.0));
+	float n010 = hash31(cell + vec3(0.0, 1.0, 0.0));
+	float n110 = hash31(cell + vec3(1.0, 1.0, 0.0));
+	float n001 = hash31(cell + vec3(0.0, 0.0, 1.0));
+	float n101 = hash31(cell + vec3(1.0, 0.0, 1.0));
+	float n011 = hash31(cell + vec3(0.0, 1.0, 1.0));
+	float n111 = hash31(cell + vec3(1.0, 1.0, 1.0));
+
+	float x00 = mix(n000, n100, local_pos.x);
+	float x10 = mix(n010, n110, local_pos.x);
+	float x01 = mix(n001, n101, local_pos.x);
+	float x11 = mix(n011, n111, local_pos.x);
+
+	float y0 = mix(x00, x10, local_pos.y);
+	float y1 = mix(x01, x11, local_pos.y);
+
+	return mix(y0, y1, local_pos.z);
+}
+
+
+vec3 rotate_y(vec3 direction, float angle) {
+	float c = cos(angle);
+	float s = sin(angle);
+
+	return vec3(
+		c * direction.x - s * direction.z,
+		direction.y,
+		s * direction.x + c * direction.z
+	);
+}
+
+
+void sky() {
+	float sun_height = LIGHT0_DIRECTION.y;
+	float daylight = smoothstep(-0.12, 0.18, sun_height);
+	float night_factor = 1.0 - smoothstep(-0.08, 0.12, sun_height);
+
+	vec3 night_color = vec3(0.012, 0.015, 0.025);
+	vec3 day_color = vec3(0.18, 0.25, 0.34);
 	vec3 color = mix(night_color, day_color, daylight);
 
-	// Статичные звёзды: координаты не зависят от времени или ветра.
-	vec2 star_grid = uv * vec2(900.0, 450.0);
-	vec2 cell = floor(star_grid);
-	float star_random = hash21(cell);
-	float star = step(0.997, star_random);
-	float night_factor = 1.0 - smoothstep(-0.08, 0.12, sun_direction.y);
-	color += vec3(0.8, 0.86, 1.0) * star * star_intensity * night_factor;
 
-	// Диск луны рисуется поверх звёзд, но перед облаками.
-	float moon_dot = dot(normalize(direction), normalize(moon_direction));
-	float moon_disk = smoothstep(0.9990, 0.9996, moon_dot);
-	color += vec3(0.72, 0.78, 0.95) * moon_disk * moon_intensity * night_factor;
+	// ЗВЁЗДЫ: неподвижный узор, вращается только со временем суток.
+	vec3 star_direction = normalize(rotate_y(EYEDIR, star_rotation));
+	vec3 star_cell = floor(star_direction * 120.0);
+	float star_random = hash31(star_cell);
+	float star = step(0.9985, star_random);
 
-	// Движутся только облака; wind_offset задаёт направление и скорость.
-	vec2 cloud_uv = uv * cloud_scale + wind_offset;
-	float noise_value = texture(cloud_noise, cloud_uv).r;
-	float cloud_alpha = smoothstep(
-		1.0 - cloud_coverage - 0.18,
-		1.0 - cloud_coverage + 0.18,
-		noise_value
+	color += vec3(0.72, 0.78, 0.9)
+		* star
+		* star_intensity
+		* night_factor;
+
+
+	// ЛУНА: заменяет цвет звёзд под диском, а не добавляется поверх них.
+	float moon_dot = dot(
+		normalize(EYEDIR),
+		normalize(moon_direction)
 	);
-	cloud_alpha *= 0.85;
+	float moon_disk = smoothstep(0.9990, 0.9995, moon_dot);
+	float moon_visibility = moon_disk * night_factor;
 
+	vec3 moon_color = vec3(0.62, 0.67, 0.76);
+	color = mix(color, moon_color, moon_visibility * moon_intensity);
+
+
+	// ОБЛАКА: вычисляются по 3D-направлению взгляда, без текстурных швов.
+	vec3 cloud_direction = normalize(rotate_y(EYEDIR, cloud_wind_angle));
+	float cloud_noise_value = noise3d(cloud_direction * cloud_scale);
+
+	float cloud_alpha = smoothstep(
+		1.0 - cloud_coverage - 0.12,
+		1.0 - cloud_coverage + 0.12,
+		cloud_noise_value
+	);
+	cloud_alpha *= 0.75;
+
+	vec3 night_cloud_color = vec3(0.045, 0.052, 0.067);
+	vec3 day_cloud_color = vec3(0.52, 0.55, 0.58);
 	vec3 cloud_color = mix(
-		vec3(0.12, 0.15, 0.22),
-		vec3(0.92, 0.94, 1.0),
+		night_cloud_color,
+		day_cloud_color,
 		daylight
 	);
+
 	color = mix(color, cloud_color, cloud_alpha);
 
-	// Диск солнца поверх облаков.
-	float sun_dot = dot(normalize(direction), normalize(sun_direction));
-	float sun_disk = smoothstep(0.9992, 0.99975, sun_dot);
-	vec3 sun_color = mix(vec3(1.0, 0.55, 0.28), vec3(1.0, 0.92, 0.72), daylight);
+
+	// СОЛНЦЕ: направление берётся от первого DirectionalLight3D.
+	float sun_dot = dot(
+		normalize(EYEDIR),
+		normalize(LIGHT0_DIRECTION)
+	);
+	float sun_disk = smoothstep(0.9990, 0.99965, sun_dot);
+
+	vec3 sun_color = mix(
+		vec3(0.85, 0.48, 0.27),
+		vec3(1.0, 0.82, 0.58),
+		daylight
+	);
+
 	color = mix(color, sun_color, sun_disk);
 
 	COLOR = color;

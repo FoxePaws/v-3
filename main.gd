@@ -13,6 +13,9 @@ func update_weather_position() -> void:
 	snow.global_position = player.global_position + Vector3(0, 8, 0)
 
 var current_weather: String = "clear"
+var cloud_noise_texture: NoiseTexture3D
+
+
 
 signal world_time_advanced(delta_world_seconds: float)
 
@@ -28,29 +31,91 @@ var start_time: float = 8.0
 var time_of_day: float = 8.0
 var total_world_seconds: float = 0.0
 
+@export_range(0.0, 1.0, 0.01) var cloud_coverage: float = 0.25
+@export var wind_direction: Vector2 = Vector2(1.0, 0.0)
+@export_range(0.0, 10.0, 0.01) var wind_speed: float = 0.02
+
+var cloud_offset: Vector2 = Vector2.ZERO
+var sky_material: ShaderMaterial
+
+
+
 func _ready() -> void:
-	time_of_day = fposmod(start_time, 24.0)
+	time_of_day = start_time
+	_setup_procedural_sky()
 	set_weather("clear")
 	update_day_night()
 
 
-func _process(delta: float) -> void:
-	var world_delta: float = delta * time_scale
-	if world_delta <= 0.0:
-		update_weather_position()
+
+
+func _setup_procedural_sky() -> void:
+	var environment: Environment = world_environment.environment
+	if environment == null:
+		push_error("WorldEnvironment: свойство environment не назначено")
 		return
 
-	total_world_seconds += world_delta
+	var sky_shader: Shader = load("res://world_sky.gdshader") as Shader
+	if sky_shader == null:
+		push_error("Не удалось загрузить res://world_sky.gdshader")
+		return
+
+	# Сначала создаём и назначаем shader-материал.
+	sky_material = ShaderMaterial.new()
+	sky_material.shader = sky_shader
+
+	var sky: Sky = Sky.new()
+	sky.sky_material = sky_material
+	environment.sky = sky
+	environment.background_mode = Environment.BG_SKY
+
+	# Затем создаём и назначаем текстуру шума.
+	var noise: FastNoiseLite = FastNoiseLite.new()
+	noise.frequency = 0.035
+	noise.fractal_octaves = 4
+
+	cloud_noise_texture = NoiseTexture3D.new()
+	cloud_noise_texture.width = 64
+	cloud_noise_texture.height = 64
+	cloud_noise_texture.depth = 64
+	cloud_noise_texture.noise = noise
+
+	sky_material.set_shader_parameter("cloud_noise", cloud_noise_texture)
+	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
+	sky_material.set_shader_parameter("wind_offset", cloud_offset)
+
+
+func _process(delta: float) -> void:
 	time_of_day = fposmod(
-		time_of_day + world_delta * 24.0 / day_length_seconds,
+		time_of_day + delta * 24.0 / day_length_seconds,
 		24.0
 	)
 
-	world_time_advanced.emit(world_delta)
+	var direction: Vector2 = wind_direction.normalized()
+	cloud_offset += direction * wind_speed * delta
+
 	update_day_night()
+	_update_sky_shader()
 	update_weather_position()
 
+func _update_sky_shader() -> void:
+	if sky_material == null:
+		return
 
+	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
+	sky_material.set_shader_parameter("wind_offset", cloud_offset)
+
+	var sun_angle: float = (time_of_day / 24.0) * TAU - PI * 0.5
+	var sun_dir: Vector3 = Vector3(cos(sun_angle), sin(sun_angle), 0.0).normalized()
+
+	var moon_angle: float = sun_angle + PI + deg_to_rad(12.0)
+	var moon_dir: Vector3 = Vector3(cos(moon_angle), sin(moon_angle), 0.0).normalized()
+
+	var star_angle: float = (time_of_day / 24.0) * TAU
+
+	sky_material.set_shader_parameter("sun_direction", sun_dir)
+	sky_material.set_shader_parameter("moon_direction", moon_dir)
+	sky_material.set_shader_parameter("star_rotation", star_angle)
 
 
 func update_day_night() -> void:
@@ -109,10 +174,12 @@ func set_weather(weather: String) -> void:
 
 	match weather:
 		"clear":
+			cloud_coverage = 0.12
 			if environment:
 				environment.fog_enabled = false
 
 		"rain":
+			cloud_coverage = 0.82
 			rain.emitting = true
 
 			if environment:
@@ -121,6 +188,7 @@ func set_weather(weather: String) -> void:
 				environment.fog_light_color = Color(0.35, 0.42, 0.48)
 
 		"snow":
+			cloud_coverage = 0.72
 			snow.emitting = true
 
 			if environment:
@@ -129,6 +197,7 @@ func set_weather(weather: String) -> void:
 				environment.fog_light_color = Color(0.75, 0.8, 0.85)
 
 		"fog":
+			cloud_coverage = 0.65
 			if environment:
 				environment.fog_enabled = true
 				environment.fog_density = 0.04
