@@ -12,6 +12,10 @@ metadata/_custom_type_script = "uid://bqvfbbv2ky2ya"
 
 [resource]
 script = ExtResource("2_kvu0t")
+max_willpower_modifier = 10.0
+stamina_recovery_modifier = -0.1
+willpower_recovery_modifier = 0.2
+sprint_speed_multiplier = -0.09999999999999432
 item_id = &"Sweater"
 display_name = "Sweater"
 item_scene = ExtResource("3_qqmqd")

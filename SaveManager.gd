@@ -31,12 +31,19 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 	var records: Array[Dictionary] = []
 	for item: ItemInstance in _find_items(scene):
 		if item.data == null:
-			push_warning("SaveManager: пропущен предмет без ItemData: %s" % item.get_path())
+			push_warning(
+				"SaveManager: пропущен предмет без ItemData: %s"
+				% item.get_path()
+			)
 			continue
 
 		if item.data.resource_path.is_empty():
-			push_warning("SaveManager: у ItemData нет resource_path: %s" % item.get_path())
+			push_warning(
+				"SaveManager: у ItemData нет resource_path: %s"
+				% item.get_path()
+			)
 			continue
+
 		records.append(_make_record(item, player))
 
 	var save_path: String = _get_save_path(slot_name)
@@ -44,21 +51,27 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 		ProjectSettings.globalize_path(SAVE_DIRECTORY)
 	)
 	if directory_error != OK:
-		push_error("SaveManager: не удалось создать каталог сохранений: %s" % error_string(directory_error))
+		push_error(
+			"SaveManager: не удалось создать каталог сохранений: %s"
+			% error_string(directory_error)
+		)
 		return false
 
 	var file: FileAccess = FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
-		push_error("SaveManager: не удалось открыть файл для записи: %s (%s)" % [
-			save_path,
-			error_string(FileAccess.get_open_error())
-		])
+		push_error(
+			"SaveManager: не удалось открыть файл для записи: %s (%s)"
+			% [save_path, error_string(FileAccess.get_open_error())]
+		)
 		return false
+
 	var player_transform: Transform3D = player.global_transform
-	var player_rotation: Quaternion = player_transform.basis.get_rotation_quaternion()
+	var player_rotation: Quaternion = (
+		player_transform.basis.get_rotation_quaternion()
+	)
 
 	var save_data: Dictionary = {
-		"version": 1,
+		"version": 2,
 		"player": {
 			"position": _vector_to_array(player_transform.origin),
 			"rotation": [
@@ -69,19 +82,28 @@ func save_game(slot_name: String = DEFAULT_SLOT) -> bool:
 			],
 		},
 		"items": records,
+		"world_time": _make_world_time_save_data(scene),
+		"stats": _make_player_stats_save_data(player),
 	}
+
 	file.store_string(JSON.stringify(save_data, "\t"))
 	file.flush()
 
 	var write_error: Error = file.get_error()
 	file.close()
+
 	if write_error != OK:
-		push_error("SaveManager: ошибка записи %s: %s" % [save_path, error_string(write_error)])
+		push_error(
+			"SaveManager: ошибка записи %s: %s"
+			% [save_path, error_string(write_error)]
+		)
 		return false
 
-	print("SaveManager: сохранено предметов: %d; слот: %s" % [records.size(), save_path])
+	print(
+		"SaveManager: сохранено предметов: %d; слот: %s"
+		% [records.size(), save_path]
+	)
 	return true
-
 
 func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 	var scene: Node = get_tree().current_scene
@@ -101,10 +123,10 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 
 	var file: FileAccess = FileAccess.open(save_path, FileAccess.READ)
 	if file == null:
-		push_error("SaveManager: не удалось открыть файл: %s (%s)" % [
-			save_path,
-			error_string(FileAccess.get_open_error())
-		])
+		push_error(
+			"SaveManager: не удалось открыть файл: %s (%s)"
+			% [save_path, error_string(FileAccess.get_open_error())]
+		)
 		return false
 
 	var json_text: String = file.get_as_text()
@@ -113,18 +135,21 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 	var json: JSON = JSON.new()
 	var parse_error: Error = json.parse(json_text)
 	if parse_error != OK:
-		push_error("SaveManager: ошибка JSON в строке %d: %s" % [
-			json.get_error_line(),
-			json.get_error_message()
-		])
+		push_error(
+			"SaveManager: ошибка JSON в строке %d: %s"
+			% [json.get_error_line(), json.get_error_message()]
+		)
 		return false
 
 	var parsed_data: Variant = json.data
 	if not parsed_data is Dictionary:
-		push_error("SaveManager: корень файла сохранения должен быть Dictionary")
+		push_error(
+			"SaveManager: корень файла сохранения должен быть Dictionary"
+		)
 		return false
 
 	var save_data: Dictionary = parsed_data as Dictionary
+
 	var raw_records: Variant = save_data.get("items", [])
 	if not raw_records is Array:
 		push_error("SaveManager: поле 'items' должно быть Array")
@@ -137,7 +162,6 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 		else:
 			push_warning("SaveManager: пропущена некорректная запись предмета")
 
-
 	var raw_player_data: Variant = save_data.get("player", {})
 	if not raw_player_data is Dictionary:
 		push_error("SaveManager: поле 'player' должно быть Dictionary")
@@ -145,13 +169,11 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 
 	var player_data: Dictionary = raw_player_data as Dictionary
 
-	# Удаляем текущие предметы только после успешного чтения и проверки JSON.
+	# Предметы удаляются только после чтения и проверки основного JSON.
 	await _clear_existing_items(scene, player)
-
 	_restore_player_transform(player, player_data)
-	
-	# Создаём сначала все экземпляры, чтобы предметы-контейнеры уже
-	# существовали к моменту восстановления вложенных в них предметов.
+
+	# Сначала создаём все предметы, затем восстанавливаем их расположение.
 	var instances: Dictionary[String, ItemInstance] = {}
 	var restored_items: Array[ItemInstance] = []
 	var item_locations: Array[Dictionary] = []
@@ -163,26 +185,162 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 
 		scene.add_child(item)
 		restored_items.append(item)
-		item_locations.append(record.get("location", {}) as Dictionary)
 
-		var id: String = str(record.get("instance_id", item.instance_id))
-		if not id.is_empty():
-			instances[id] = item
+		var raw_location: Variant = record.get("location", {})
+		if raw_location is Dictionary:
+			item_locations.append(raw_location as Dictionary)
+		else:
+			item_locations.append({})
 
-	# Ждём _ready() созданных сцен: у контейнеров к этому моменту
-	# должны быть готовы узлы и массивы слотов.
+		var instance_id: String = str(
+			record.get("instance_id", item.instance_id)
+		)
+		if not instance_id.is_empty():
+			instances[instance_id] = item
+
+	# Даём созданным сценам предметов завершить _ready().
 	await get_tree().process_frame
 
 	for index: int in range(restored_items.size()):
-		var item: ItemInstance = restored_items[index]
-		var location: Dictionary = item_locations[index]
-		_restore_location(item, location, instances, player, scene)
+		_restore_location(
+			restored_items[index],
+			item_locations[index],
+			instances,
+			player,
+			scene
+		)
 
-	print("SaveManager: восстановлено предметов: %d; слот: %s" % [
-		restored_items.size(),
-		save_path
-	])
+	# Время восстанавливаем до эффектов: PlayerStats подключён к сигналу
+	# мирового времени основной сцены.
+	_restore_world_time_from_save(scene, save_data)
+
+	# Экипировка уже восстановлена. Сначала пересчитываем итоговые
+	# максимумы и модификаторы, затем возвращаем текущие ресурсы и эффекты.
+	_restore_player_stats_from_save(player, save_data)
+
+	print(
+		"SaveManager: восстановлено предметов: %d; слот: %s"
+		% [restored_items.size(), save_path]
+	)
 	return true
+
+func _make_world_time_save_data(scene: Node) -> Dictionary:
+	if not scene.has_method("get_world_time_save_data"):
+		push_warning(
+			"SaveManager: у текущей сцены нет get_world_time_save_data()"
+		)
+		return {}
+
+	var raw_data: Variant = scene.call("get_world_time_save_data")
+	if raw_data is Dictionary:
+		return (raw_data as Dictionary).duplicate(true)
+
+	push_warning(
+		"SaveManager: get_world_time_save_data() вернул не Dictionary"
+	)
+	return {}
+
+
+func _make_player_stats_save_data(player: Player) -> Dictionary:
+	var stats_node: Node = player.get_node_or_null("PlayerStats")
+	if stats_node == null:
+		push_warning("SaveManager: узел PlayerStats не найден")
+		return {}
+
+	if not stats_node.has_method("make_save_data"):
+		push_warning(
+			"SaveManager: у PlayerStats нет метода make_save_data()"
+		)
+		return {}
+
+	var raw_data: Variant = stats_node.call("make_save_data")
+	if not raw_data is Dictionary:
+		push_warning(
+			"SaveManager: make_save_data() должен возвращать Dictionary"
+		)
+		return {}
+
+	var stats_data: Dictionary = (raw_data as Dictionary).duplicate(true)
+
+	if stats_node.has_method("make_status_effects_save_data"):
+		var raw_effects: Variant = stats_node.call(
+			"make_status_effects_save_data"
+		)
+		if raw_effects is Array:
+			stats_data["status_effects"] = (
+				raw_effects as Array
+			).duplicate(true)
+		else:
+			push_warning(
+				"SaveManager: make_status_effects_save_data() "
+				+ "должен возвращать Array"
+			)
+
+	return stats_data
+
+
+func _restore_world_time_from_save(
+	scene: Node,
+	save_data: Dictionary
+) -> void:
+	var raw_world_time: Variant = save_data.get("world_time", {})
+	if not raw_world_time is Dictionary:
+		push_warning(
+			"SaveManager: поле 'world_time' отсутствует "
+			+ "или имеет неверный тип"
+		)
+		return
+
+	if not scene.has_method("restore_world_time"):
+		push_warning(
+			"SaveManager: у текущей сцены нет restore_world_time()"
+		)
+		return
+
+	scene.call("restore_world_time", raw_world_time as Dictionary)
+
+
+func _restore_player_stats_from_save(
+	player: Player,
+	save_data: Dictionary
+) -> void:
+	var stats_node: Node = player.get_node_or_null("PlayerStats")
+	if stats_node == null:
+		push_warning("SaveManager: узел PlayerStats не найден")
+		return
+
+	var raw_stats: Variant = save_data.get("stats", {})
+	if not raw_stats is Dictionary:
+		push_warning(
+			"SaveManager: поле 'stats' отсутствует "
+			+ "или имеет неверный тип"
+		)
+		return
+
+	var stats_data: Dictionary = raw_stats as Dictionary
+
+	# Этот вызов должен пересчитать экипировочные модификаторы после
+	# восстановления слотов оборудования.
+	if stats_node.has_method("recalculate_stats"):
+		stats_node.call("recalculate_stats")
+
+	if stats_node.has_method("restore_save_data"):
+		stats_node.call("restore_save_data", stats_data)
+	else:
+		push_warning(
+			"SaveManager: у PlayerStats нет restore_save_data()"
+		)
+
+	var raw_effects: Variant = stats_data.get("status_effects", [])
+	if not stats_node.has_method("restore_status_effects_save_data"):
+		if raw_effects is Array and not (raw_effects as Array).is_empty():
+			push_warning(
+				"SaveManager: у PlayerStats нет "
+				+ "restore_status_effects_save_data()"
+			)
+		return
+
+	stats_node.call("restore_status_effects_save_data", raw_effects)
 
 
 func _get_save_path(slot_name: String) -> String:

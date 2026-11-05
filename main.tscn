@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bcwdwa041bmh"]
 
+[ext_resource type="Script" uid="uid://cb8gve05hvg7p" path="res://main.gd" id="1_vivmo"]
 [ext_resource type="Texture2D" uid="uid://b505r7n6wra36" path="res://textures/th-2126056594.jpg" id="2_dg77c"]
 [ext_resource type="Texture2D" uid="uid://b3ssn0ps1ec7g" path="res://textures/pesok.png" id="2_kek77"]
 [ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="3_4c57u"]
@@ -79,6 +80,7 @@ uv1_offset = Vector3(-0.52, 0, 0)
 material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
+script = ExtResource("1_vivmo")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_nb5cy")

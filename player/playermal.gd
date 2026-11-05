@@ -12,7 +12,7 @@ enum BodyState {
 	LYING
 }
 @onready var inventory_ui: InventoryUI = $InventoryUI
-
+@onready var stats: PlayerStats = $PlayerStats
 @export_category("Movement")
 @export var walk_speed: float = 4.0
 @export var sprint_speed: float = 7.0
@@ -121,6 +121,10 @@ func _ready() -> void:
 	base_sprint_speed = sprint_speed
 	equipment.player = self
 
+	stats.base_walk_speed = walk_speed
+	stats.base_sprint_speed = sprint_speed
+	stats.base_jump_velocity = jump_velocity
+	stats.recalculate_stats()
 	# Остальной код вашего _ready() оставьте.
 	# После загрузки визуальных узлов заполните clothing_visuals.
 	recalculate_equipment_stats()
@@ -133,17 +137,91 @@ func recalculate_equipment_stats() -> void:
 	protection = 0.0
 	warmth = 0.0
 
-	if equipment == null:
+	var modifiers: Dictionary = {}
+
+	if equipment != null:
+		for item_variant: Variant in equipment.slots.values():
+			var item: ItemInstance = item_variant as ItemInstance
+			if item == null or item.data == null:
+				continue
+
+			walk_speed += item.data.walk_speed_modifier
+			sprint_speed += item.data.sprint_speed_modifier
+			protection += item.data.protection
+			warmth += item.data.warmth
+
+			# Эти поля добавляются в ItemData ниже.
+			_add_equipment_modifier(
+				modifiers,
+				"max_willpower_add",
+				item.data.max_willpower_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"max_stamina_add",
+				item.data.max_stamina_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"stamina_threshold_add",
+				item.data.stamina_threshold_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"stamina_recovery_add",
+				item.data.stamina_recovery_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"willpower_recovery_add",
+				item.data.willpower_recovery_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"stamina_cost_multiplier_multiplier",
+				item.data.stamina_cost_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"willpower_cost_multiplier_multiplier",
+				item.data.willpower_cost_modifier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"walk_speed_multiplier",
+				item.data.walk_speed_multiplier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"sprint_speed_multiplier",
+				item.data.sprint_speed_multiplier
+			)
+			_add_equipment_modifier(
+				modifiers,
+				"jump_velocity_multiplier",
+				item.data.jump_velocity_multiplier
+			)
+
+	stats.set_equipment_modifiers(modifiers)
+
+	# Синхронизируем устаревшие поля игрока с итоговыми значениями,
+	# чтобы другие существующие функции продолжали работать.
+	walk_speed = stats.walk_speed
+	sprint_speed = stats.sprint_speed
+	jump_velocity = stats.jump_velocity
+
+
+func _add_equipment_modifier(
+	modifiers: Dictionary,
+	key: String,
+	value: float
+) -> void:
+	if is_zero_approx(value):
 		return
 
-	for item in equipment.slots.values():
-		if item == null or item.data == null:
-			continue
+	var default_value: float = 1.0 if key.ends_with("_multiplier") else 0.0
+	modifiers[key] = float(modifiers.get(key, default_value)) + value
 
-		walk_speed += item.data.walk_speed_modifier
-		sprint_speed += item.data.sprint_speed_modifier
-		protection += item.data.protection
-		warmth += item.data.warmth
 
 func _physics_process(delta: float) -> void:
 	_handle_body_state()
@@ -608,12 +686,18 @@ func _update_body_pose(delta: float) -> void:
 		interpolation
 	)
 
-
 func _handle_jump_and_gravity(delta: float) -> void:
 	if is_on_floor():
-		if Input.is_action_just_pressed("jump") and body_state == BodyState.STANDING:
-			velocity.y = jump_velocity
-			jump_started.emit()
+		if (
+			Input.is_action_just_pressed("jump")
+			and body_state == BodyState.STANDING
+			and not stats.is_willpower_depleted()
+		):
+			if stats.consume_stamina(stats.jump_stamina_cost):
+				velocity.y = stats.get_jump_velocity()
+				jump_started.emit()
+			else:
+				velocity.y = -0.5
 		else:
 			velocity.y = -0.5
 	else:
@@ -640,11 +724,35 @@ func _handle_movement() -> void:
 		camera_right * input_vector.x
 		+ camera_forward * -input_vector.y
 	)
+	
+	if stats.is_willpower_depleted():
+		velocity.x = 0.0
+		velocity.z = 0.0
+		return
 
 	if move_direction.length_squared() > 1.0:
 		move_direction = move_direction.normalized()
 
-	var current_speed: float = walk_speed
+	var current_speed: float = stats.get_walk_speed()
+
+	match body_state:
+		BodyState.STANDING:
+			if Input.is_action_pressed("sprint"):
+				current_speed = stats.get_sprint_speed()
+
+				if move_direction.length_squared() > 0.0:
+					stats.consume_stamina(
+						stats.sprint_stamina_per_second
+						* get_physics_process_delta_time()
+					)
+		BodyState.CROUCHING:
+			current_speed = crouch_speed
+		BodyState.LYING:
+			current_speed = prone_speed
+
+	if Input.is_action_pressed("slow_walk"):
+		current_speed *= slow_walk_multiplier
+
 
 	match body_state:
 		BodyState.STANDING:

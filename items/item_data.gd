@@ -8,6 +8,19 @@ enum ItemType {
 	CONTAINER
 }
 
+@export_category("Player Stats")
+@export var max_willpower_modifier: float = 0.0
+@export var max_stamina_modifier: float = 0.0
+@export var stamina_threshold_modifier: float = 0.0
+@export var stamina_recovery_modifier: float = 0.0
+@export var willpower_recovery_modifier: float = 0.0
+@export_range(-100, 100.0, 0.01) var stamina_cost_modifier: float = 0.0
+@export_range(-100, 100.0, 0.01) var willpower_cost_modifier: float = 0.0
+@export_range(-100, 100.0, 0.01) var walk_speed_multiplier: float = 0.0
+@export_range(-100, 100.0, 0.01) var sprint_speed_multiplier: float = 0.0
+@export_range(-100, 100.0, 0.01) var jump_velocity_multiplier: float = 0.0
+
+
 @export_category("Identity")
 @export var item_id: StringName = &""
 @export var display_name: String = ""

@@ -1,7 +1,6 @@
 extends Node3D
 
-@export var day_length_seconds: float = 120.0
-@export var start_time: float = 8.0
+
 
 @onready var sun: DirectionalLight3D = $Sun
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
@@ -13,24 +12,46 @@ func update_weather_position() -> void:
 	rain.global_position = player.global_position + Vector3(0, 8, 0)
 	snow.global_position = player.global_position + Vector3(0, 8, 0)
 
-var time_of_day: float = 8.0
 var current_weather: String = "clear"
 
+signal world_time_advanced(delta_world_seconds: float)
+
+@export_range(0.01, 100000.0, 0.1)
+var day_length_seconds: float = 120.0
+
+@export_range(0.0, 1000.0, 0.1)
+var time_scale: float = 1.0
+
+@export_range(0.0, 24.0, 0.01)
+var start_time: float = 8.0
+
+var time_of_day: float = 8.0
+var total_world_seconds: float = 0.0
+
 func _ready() -> void:
-	time_of_day = start_time
+	time_of_day = fposmod(start_time, 24.0)
 	set_weather("clear")
 	update_day_night()
 
 
 func _process(delta: float) -> void:
-	# Продвижение игрового времени
-	time_of_day += delta * 24.0 / day_length_seconds
+	var world_delta: float = delta * time_scale
+	if world_delta <= 0.0:
+		update_weather_position()
+		return
 
-	if time_of_day >= 24.0:
-		time_of_day -= 24.0
+	total_world_seconds += world_delta
+	time_of_day = fposmod(
+		time_of_day + world_delta * 24.0 / day_length_seconds,
+		24.0
+	)
 
+	world_time_advanced.emit(world_delta)
 	update_day_night()
 	update_weather_position()
+
+
+
 
 func update_day_night() -> void:
 	var sun_angle := (time_of_day / 24.0) * 360.0 - 90.0
@@ -135,3 +156,30 @@ func _input(event: InputEvent) -> void:
 				set_weather("snow")
 			KEY_4:
 				set_weather("fog")
+
+
+
+func set_time_scale(new_scale: float) -> void:
+	time_scale = maxf(new_scale, 0.0)
+
+
+func set_world_time(hour: float, elapsed_world_seconds: float = 0.0) -> void:
+	time_of_day = fposmod(hour, 24.0)
+	total_world_seconds = maxf(elapsed_world_seconds, 0.0)
+	update_day_night()
+
+
+func get_world_time_save_data() -> Dictionary:
+	return {
+		"time_of_day": time_of_day,
+		"total_world_seconds": total_world_seconds,
+		"time_scale": time_scale,
+	}
+
+
+func restore_world_time(data: Dictionary) -> void:
+	set_world_time(
+		float(data.get("time_of_day", start_time)),
+		float(data.get("total_world_seconds", 0.0))
+	)
+	time_scale = maxf(float(data.get("time_scale", time_scale)), 0.0)

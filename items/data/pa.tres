@@ -6,6 +6,11 @@
 
 [resource]
 script = ExtResource("3_xtwst")
+max_willpower_modifier = 15.0
+max_stamina_modifier = 5.0
+willpower_recovery_modifier = 0.2
+stamina_cost_modifier = -0.20000000000000284
+willpower_cost_modifier = -0.09999999999999432
 item_id = &"pa"
 display_name = "Panties"
 item_scene = ExtResource("2_8or6q")

@@ -12,6 +12,10 @@ metadata/_custom_type_script = "uid://bqvfbbv2ky2ya"
 
 [resource]
 script = ExtResource("3_kmhg8")
+max_willpower_modifier = 10.0
+willpower_cost_modifier = -0.20000000000000284
+walk_speed_multiplier = 0.09999999999999432
+sprint_speed_multiplier = 0.20000000000000284
 item_id = &"br"
 display_name = "bra"
 item_scene = ExtResource("2_blqqy")

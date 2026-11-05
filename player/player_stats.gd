@@ -1,0 +1,446 @@
+class_name PlayerStats
+extends Node
+
+signal resources_changed(
+	current_willpower: float,
+	max_willpower: float,
+	current_stamina: float,
+	max_stamina: float
+)
+signal stats_recalculated()
+signal status_effects_changed()
+
+@export_category("Base resources")
+@export_range(0.0, 100000.0, 0.1) var base_max_willpower: float = 100.0
+@export_range(0.0, 100000.0, 0.1) var base_max_stamina: float = 100.0
+@export_range(0.0, 100000.0, 0.1) var base_stamina_threshold: float = 0.0
+
+@export_category("Base movement")
+@export var base_walk_speed: float = 4.0
+@export var base_sprint_speed: float = 7.0
+@export var base_jump_velocity: float = 5.0
+
+@export_category("Recovery")
+@export_range(0.0, 100000.0, 0.1) var base_willpower_recovery: float = 0.0
+@export_range(0.0, 100000.0, 0.1) var base_stamina_recovery: float = 20.0
+@export var recovery_delay: float = 0.75
+
+@export_category("Costs")
+@export_range(0.0, 1000.0, 0.01) var base_stamina_cost_multiplier: float = 1.0
+@export_range(0.0, 1000.0, 0.01) var base_willpower_cost_multiplier: float = 1.0
+@export_range(0.0, 1000.0, 0.01) var exhaustion_willpower_multiplier: float = 1.0
+@export_range(0.0, 100000.0, 0.1) var sprint_stamina_per_second: float = 12.0
+@export_range(0.0, 100000.0, 0.1) var jump_stamina_cost: float = 15.0
+
+@export_category("Exhaustion penalties")
+@export_range(0.0, 1.0, 0.01) var exhausted_walk_multiplier: float = 0.5
+@export_range(0.0, 1.0, 0.01) var exhausted_sprint_multiplier: float = 0.5
+@export_range(0.0, 1.0, 0.01) var exhausted_jump_multiplier: float = 0.5
+
+var current_willpower: float = 100.0
+var current_stamina: float = 100.0
+
+var max_willpower: float = 100.0
+var max_stamina: float = 100.0
+var stamina_threshold: float = 0.0
+
+var walk_speed: float = 4.0
+var sprint_speed: float = 7.0
+var jump_velocity: float = 5.0
+var willpower_recovery: float = 0.0
+var stamina_recovery: float = 20.0
+var stamina_cost_multiplier: float = 1.0
+var willpower_cost_multiplier: float = 1.0
+
+var _recovery_timer: float = 0.0
+var _equipment_modifiers: Dictionary = {}
+var _status_modifiers: Dictionary = {}
+
+var active_status_effects: Array[Dictionary] = []
+var _world_clock: Node = null
+
+func _ready() -> void:
+	current_willpower = clampf(current_willpower, 0.0, base_max_willpower)
+	current_stamina = clampf(current_stamina, 0.0, base_max_stamina)
+	recalculate_stats()
+	_connect_world_clock()
+
+
+func _connect_world_clock() -> void:
+	var scene: Node = get_tree().current_scene
+	if scene == null:
+		return
+
+	_world_clock = scene
+	var callback: Callable = _on_world_time_advanced
+
+	if _world_clock.has_signal("world_time_advanced"):
+		if not _world_clock.is_connected("world_time_advanced", callback):
+			_world_clock.connect("world_time_advanced", callback)
+	else:
+		push_warning(
+			"PlayerStats: current scene не предоставляет world_time_advanced"
+		)
+
+
+func _process(delta: float) -> void:
+	if _recovery_timer > 0.0:
+		_recovery_timer = maxf(_recovery_timer - delta, 0.0)
+		return
+
+	var changed: bool = false
+
+	if current_stamina < max_stamina:
+		current_stamina = minf(
+			current_stamina + stamina_recovery * delta,
+			max_stamina
+		)
+		changed = true
+
+	if current_willpower < max_willpower and willpower_recovery > 0.0:
+		current_willpower = minf(
+			current_willpower + willpower_recovery * delta,
+			max_willpower
+		)
+		changed = true
+
+	if changed:
+		_emit_resources_changed()
+
+
+func is_exhausted() -> bool:
+	return current_stamina <= stamina_threshold
+
+
+func is_willpower_depleted() -> bool:
+	return current_willpower <= 0.0
+
+
+func get_walk_speed() -> float:
+	var result: float = walk_speed
+	if is_exhausted():
+		result *= exhausted_walk_multiplier
+	return maxf(result, 0.0)
+
+
+func get_sprint_speed() -> float:
+	var result: float = sprint_speed
+	if is_exhausted():
+		result *= exhausted_sprint_multiplier
+	return maxf(result, 0.0)
+
+
+func get_jump_velocity() -> float:
+	var result: float = jump_velocity
+	if is_exhausted():
+		result *= exhausted_jump_multiplier
+	return maxf(result, 0.0)
+
+
+# Возвращает true, если затрата принята.
+# Выносливость не опускается ниже порога; нехватка конвертируется в силу воли.
+func consume_stamina(base_cost: float) -> bool:
+	if base_cost <= 0.0:
+		return true
+
+	var cost: float = base_cost * stamina_cost_multiplier
+	var available_stamina: float = maxf(current_stamina - stamina_threshold, 0.0)
+	var stamina_paid: float = minf(cost, available_stamina)
+	var uncovered_cost: float = cost - stamina_paid
+	var willpower_cost: float = (
+		uncovered_cost
+		* exhaustion_willpower_multiplier
+		* willpower_cost_multiplier
+	)
+
+	if willpower_cost > current_willpower:
+		# Не допускаем действия, которое должно было бы опустить силу воли ниже нуля.
+		current_willpower = 0.0
+		current_stamina -= stamina_paid
+		_recovery_timer = recovery_delay
+		_emit_resources_changed()
+		return false
+
+	current_stamina -= stamina_paid
+	current_willpower -= willpower_cost
+	_recovery_timer = recovery_delay
+	_emit_resources_changed()
+	return true
+
+
+func restore_willpower(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	current_willpower = minf(current_willpower + amount, max_willpower)
+	_emit_resources_changed()
+
+
+func restore_stamina(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	current_stamina = minf(current_stamina + amount, max_stamina)
+	_emit_resources_changed()
+
+
+# Формат модификаторов:
+# {"max_stamina_add": 10.0, "walk_speed_multiplier": 1.1, ...}
+# Значения оборудования и эффектов складываются для *_add,
+# складываются относительно 1 для *_multiplier.
+func set_equipment_modifiers(modifiers: Dictionary) -> void:
+	_equipment_modifiers = modifiers.duplicate(true)
+	recalculate_stats()
+
+
+func set_status_modifiers(modifiers: Dictionary) -> void:
+	_status_modifiers = modifiers.duplicate(true)
+	recalculate_stats()
+
+
+func recalculate_stats() -> void:
+	var all_modifiers: Dictionary = {}
+
+	_merge_modifiers(all_modifiers, _equipment_modifiers)
+	_merge_modifiers(all_modifiers, _status_modifiers)
+
+	max_willpower = maxf(
+		0.0,
+		(base_max_willpower + _add_value(all_modifiers, "max_willpower_add"))
+		* _multiplier_value(all_modifiers, "max_willpower_multiplier")
+	)
+	max_stamina = maxf(
+		0.0,
+		(base_max_stamina + _add_value(all_modifiers, "max_stamina_add"))
+		* _multiplier_value(all_modifiers, "max_stamina_multiplier")
+	)
+	stamina_threshold = clampf(
+		base_stamina_threshold + _add_value(all_modifiers, "stamina_threshold_add"),
+		0.0,
+		max_stamina
+	)
+
+	walk_speed = maxf(
+		0.0,
+		(base_walk_speed + _add_value(all_modifiers, "walk_speed_add"))
+		* _multiplier_value(all_modifiers, "walk_speed_multiplier")
+	)
+	sprint_speed = maxf(
+		0.0,
+		(base_sprint_speed + _add_value(all_modifiers, "sprint_speed_add"))
+		* _multiplier_value(all_modifiers, "sprint_speed_multiplier")
+	)
+	jump_velocity = maxf(
+		0.0,
+		(base_jump_velocity + _add_value(all_modifiers, "jump_velocity_add"))
+		* _multiplier_value(all_modifiers, "jump_velocity_multiplier")
+	)
+
+	stamina_recovery = maxf(
+		0.0,
+		(base_stamina_recovery + _add_value(all_modifiers, "stamina_recovery_add"))
+		* _multiplier_value(all_modifiers, "stamina_recovery_multiplier")
+	)
+	willpower_recovery = maxf(
+		0.0,
+		(base_willpower_recovery + _add_value(all_modifiers, "willpower_recovery_add"))
+		* _multiplier_value(all_modifiers, "willpower_recovery_multiplier")
+	)
+	stamina_cost_multiplier = maxf(
+		0.0,
+		(base_stamina_cost_multiplier + _add_value(all_modifiers, "stamina_cost_multiplier_add"))
+		* _multiplier_value(all_modifiers, "stamina_cost_multiplier_multiplier")
+	)
+	willpower_cost_multiplier = maxf(
+		0.0,
+		(base_willpower_cost_multiplier + _add_value(all_modifiers, "willpower_cost_multiplier_add"))
+		* _multiplier_value(all_modifiers, "willpower_cost_multiplier_multiplier")
+	)
+
+	current_willpower = clampf(current_willpower, 0.0, max_willpower)
+	current_stamina = clampf(current_stamina, 0.0, max_stamina)
+
+	stats_recalculated.emit()
+	_emit_resources_changed()
+
+
+func make_save_data() -> Dictionary:
+	return {
+		"current_willpower": current_willpower,
+		"current_stamina": current_stamina,
+		"recovery_timer": _recovery_timer,
+	}
+
+
+func restore_save_data(data: Dictionary) -> void:
+	current_willpower = clampf(
+		float(data.get("current_willpower", max_willpower)),
+		0.0,
+		max_willpower
+	)
+	current_stamina = clampf(
+		float(data.get("current_stamina", max_stamina)),
+		0.0,
+		max_stamina
+	)
+	_recovery_timer = maxf(float(data.get("recovery_timer", 0.0)), 0.0)
+	_emit_resources_changed()
+
+
+func _merge_modifiers(target: Dictionary, source: Dictionary) -> void:
+	for key_variant: Variant in source.keys():
+		var key: String = str(key_variant)
+		var value: float = float(source[key_variant])
+
+		if key.ends_with("_multiplier"):
+			target[key] = float(target.get(key, 1.0)) + value - 1.0
+		else:
+			target[key] = float(target.get(key, 0.0)) + value
+
+
+func _add_value(modifiers: Dictionary, key: String) -> float:
+	return float(modifiers.get(key, 0.0))
+
+
+func _multiplier_value(modifiers: Dictionary, key: String) -> float:
+	return float(modifiers.get(key, 1.0))
+
+
+func _emit_resources_changed() -> void:
+	resources_changed.emit(
+		current_willpower,
+		max_willpower,
+		current_stamina,
+		max_stamina
+	)
+
+func add_status_effect(effect: StatusEffectData) -> bool:
+	if effect == null or effect.effect_id == &"":
+		push_warning("PlayerStats: некорректный StatusEffectData")
+		return false
+
+	# Повторное применение того же эффекта обновляет его длительность,
+	# не создавая дубликат в списке.
+	for index: int in range(active_status_effects.size()):
+		var active: Dictionary = active_status_effects[index]
+		if str(active.get("effect_id", "")) == str(effect.effect_id):
+			active["remaining_world_seconds"] = effect.duration_world_seconds
+			active_status_effects[index] = active
+			_recalculate_status_modifiers()
+			return true
+
+	active_status_effects.append({
+		"effect_id": str(effect.effect_id),
+		"resource_path": effect.resource_path,
+		"remaining_world_seconds": effect.duration_world_seconds,
+		"modifiers": effect.modifiers.duplicate(true),
+		"icon_path": effect.icon.resource_path if effect.icon != null else "",
+	})
+
+	_recalculate_status_modifiers()
+	return true
+
+
+func remove_status_effect(effect_id: StringName) -> void:
+	var old_size: int = active_status_effects.size()
+
+	for index: int in range(active_status_effects.size() - 1, -1, -1):
+		if str(active_status_effects[index].get("effect_id", "")) == str(effect_id):
+			active_status_effects.remove_at(index)
+
+	if active_status_effects.size() != old_size:
+		_recalculate_status_modifiers()
+
+
+func clear_status_effects() -> void:
+	if active_status_effects.is_empty():
+		return
+
+	active_status_effects.clear()
+	_recalculate_status_modifiers()
+
+
+func _on_world_time_advanced(delta_world_seconds: float) -> void:
+	if delta_world_seconds <= 0.0 or active_status_effects.is_empty():
+		return
+
+	var changed: bool = false
+
+	for index: int in range(active_status_effects.size() - 1, -1, -1):
+		var effect: Dictionary = active_status_effects[index]
+		var remaining: float = float(
+			effect.get("remaining_world_seconds", 0.0)
+		)
+		remaining -= delta_world_seconds
+
+		if remaining <= 0.0:
+			active_status_effects.remove_at(index)
+			changed = true
+		else:
+			effect["remaining_world_seconds"] = remaining
+			active_status_effects[index] = effect
+
+	if changed:
+		_recalculate_status_modifiers()
+
+
+func _recalculate_status_modifiers() -> void:
+	var combined: Dictionary = {}
+
+	for effect: Dictionary in active_status_effects:
+		var raw_modifiers: Variant = effect.get("modifiers", {})
+		if not raw_modifiers is Dictionary:
+			continue
+
+		var modifiers: Dictionary = raw_modifiers as Dictionary
+		for key_variant: Variant in modifiers.keys():
+			var key: String = str(key_variant)
+			var value: float = float(modifiers[key_variant])
+
+			if key.ends_with("_multiplier"):
+				combined[key] = float(combined.get(key, 1.0)) + value - 1.0
+			else:
+				combined[key] = float(combined.get(key, 0.0)) + value
+
+	set_status_modifiers(combined)
+	status_effects_changed.emit()
+
+
+func make_status_effects_save_data() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+
+	for effect: Dictionary in active_status_effects:
+		result.append(effect.duplicate(true))
+
+	return result
+
+
+func restore_status_effects_save_data(raw_effects: Variant) -> void:
+	active_status_effects.clear()
+
+	if not raw_effects is Array:
+		_recalculate_status_modifiers()
+		return
+
+	for raw_effect: Variant in raw_effects:
+		if not raw_effect is Dictionary:
+			continue
+
+		var effect: Dictionary = (raw_effect as Dictionary).duplicate(true)
+		var remaining: float = float(
+			effect.get("remaining_world_seconds", 0.0)
+		)
+
+		if remaining <= 0.0:
+			continue
+
+		# По возможности перезагружаем Resource-источник.
+		var resource_path: String = str(effect.get("resource_path", ""))
+		if not resource_path.is_empty() and ResourceLoader.exists(resource_path):
+			var loaded: Resource = load(resource_path)
+			if loaded is StatusEffectData:
+				var effect_data: StatusEffectData = loaded as StatusEffectData
+				effect["effect_id"] = str(effect_data.effect_id)
+				effect["modifiers"] = effect_data.modifiers.duplicate(true)
+
+		active_status_effects.append(effect)
+
+	_recalculate_status_modifiers()
