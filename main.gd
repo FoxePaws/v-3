@@ -39,14 +39,22 @@ var cloud_offset: Vector2 = Vector2.ZERO
 var sky_material: ShaderMaterial
 
 
-
 func _ready() -> void:
 	time_of_day = start_time
-	_setup_procedural_sky()
+
+	var environment: Environment = world_environment.environment
+	if environment == null or environment.sky == null:
+		push_error("WorldEnvironment: Environment или Sky не назначен")
+		return
+
+	sky_material = environment.sky.sky_material as ShaderMaterial
+	if sky_material == null:
+		push_error("WorldEnvironment: у Sky не назначен ShaderMaterial")
+		return
+
 	set_weather("clear")
 	update_day_night()
-
-
+	_update_sky_shader()
 
 
 func _setup_procedural_sky() -> void:
@@ -84,38 +92,33 @@ func _setup_procedural_sky() -> void:
 	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
 	sky_material.set_shader_parameter("wind_offset", cloud_offset)
 
-
 func _process(delta: float) -> void:
-	time_of_day = fposmod(
-		time_of_day + delta * 24.0 / day_length_seconds,
-		24.0
-	)
+	var world_delta: float = delta * time_scale
+	var day_delta: float = 24.0 * world_delta / day_length_seconds
 
-	var direction: Vector2 = wind_direction.normalized()
-	cloud_offset += direction * wind_speed * delta
+	time_of_day = fposmod(time_of_day + day_delta, 24.0)
+	total_world_seconds += world_delta
+
+	var wind: Vector2 = wind_direction.normalized()
+	cloud_offset += wind * wind_speed * world_delta
 
 	update_day_night()
 	_update_sky_shader()
 	update_weather_position()
+
+	if world_delta > 0.0:
+		world_time_advanced.emit(world_delta)
+
 
 func _update_sky_shader() -> void:
 	if sky_material == null:
 		return
 
 	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
-	sky_material.set_shader_parameter("wind_offset", cloud_offset)
+	sky_material.set_shader_parameter("cloud_offset", cloud_offset)
+	sky_material.set_shader_parameter("moon_direction", moon_direction)
+	sky_material.set_shader_parameter("star_rotation", star_rotation)
 
-	var sun_angle: float = (time_of_day / 24.0) * TAU - PI * 0.5
-	var sun_dir: Vector3 = Vector3(cos(sun_angle), sin(sun_angle), 0.0).normalized()
-
-	var moon_angle: float = sun_angle + PI + deg_to_rad(12.0)
-	var moon_dir: Vector3 = Vector3(cos(moon_angle), sin(moon_angle), 0.0).normalized()
-
-	var star_angle: float = (time_of_day / 24.0) * TAU
-
-	sky_material.set_shader_parameter("sun_direction", sun_dir)
-	sky_material.set_shader_parameter("moon_direction", moon_dir)
-	sky_material.set_shader_parameter("star_rotation", star_angle)
 
 
 func update_day_night() -> void:

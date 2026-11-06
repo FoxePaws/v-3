@@ -6,7 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="3_4c57u"]
 [ext_resource type="PackedScene" uid="uid://datumxyio33qi" path="res://Props/rat.tscn" id="3_efxa6"]
 [ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
+[ext_resource type="Texture2D" uid="uid://dayrd1ojttbs0" path="res://textures/MoonMap.png" id="3_yaehf"]
 [ext_resource type="Resource" uid="uid://b7v4hkv3hgvoq" path="res://items/data/flas.tres" id="4_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://dja6ya1pigwv2" path="res://textures/StarField.jpg" id="4_074og"]
 [ext_resource type="Resource" uid="uid://iuswp188omqg" path="res://items/data/Stick.tres" id="5_lquwl"]
 [ext_resource type="Resource" uid="uid://nbyewndav4kn" path="res://items/data/leuka2_s.tres" id="6_7mycd"]
 [ext_resource type="Resource" uid="uid://b26djfr6je75u" path="res://items/data/Sponge.tres" id="6_efxa6"]
@@ -18,13 +20,27 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2cqfq"]
 shader = ExtResource("2_vivmo")
-shader_parameter/cloud_coverage = 0.25
-shader_parameter/cloud_scale = 3.0
-shader_parameter/cloud_wind_angle = 0.0
+shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
+shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
+shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
+shader_parameter/night_zenith = Color(0.008, 0.012, 0.045, 1)
+shader_parameter/night_horizon = Color(0.035, 0.045, 0.1, 1)
+shader_parameter/ground_color = Color(0.025, 0.03, 0.04, 1)
+shader_parameter/atmosphere_strength = 1.0
+shader_parameter/twilight_width = 0.22
+shader_parameter/moon_direction = Vector3(-0.5, 0.3, 0.7)
+shader_parameter/sun_angular_size = 0.009
+shader_parameter/moon_angular_size = 0.012
+shader_parameter/moon_phase = 0.5
+shader_parameter/moon_brightness = 1.0
+shader_parameter/star_map = ExtResource("4_074og")
+shader_parameter/moon_texture = ExtResource("3_yaehf")
+shader_parameter/star_brightness = 1.0
 shader_parameter/star_rotation = 0.0
-shader_parameter/star_intensity = 1.0
-shader_parameter/moon_direction = Vector3(0, -0.5, 0)
-shader_parameter/moon_intensity = 0.8
+shader_parameter/cloud_coverage = 0.2
+shader_parameter/cloud_opacity = 0.16
+shader_parameter/cloud_scale = 18.0
+shader_parameter/cloud_offset = Vector2(0, 0)
 
 [sub_resource type="Sky" id="Sky_yaehf"]
 sky_material = SubResource("ShaderMaterial_2cqfq")
@@ -88,10 +104,12 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-day_length_seconds = 30.01
-cloud_coverage = 0.51
-wind_direction = Vector2(1.32, 11)
-wind_speed = 4.54
+day_length_seconds = null
+time_scale = null
+start_time = null
+cloud_coverage = null
+wind_direction = null
+wind_speed = null
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
@@ -101,7 +119,7 @@ wait_time = 60.0
 autostart = true
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1346481109]
-transform = Transform3D(0.85992616, 0.26431903, -0.43664923, 0, 0.85547286, 0.51784766, 0.51041853, -0.4453107, 0.7356435, 0, 23.747242, 0)
+transform = Transform3D(0.9534559, 0.18379459, -0.23904258, 0.23709273, 0.03284365, 0.970932, 0.18630311, -0.9824159, -0.012261301, 0, 23.747242, 0)
 light_color = Color(0.8945121, 0.72392356, 0.6534609, 1)
 light_angular_distance = 1.0
 shadow_enabled = true
