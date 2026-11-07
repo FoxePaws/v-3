@@ -18,21 +18,20 @@
 [ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
 [ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
 
-[sub_resource type="Gradient" id="Gradient_cegan"]
+[sub_resource type="Gradient" id="Gradient_074og"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_074og"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_yaehf"]
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_yaehf"]
-generate_mipmaps = false
-noise = SubResource("FastNoiseLite_074og")
-color_ramp = SubResource("Gradient_cegan")
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2cqfq"]
+noise = SubResource("FastNoiseLite_yaehf")
+color_ramp = SubResource("Gradient_074og")
 seamless = true
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_yaehf"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vivmo"]
 shader = ExtResource("2_vivmo")
 shader_parameter/cloud_base_height = 0.12
-shader_parameter/cloud_horizon_fade_start = -0.054999996092729986
-shader_parameter/cloud_horizon_fade_end = 0.80000001192093
+shader_parameter/cloud_horizon_fade_start = 0.02
+shader_parameter/cloud_horizon_fade_end = 0.2
 shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
 shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
 shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
@@ -42,22 +41,22 @@ shader_parameter/ground_color = Color(0.025, 0.03, 0.04, 1)
 shader_parameter/atmosphere_strength = 1.0
 shader_parameter/twilight_width = 0.22
 shader_parameter/moon_direction = Vector3(-0.5, 0.3, 0.7)
-shader_parameter/sun_angular_size = 0.0270000012825
-shader_parameter/moon_angular_size = 0.020000000950000003
+shader_parameter/sun_angular_size = 0.0290000013775
+shader_parameter/moon_angular_size = 0.018000000855
 shader_parameter/moon_phase = 0.5
 shader_parameter/moon_brightness = 1.0
 shader_parameter/star_map = ExtResource("4_074og")
 shader_parameter/moon_texture = ExtResource("3_yaehf")
 shader_parameter/star_brightness = 1.0
 shader_parameter/star_rotation = 0.0
-shader_parameter/cloudtext = SubResource("NoiseTexture2D_yaehf")
-shader_parameter/cloud_coverage = 0.1950000092625
+shader_parameter/cloudtext = SubResource("NoiseTexture2D_2cqfq")
+shader_parameter/cloud_coverage = 0.2
 shader_parameter/cloud_opacity = 0.16
 shader_parameter/cloud_scale = 18.0
 shader_parameter/cloud_offset = Vector2(0, 0)
 
 [sub_resource type="Sky" id="Sky_yaehf"]
-sky_material = SubResource("ShaderMaterial_yaehf")
+sky_material = SubResource("ShaderMaterial_vivmo")
 
 [sub_resource type="Environment" id="Environment_2cqfq"]
 background_mode = 2
@@ -118,7 +117,7 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-cloud_coverage = 0.8
+cloud_coverage = 0.73
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")

@@ -111,7 +111,7 @@ func update_day_night() -> void:
 	# Цвет на рассвете и закате
 	var warm_factor := 1.0 - smoothstep(0.15, 0.7, sun_height)
 
-	var day_color := Color(1.0, 0.733, 0.412, 1.0)
+	var day_color := Color(0.995, 0.721, 0.425, 1.0)
 	var sunset_color := Color(1.0, 0.35, 0.12)
 
 	sun.light_color = sunset_color.lerp(day_color, 1.0 - warm_factor)

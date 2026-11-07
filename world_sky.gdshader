@@ -91,10 +91,10 @@ void sky() {
 	// Более тёплый и менее яркий диск.
 	vec3 sun_disk_color = mix(
 		vec3(1.0, 0.20, 0.035), // рассвет и закат
-		vec3(1.0, 0.733, 0.412),  // дневное солнце
+		vec3(1.0, 0.55, 0.22),  // дневное солнце
 		day_amount
 	);
-	sky_color += sun_disk_color * sun_disk * 0.90;
+	sky_color += sun_disk_color * sun_disk * 0.87;
 
 	// Звёздная карта вращается параметром star_rotation.
 	vec2 star_uv = direction_to_spherical_uv(view_dir);
