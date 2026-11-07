@@ -23,6 +23,7 @@
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_yaehf"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2cqfq"]
+generate_mipmaps = false
 noise = SubResource("FastNoiseLite_yaehf")
 color_ramp = SubResource("Gradient_074og")
 seamless = true
@@ -117,7 +118,10 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-cloud_coverage = 0.73
+time_scale = 3.0
+cloud_coverage = 0.56
+wind_direction = Vector2(1, 0.2)
+wind_speed = 0.025
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
