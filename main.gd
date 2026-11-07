@@ -13,7 +13,6 @@ func update_weather_position() -> void:
 	snow.global_position = player.global_position + Vector3(0, 8, 0)
 
 var current_weather: String = "clear"
-var cloud_noise_texture: NoiseTexture3D
 
 
 
@@ -32,12 +31,16 @@ var time_of_day: float = 8.0
 var total_world_seconds: float = 0.0
 
 @export_range(0.0, 1.0, 0.01) var cloud_coverage: float = 0.25
+
 @export var wind_direction: Vector2 = Vector2(1.0, 0.0)
-@export_range(0.0, 10.0, 0.01) var wind_speed: float = 0.02
+@export_range(0.0, 1.0, 0.001) var wind_speed: float = 0.002
+
+@export_range(1.0, 100.0, 0.1) var moon_orbit_days: float = 27.3
+@export_range(-30.0, 30.0, 0.1) var moon_orbit_inclination_degrees: float = 5.0
+
 
 var cloud_offset: Vector2 = Vector2.ZERO
 var sky_material: ShaderMaterial
-
 
 func _ready() -> void:
 	time_of_day = start_time
@@ -57,41 +60,6 @@ func _ready() -> void:
 	_update_sky_shader()
 
 
-func _setup_procedural_sky() -> void:
-	var environment: Environment = world_environment.environment
-	if environment == null:
-		push_error("WorldEnvironment: свойство environment не назначено")
-		return
-
-	var sky_shader: Shader = load("res://world_sky.gdshader") as Shader
-	if sky_shader == null:
-		push_error("Не удалось загрузить res://world_sky.gdshader")
-		return
-
-	# Сначала создаём и назначаем shader-материал.
-	sky_material = ShaderMaterial.new()
-	sky_material.shader = sky_shader
-
-	var sky: Sky = Sky.new()
-	sky.sky_material = sky_material
-	environment.sky = sky
-	environment.background_mode = Environment.BG_SKY
-
-	# Затем создаём и назначаем текстуру шума.
-	var noise: FastNoiseLite = FastNoiseLite.new()
-	noise.frequency = 0.035
-	noise.fractal_octaves = 4
-
-	cloud_noise_texture = NoiseTexture3D.new()
-	cloud_noise_texture.width = 64
-	cloud_noise_texture.height = 64
-	cloud_noise_texture.depth = 64
-	cloud_noise_texture.noise = noise
-
-	sky_material.set_shader_parameter("cloud_noise", cloud_noise_texture)
-	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
-	sky_material.set_shader_parameter("wind_offset", cloud_offset)
-
 func _process(delta: float) -> void:
 	var world_delta: float = delta * time_scale
 	var day_delta: float = 24.0 * world_delta / day_length_seconds
@@ -101,6 +69,10 @@ func _process(delta: float) -> void:
 
 	var wind: Vector2 = wind_direction.normalized()
 	cloud_offset += wind * wind_speed * world_delta
+	cloud_offset = Vector2(
+		fposmod(cloud_offset.x, 1.0),
+		fposmod(cloud_offset.y, 1.0)
+	)
 
 	update_day_night()
 	_update_sky_shader()
@@ -116,6 +88,7 @@ func _update_sky_shader() -> void:
 
 	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
 	sky_material.set_shader_parameter("cloud_offset", cloud_offset)
+	_update_moon_direction()
 
 
 
@@ -125,23 +98,20 @@ func update_day_night() -> void:
 
 	var sun_height := sin(deg_to_rad(sun_angle))
 
-# Солнце начинает заметно темнеть только глубже за горизонтом
 	var sun_visibility := smoothstep(-0.8, 0.35, sun_height)
+	var light_factor := pow(sun_visibility, 0.55)
 
-# Чем меньше степень, тем дольше солнце остаётся ярким
-	var light_factor := pow(sun_visibility, 0.35)
+	sun.light_energy = lerp(0.02, 0.76, light_factor)
 
-# Минимальная яркость в сумерках
-	sun.light_energy = lerp(0.08, 1.2, light_factor)
-
-# Полностью выключаем солнце только глубокой ночью
 	if sun_height < -0.8:
 		sun.light_energy = 0.0
+
+
 
 	# Цвет на рассвете и закате
 	var warm_factor := 1.0 - smoothstep(0.15, 0.7, sun_height)
 
-	var day_color := Color(1.0, 0.92, 0.75)
+	var day_color := Color(1.0, 0.733, 0.412, 1.0)
 	var sunset_color := Color(1.0, 0.35, 0.12)
 
 	sun.light_color = sunset_color.lerp(day_color, 1.0 - warm_factor)
@@ -157,10 +127,10 @@ func update_day_night() -> void:
 			ambient_factor
 		)
 
-		environment.adjustment_enabled = true
+		environment.adjustment_enabled = false
 		environment.adjustment_brightness = lerp(
-			0.65,
-			1.1,
+			0.04,
+			0.45,
 			ambient_factor
 		)
 
@@ -171,17 +141,23 @@ func set_weather(weather: String) -> void:
 	rain.emitting = false
 	snow.emitting = false
 
-	var environment := world_environment.environment
+	var environment: Environment = world_environment.environment
+	if environment:
+		# Сначала сбрасываем туман, чтобы его настройки не оставались
+		# после перехода с дождя/снега/тумана на ясную погоду.
+		environment.fog_enabled = false
 
 	match weather:
 		"clear":
 			cloud_coverage = 0.12
-			if environment:
-				environment.fog_enabled = false
+			if sky_material:
+				sky_material.set_shader_parameter("cloud_opacity", 0.16)
 
 		"rain":
 			cloud_coverage = 0.82
 			rain.emitting = true
+			if sky_material:
+				sky_material.set_shader_parameter("cloud_opacity", 0.75)
 
 			if environment:
 				environment.fog_enabled = true
@@ -191,6 +167,8 @@ func set_weather(weather: String) -> void:
 		"snow":
 			cloud_coverage = 0.72
 			snow.emitting = true
+			if sky_material:
+				sky_material.set_shader_parameter("cloud_opacity", 0.65)
 
 			if environment:
 				environment.fog_enabled = true
@@ -199,10 +177,21 @@ func set_weather(weather: String) -> void:
 
 		"fog":
 			cloud_coverage = 0.65
+			if sky_material:
+				sky_material.set_shader_parameter("cloud_opacity", 0.45)
+
 			if environment:
 				environment.fog_enabled = true
 				environment.fog_density = 0.04
 				environment.fog_light_color = Color(0.55, 0.6, 0.62)
+
+		_:
+			push_warning("Неизвестный тип погоды: " + weather)
+			cloud_coverage = 0.12
+			if sky_material:
+				sky_material.set_shader_parameter("cloud_opacity", 0.16)
+
+	_update_sky_shader()
 
 
 func random_weather() -> void:
@@ -253,3 +242,22 @@ func restore_world_time(data: Dictionary) -> void:
 		float(data.get("total_world_seconds", 0.0))
 	)
 	time_scale = maxf(float(data.get("time_scale", time_scale)), 0.0)
+
+
+func _update_moon_direction() -> void:
+	if sky_material == null:
+		return
+
+	# Один игровой день длится day_length_seconds реальных секунд.
+	var game_days := total_world_seconds / maxf(day_length_seconds, 0.001)
+	var orbit_angle := TAU * game_days / moon_orbit_days
+
+	var inclination := deg_to_rad(moon_orbit_inclination_degrees)
+
+	var moon_direction := Vector3(
+		cos(orbit_angle),
+		sin(orbit_angle) * cos(inclination),
+		sin(orbit_angle) * sin(inclination)
+	).normalized()
+
+	sky_material.set_shader_parameter("moon_direction", moon_direction)

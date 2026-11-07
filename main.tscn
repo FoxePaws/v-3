@@ -23,12 +23,16 @@
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_074og"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_yaehf"]
+generate_mipmaps = false
 noise = SubResource("FastNoiseLite_074og")
 color_ramp = SubResource("Gradient_cegan")
 seamless = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yaehf"]
 shader = ExtResource("2_vivmo")
+shader_parameter/cloud_base_height = 0.0
+shader_parameter/cloud_horizon_fade_start = 0.22600001725477
+shader_parameter/cloud_horizon_fade_end = 0.35600001691
 shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
 shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
 shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
@@ -39,7 +43,7 @@ shader_parameter/atmosphere_strength = 1.0
 shader_parameter/twilight_width = 0.22
 shader_parameter/moon_direction = Vector3(-0.5, 0.3, 0.7)
 shader_parameter/sun_angular_size = 0.0270000012825
-shader_parameter/moon_angular_size = 0.0470000022325
+shader_parameter/moon_angular_size = 0.020000000950000003
 shader_parameter/moon_phase = 0.5
 shader_parameter/moon_brightness = 1.0
 shader_parameter/star_map = ExtResource("4_074og")
@@ -47,7 +51,7 @@ shader_parameter/moon_texture = ExtResource("3_yaehf")
 shader_parameter/star_brightness = 1.0
 shader_parameter/star_rotation = 0.0
 shader_parameter/cloudtext = SubResource("NoiseTexture2D_yaehf")
-shader_parameter/cloud_coverage = 1.0
+shader_parameter/cloud_coverage = 0.1950000092625
 shader_parameter/cloud_opacity = 0.16
 shader_parameter/cloud_scale = 18.0
 shader_parameter/cloud_offset = Vector2(0, 0)
@@ -115,8 +119,8 @@ material = SubResource("StandardMaterial3D_as5ja")
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
 time_scale = 0.0
-start_time = 8.27
-cloud_coverage = 1.0
+start_time = 8.77
+cloud_coverage = 0.45
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
