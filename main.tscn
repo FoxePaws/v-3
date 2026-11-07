@@ -30,9 +30,9 @@ seamless = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yaehf"]
 shader = ExtResource("2_vivmo")
-shader_parameter/cloud_base_height = 0.0
-shader_parameter/cloud_horizon_fade_start = 0.22600001725477
-shader_parameter/cloud_horizon_fade_end = 0.35600001691
+shader_parameter/cloud_base_height = 0.12
+shader_parameter/cloud_horizon_fade_start = -0.054999996092729986
+shader_parameter/cloud_horizon_fade_end = 0.80000001192093
 shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
 shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
 shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
@@ -118,9 +118,7 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-time_scale = 0.0
-start_time = 8.77
-cloud_coverage = 0.45
+cloud_coverage = 0.8
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
