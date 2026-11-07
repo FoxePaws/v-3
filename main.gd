@@ -116,8 +116,6 @@ func _update_sky_shader() -> void:
 
 	sky_material.set_shader_parameter("cloud_coverage", cloud_coverage)
 	sky_material.set_shader_parameter("cloud_offset", cloud_offset)
-	sky_material.set_shader_parameter("moon_direction", moon_direction)
-	sky_material.set_shader_parameter("star_rotation", star_rotation)
 
 
 

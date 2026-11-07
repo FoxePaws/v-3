@@ -24,7 +24,7 @@ uniform sampler2D star_map : source_color, filter_linear, repeat_enable;
 uniform sampler2D moon_texture : source_color, filter_linear, repeat_disable;
 uniform float star_brightness : hint_range(0.0, 5.0) = 1.0;
 uniform float star_rotation = 0.0;
-
+uniform sampler2D cloudtext : source_color, filter_linear, repeat_disable;
 // Дальний мягкий слой облаков. Облачный купол/плоскость — отдельный материал.
 uniform float cloud_coverage : hint_range(0.0, 1.0) = 0.2;
 uniform float cloud_opacity : hint_range(0.0, 1.0) = 0.16;
@@ -32,24 +32,7 @@ uniform float cloud_scale : hint_range(2.0, 80.0) = 18.0;
 uniform vec2 cloud_offset = vec2(0.0, 0.0);
 
 
-float hash21(vec2 p) {
-	p = fract(p * vec2(123.34, 456.21));
-	p += dot(p, p + 45.32);
-	return fract(p.x * p.y);
-}
 
-float value_noise(vec2 p) {
-	vec2 cell = floor(p);
-	vec2 f = fract(p);
-	f = f * f * (3.0 - 2.0 * f);
-
-	float a = hash21(cell);
-	float b = hash21(cell + vec2(1.0, 0.0));
-	float c = hash21(cell + vec2(0.0, 1.0));
-	float d = hash21(cell + vec2(1.0, 1.0));
-
-	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
 
 vec2 direction_to_spherical_uv(vec3 direction) {
 	vec3 d = normalize(direction);
@@ -158,15 +141,14 @@ void sky() {
 
 	// Низкочастотные дальние облака. Параметр cloud_offset задаёт движение,
 	// его следует обновлять из скрипта, а не привязывать к реальному TIME.
-	vec2 cloud_uv = view_dir.xz / max(view_dir.y + 0.35, 0.35);
-	cloud_uv = cloud_uv * cloud_scale + cloud_offset;
+	vec2 cloud_uv = (direction_to_spherical_uv(view_dir)*cloud_coverage);
 
-	float cloud_shape = value_noise(cloud_uv);
+
+
+	vec3 cloud_mask = texture(cloudtext, cloud_uv).rgb;
 	float cloud_edge = mix(0.78, 0.48, cloud_coverage);
-	float cloud_mask = smoothstep(cloud_edge, cloud_edge + 0.18, cloud_shape);
-	cloud_mask *= smoothstep(-0.02, 0.22, view_dir.y);
 
-	float cloud_alpha = cloud_mask * cloud_opacity;
+	vec3 cloud_alpha = cloud_mask * cloud_opacity;
 	vec3 cloud_day_color = vec3(0.78, 0.82, 0.88);
 	vec3 cloud_night_color = vec3(0.10, 0.13, 0.22);
 	vec3 cloud_color = mix(cloud_night_color, cloud_day_color, day_amount);
