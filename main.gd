@@ -32,7 +32,13 @@ signal world_time_advanced(delta_world_seconds: float)
 @export_range(0.0, 1.0, 0.01) var cloud_coverage: float = 0.25
 @export_range(0.0, 1.0, 0.01) var cloud_opacity: float = 0.16
 @export var wind_direction: Vector2 = Vector2(1.0, 0.0)
-@export_range(0.0, 1.0, 0.001) var wind_speed: float = 0.002
+@export_range(0.0, 1.0, 0.00001) var wind_speed: float = 0.002
+@export_range(0.0, 1.0, 0.01) var cloud_layer_coverage_multiplier: float = 0.5
+@export_group("Far Clouds")
+@export_range(0.0, 1.0, 0.01) var far_cloud_coverage: float = 0.2
+@export_range(0.0, 1.0, 0.01) var far_cloud_opacity: float = 0.12
+@export_range(0.0, 2.0, 0.01) var far_cloud_wind_multiplier: float = 0.5
+
 
 @export_group("Fog")
 @export var fog_enabled: bool = true
@@ -53,6 +59,8 @@ var _sun_direction: Vector3 = Vector3.UP
 var _moon_direction: Vector3 = Vector3.DOWN
 var _moon_phase: float = 0.5
 var _star_rotation: float = 0.0
+
+var _fog_sky_affect: float = 0.0
 
 
 func update_weather_position() -> void:
@@ -242,13 +250,30 @@ func _update_sky() -> void:
 	sky_material.set_shader_parameter("moon_direction", _moon_direction)
 	sky_material.set_shader_parameter("moon_phase", _moon_phase)
 	sky_material.set_shader_parameter("star_rotation", _star_rotation)
+	sky_material.set_shader_parameter(
+		"cloud_layer_coverage_multiplier",
+		cloud_layer_coverage_multiplier
+	)
+	sky_material.set_shader_parameter(
+		"far_cloud_coverage",
+		clampf(far_cloud_coverage * _cloud_coverage_multiplier, 0.0, 1.0)
+	)
+	sky_material.set_shader_parameter(
+		"far_cloud_opacity",
+		clampf(far_cloud_opacity * _cloud_opacity_multiplier, 0.0, 1.0)
+	)
+	sky_material.set_shader_parameter(
+		"far_cloud_wind_multiplier",
+		far_cloud_wind_multiplier
+	)
+
 
 	var environment: Environment = world_environment.environment
 	if environment != null:
 		environment.fog_enabled = fog_enabled
 		environment.fog_density = fog_density * _fog_density_multiplier
 		environment.fog_light_color = fog_color
-
+		environment.fog_sky_affect = _fog_sky_affect
 
 func update_day_night() -> void:
 	# Направленный свет в Godot направлен вдоль локальной оси -Z.
@@ -261,7 +286,7 @@ func update_day_night() -> void:
 	var sun_visibility: float = smoothstep(-0.8, 0.35, sun_height)
 	var light_factor: float = pow(sun_visibility, 0.55)
 
-	sun.light_energy = lerpf(0.0, 0.76, light_factor)
+	sun.light_energy = lerpf(0.0, 0.76, light_factor)* (1.0 - clampf(fog_density * 15 * _fog_density_multiplier , 0.0, 1.0))
 
 	var warm_factor: float = 1.0 - smoothstep(0.15, 0.7, sun_height)
 	var day_color: Color = Color(0.995, 0.721, 0.425, 1.0)
@@ -272,12 +297,15 @@ func update_day_night() -> void:
 	if environment == null:
 		return
 
+	# Энергия освещения тумана следует за энергией Солнца.
+
+
 	var ambient_factor: float = smoothstep(-0.4, 0.4, sun_height)
 	environment.ambient_light_energy = lerpf(0.04, 0.7, ambient_factor)
 	environment.adjustment_enabled = false
 	environment.adjustment_brightness = lerpf(0.04, 0.45, ambient_factor)
-
-
+	environment.fog_light_energy = lerpf(0, 0.5, ambient_factor)
+	environment.fog_sun_scatter = lerpf(0, 0.1, ambient_factor)
 func _update_celestial_directions() -> void:
 	var jd: float = game_timestamp_utc / 86400.0 + 2440587.5
 	var t: float = (jd - 2451545.0) / 36525.0
@@ -468,26 +496,29 @@ func set_weather(weather: String) -> void:
 
 	match weather:
 		"clear":
-			_cloud_coverage_multiplier = 0.48
+			_cloud_coverage_multiplier = 0.2
 			_cloud_opacity_multiplier = 1.0
-			_fog_density_multiplier = 0.0
-
+			_fog_density_multiplier = 0.0001
+			_fog_sky_affect = 0.001
 		"rain":
 			_cloud_coverage_multiplier = 1.0
 			_cloud_opacity_multiplier = 1.0
-			_fog_density_multiplier = 1.0
+			_fog_density_multiplier = 0.9
+			_fog_sky_affect = 0.6
 			rain.emitting = true
 
 		"snow":
-			_cloud_coverage_multiplier = 0.88
-			_cloud_opacity_multiplier = 1.0
-			_fog_density_multiplier = 1.67
+			_cloud_coverage_multiplier = 0.5
+			_cloud_opacity_multiplier = 0.8
+			_fog_density_multiplier = 0.3
+			_fog_sky_affect = 0.2
 			snow.emitting = true
 
 		"fog":
 			_cloud_coverage_multiplier = 0.72
 			_cloud_opacity_multiplier = 1.0
 			_fog_density_multiplier = 2.67
+			_fog_sky_affect = 1.0
 
 		_:
 			push_warning("Неизвестный тип погоды: " + weather)
@@ -495,6 +526,7 @@ func set_weather(weather: String) -> void:
 			_cloud_coverage_multiplier = 0.48
 			_cloud_opacity_multiplier = 1.0
 			_fog_density_multiplier = 0.0
+			_fog_sky_affect = 0.0
 
 	_update_sky()
 
@@ -515,11 +547,11 @@ func _on_weather_timer_timeout() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_1:
+			KEY_F1:
 				set_weather("clear")
-			KEY_2:
+			KEY_F2:
 				set_weather("rain")
-			KEY_3:
+			KEY_F3:
 				set_weather("snow")
-			KEY_4:
+			KEY_F4:
 				set_weather("fog")

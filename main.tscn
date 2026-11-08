@@ -29,6 +29,15 @@ noise = SubResource("FastNoiseLite_yaehf")
 color_ramp = SubResource("Gradient_074og")
 seamless = true
 
+[sub_resource type="Gradient" id="Gradient_82xsv"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_cegan"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_074og"]
+noise = SubResource("FastNoiseLite_cegan")
+color_ramp = SubResource("Gradient_82xsv")
+seamless = true
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vivmo"]
 shader = ExtResource("2_vivmo")
 shader_parameter/cloud_base_height = 0.12
@@ -37,17 +46,17 @@ shader_parameter/cloud_horizon_fade_end = 0.2
 shader_parameter/milky_way_map = ExtResource("3_074og")
 shader_parameter/milky_way_brightness = 0.038000001805
 shader_parameter/milky_way_rotation = 0.0
-shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
+shader_parameter/day_zenith = Color(0.14105952, 0.3738001, 0.7329664, 1)
 shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
 shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
 shader_parameter/night_zenith = Color(0.008, 0.012, 0.045, 1)
 shader_parameter/night_horizon = Color(0.035, 0.045, 0.1, 1)
 shader_parameter/ground_color = Color(0.025, 0.03, 0.04, 1)
 shader_parameter/atmosphere_strength = 1.0
-shader_parameter/twilight_width = 0.22
+shader_parameter/twilight_width = 0.02700000058398
 shader_parameter/moon_direction = Vector3(-0.5, 0.3, 0.7)
-shader_parameter/sun_angular_size = 0.0290000013775
-shader_parameter/moon_angular_size = 0.018000000855
+shader_parameter/sun_angular_size = 0.03200000152
+shader_parameter/moon_angular_size = 0.012
 shader_parameter/moon_phase = 0.5
 shader_parameter/moon_brightness = 1.0
 shader_parameter/star_map = ExtResource("4_074og")
@@ -59,17 +68,20 @@ shader_parameter/cloud_coverage = 0.2
 shader_parameter/cloud_opacity = 0.16
 shader_parameter/cloud_scale = 18.0
 shader_parameter/cloud_offset = Vector2(0, 0)
+shader_parameter/cloud_layer_coverage_multiplier = 0.5
+shader_parameter/far_cloudtext = SubResource("NoiseTexture2D_074og")
+shader_parameter/far_cloud_coverage = 0.2
+shader_parameter/far_cloud_opacity = 0.12
+shader_parameter/far_cloud_wind_multiplier = 0.5
 
 [sub_resource type="Sky" id="Sky_yaehf"]
 sky_material = SubResource("ShaderMaterial_vivmo")
 
 [sub_resource type="Environment" id="Environment_2cqfq"]
-background_mode = 2
 sky = SubResource("Sky_yaehf")
+ambient_light_source = 3
 fog_light_color = Color(0.49680004, 0.51264006, 0.54, 1)
-fog_sun_scatter = 0.5
-fog_density = 0.135
-fog_sky_affect = 0.0
+fog_sun_scatter = 0.1
 fog_depth_curve = 11.313718
 fog_depth_begin = 134.2
 fog_depth_end = 671.1
@@ -130,14 +142,16 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-time_scale = 752.7
 update_sky_every_frame = true
-cloud_coverage = 0.45
-cloud_opacity = 0.21
+cloud_coverage = 0.61
+cloud_opacity = 0.34
 wind_direction = Vector2(1, 0.2)
 wind_speed = 0.00019999999999999998
-fog_enabled = false
-fog_density = 0.045
+cloud_layer_coverage_multiplier = 0.29
+far_cloud_coverage = 0.84
+far_cloud_opacity = 0.18
+far_cloud_wind_multiplier = 0.23
+fog_density = 0.029
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
@@ -147,7 +161,7 @@ wait_time = 60.0
 autostart = true
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1346481109]
-transform = Transform3D(1, 0, 0, 0, 0.18738136, 0.9822872, 0, -0.98228735, 0.18738134, 0, 23.747, 0)
+transform = Transform3D(1, 0, 0, 0, 0.81580544, 0.5783265, 0, -0.5783265, 0.81580544, 0, 23.747, 0)
 light_color = Color(0.8087272, 0.5763494, 0.47055376, 1)
 light_angular_distance = 1.0
 shadow_enabled = true

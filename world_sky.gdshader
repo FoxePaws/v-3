@@ -42,6 +42,13 @@ uniform float cloud_opacity : hint_range(0.0, 1.0) = 0.16;
 uniform float cloud_scale : hint_range(2.0, 80.0) = 18.0;
 uniform vec2 cloud_offset = vec2(0.0, 0.0);
 
+uniform float cloud_layer_coverage_multiplier : hint_range(0.0, 1.0) = 0.5;
+
+uniform sampler2D far_cloudtext : source_color, filter_linear_mipmap, repeat_enable;
+uniform float far_cloud_coverage : hint_range(0.0, 1.0) = 0.2;
+uniform float far_cloud_opacity : hint_range(0.0, 1.0) = 0.12;
+uniform float far_cloud_wind_multiplier : hint_range(0.0, 2.0) = 0.5;
+
 
 
 vec2 direction_to_spherical_uv(vec3 direction) {
@@ -89,8 +96,8 @@ void sky() {
 	float sun_halo = pow(max(sun_dot, 0.0), 180.0);
 
 // Слабее свечение вокруг солнца.
-	sky_color += vec3(1.0, 0.30, 0.10) * sun_halo * twilight * 0.25;
-	sky_color += vec3(1.0, 0.72, 0.42) * sun_halo * day_amount * 0.08;
+	sky_color += vec3(1.0, 0.30, 0.10) * sun_halo * twilight * 0.5;
+	sky_color += vec3(1.0, 0.72, 0.42) * sun_halo * day_amount * 0.1;
 
 	// Более тёплый и менее яркий диск.
 	vec3 sun_disk_color = mix(
@@ -174,37 +181,67 @@ sky_color += milky_way * milky_way_brightness * stars_visible;
 	vec2 cloud_uv = (view_dir.xz / cloud_height) / cloud_scale;
 	cloud_uv += cloud_offset;
 
-	float cloud_noise = texture(cloudtext, cloud_uv).r;
-
 	float cloud_edge = mix(0.85, 0.30, cloud_coverage);
-	float cloud_mask = smoothstep(
+
+	// Второй слой использует тот же рисунок и те же UV.
+	// Меньшее покрытие усиливает облачные пятна, не создавая второго узора.
+	float cloud_noise_1 = texture(cloudtext, cloud_uv).r;
+	float cloud_mask_1 = smoothstep(
 		cloud_edge - 0.08,
 		cloud_edge + 0.08,
-		cloud_noise
+		cloud_noise_1
 	);
 
-	// Убираем облака у самой линии горизонта.
-	// Чем выше первый порог, тем выше начинается видимый слой.
-// Нижняя граница облаков: увеличивайте cloud_base_height, чтобы
-// облачная область начиналась выше.
-float cloud_base_fade = smoothstep(
-	cloud_base_height,
-	cloud_base_height + 0.12,
-	view_dir.y
-);
+	float cloud_coverage_2 = clamp(
+		cloud_coverage * cloud_layer_coverage_multiplier,
+		0.0,
+		1.0
+	);
+	float cloud_edge_2 = mix(0.85, 0.30, cloud_coverage_2);
+	float cloud_mask_2 = smoothstep(
+		cloud_edge_2 - 0.08,
+		cloud_edge_2 + 0.08,
+		cloud_noise_1
+	);
 
-// Отдельное плавное исчезновение у горизонта.
-// Меньшие значения позволяют облакам дотянуться ближе к горизонту.
-float horizon_fade = smoothstep(
-	cloud_horizon_fade_start,
-	cloud_horizon_fade_end,
-	view_dir.y
-);
+	// Дальний слой использует отдельную текстуру и движется медленнее
+	// или быстрее в соответствии с far_cloud_wind_multiplier.
+	vec2 far_cloud_uv = (view_dir.xz / cloud_height) / cloud_scale;
+	far_cloud_uv += cloud_offset * far_cloud_wind_multiplier;
 
-cloud_mask *= cloud_base_fade * horizon_fade;
+	float far_cloud_edge = mix(0.85, 0.30, far_cloud_coverage);
+	float far_cloud_noise = texture(far_cloudtext, far_cloud_uv).r;
+	float far_cloud_mask = smoothstep(
+		far_cloud_edge - 0.08,
+		far_cloud_edge + 0.08,
+		far_cloud_noise
+	);
 
+	float cloud_base_fade = smoothstep(
+		cloud_base_height,
+		cloud_base_height + 0.12,
+		view_dir.y
+	);
+	float horizon_fade = smoothstep(
+		cloud_horizon_fade_start,
+		cloud_horizon_fade_end,
+		view_dir.y
+	);
+	float cloud_fade = cloud_base_fade * horizon_fade;
 
-	// Не рисуем облака под горизонтом, край делаем плавным.
+	cloud_mask_1 *= cloud_fade;
+	cloud_mask_2 *= cloud_fade;
+	far_cloud_mask *= cloud_fade;
+
+	// Альфа-композитинг: перекрывающиеся слои становятся плотнее.
+	float cloud_alpha_1 = cloud_mask_1 * cloud_opacity;
+	float cloud_alpha_2 = cloud_mask_2 * cloud_opacity;
+	float far_cloud_alpha = far_cloud_mask * far_cloud_opacity;
+
+	float cloud_alpha = cloud_alpha_1
+		+ cloud_alpha_2 * (1.0 - cloud_alpha_1);
+	cloud_alpha = cloud_alpha
+		+ far_cloud_alpha * (1.0 - cloud_alpha);
 
 	vec3 cloud_day_color = vec3(0.78, 0.82, 0.88);
 	vec3 cloud_night_color = vec3(0.10, 0.13, 0.22);
@@ -215,7 +252,7 @@ cloud_mask *= cloud_base_fade * horizon_fade;
 		twilight * horizon_factor * 0.5
 	);
 
-	float cloud_alpha = cloud_mask * cloud_opacity;
-	COLOR = mix(sky_color, cloud_color, cloud_alpha);
+	COLOR = mix(sky_color, cloud_color, clamp(cloud_alpha, 0.0, 1.0));
+
 
 }
