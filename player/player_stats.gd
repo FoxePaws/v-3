@@ -82,30 +82,60 @@ func _connect_world_clock() -> void:
 			"PlayerStats: current scene не предоставляет world_time_advanced"
 		)
 
+func _process(_delta: float) -> void:
+	# Восстановление и таймеры идут через world_time_advanced,
+	# чтобы time_scale влиял на них так же, как на игровой календарь.
+	pass
 
-func _process(delta: float) -> void:
-	if _recovery_timer > 0.0:
-		_recovery_timer = maxf(_recovery_timer - delta, 0.0)
+
+func _on_world_time_advanced(delta_world_seconds: float) -> void:
+	if delta_world_seconds <= 0.0:
 		return
 
-	var changed: bool = false
+	var effects_changed: bool = false
+
+	for index: int in range(active_status_effects.size() - 1, -1, -1):
+		var effect: Dictionary = active_status_effects[index]
+		var remaining: float = float(
+			effect.get("remaining_world_seconds", 0.0)
+		) - delta_world_seconds
+
+		if remaining <= 0.0:
+			active_status_effects.remove_at(index)
+			effects_changed = true
+		else:
+			effect["remaining_world_seconds"] = remaining
+			active_status_effects[index] = effect
+
+	if effects_changed:
+		_recalculate_status_modifiers()
+
+	if _recovery_timer > 0.0:
+		_recovery_timer = maxf(
+			_recovery_timer - delta_world_seconds,
+			0.0
+		)
+		return
+
+	var resources_changed: bool = false
 
 	if current_stamina < max_stamina:
 		current_stamina = minf(
-			current_stamina + stamina_recovery * delta,
+			current_stamina + stamina_recovery * delta_world_seconds,
 			max_stamina
 		)
-		changed = true
+		resources_changed = true
 
 	if current_willpower < max_willpower and willpower_recovery > 0.0:
 		current_willpower = minf(
-			current_willpower + willpower_recovery * delta,
+			current_willpower + willpower_recovery * delta_world_seconds,
 			max_willpower
 		)
-		changed = true
+		resources_changed = true
 
-	if changed:
+	if resources_changed:
 		_emit_resources_changed()
+
 
 
 func is_exhausted() -> bool:
@@ -357,29 +387,6 @@ func clear_status_effects() -> void:
 	active_status_effects.clear()
 	_recalculate_status_modifiers()
 
-
-func _on_world_time_advanced(delta_world_seconds: float) -> void:
-	if delta_world_seconds <= 0.0 or active_status_effects.is_empty():
-		return
-
-	var changed: bool = false
-
-	for index: int in range(active_status_effects.size() - 1, -1, -1):
-		var effect: Dictionary = active_status_effects[index]
-		var remaining: float = float(
-			effect.get("remaining_world_seconds", 0.0)
-		)
-		remaining -= delta_world_seconds
-
-		if remaining <= 0.0:
-			active_status_effects.remove_at(index)
-			changed = true
-		else:
-			effect["remaining_world_seconds"] = remaining
-			active_status_effects[index] = effect
-
-	if changed:
-		_recalculate_status_modifiers()
 
 
 func _recalculate_status_modifiers() -> void:

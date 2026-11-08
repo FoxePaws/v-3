@@ -5,6 +5,10 @@ uniform float cloud_base_height : hint_range(0.0, 0.8) = 0.12;
 uniform float cloud_horizon_fade_start : hint_range(-0.2, 0.5) = 0.02;
 uniform float cloud_horizon_fade_end : hint_range(0.0, 0.8) = 0.20;
 
+uniform sampler2D milky_way_map : source_color, filter_linear, repeat_enable;
+uniform float milky_way_brightness : hint_range(0.0, 5.0) = 0.0;
+uniform float milky_way_rotation = 0.0;
+
 
 // Атмосфера
 uniform vec3 day_zenith : source_color = vec3(0.12, 0.34, 0.68);
@@ -96,12 +100,21 @@ void sky() {
 	);
 	sky_color += sun_disk_color * sun_disk * 0.87;
 
-	// Звёздная карта вращается параметром star_rotation.
-	vec2 star_uv = direction_to_spherical_uv(view_dir);
-	star_uv.x = fract(star_uv.x + star_rotation);
-	vec3 stars = texture(star_map, star_uv).rgb;
-	float stars_visible = night_amount * (1.0 - twilight * 0.65);
-	sky_color += stars * star_brightness * stars_visible;
+// Звёзды и Млечный Путь используют эквидистантные карты
+// и скрываются при дневном свете.
+vec2 star_uv = direction_to_spherical_uv(view_dir);
+
+vec2 rotated_star_uv = star_uv;
+rotated_star_uv.x = fract(rotated_star_uv.x + star_rotation);
+vec3 stars = texture(star_map, rotated_star_uv).rgb;
+
+vec2 milky_way_uv = star_uv;
+milky_way_uv.x = fract(milky_way_uv.x + milky_way_rotation);
+vec3 milky_way = texture(milky_way_map, milky_way_uv).rgb;
+
+float stars_visible = night_amount * (1.0 - twilight * 0.65);
+sky_color += stars * star_brightness * stars_visible;
+sky_color += milky_way * milky_way_brightness * stars_visible;
 
 	// Лунный диск: отдельное направление, не обязательно строго напротив Солнца.
 	float moon_dot = clamp(dot(view_dir, moon_dir), -1.0, 1.0);

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b3ssn0ps1ec7g" path="res://textures/pesok.png" id="2_kek77"]
 [ext_resource type="Shader" uid="uid://bjjg308nydhpe" path="res://world_sky.gdshader" id="2_vivmo"]
 [ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="3_4c57u"]
+[ext_resource type="Texture2D" uid="uid://c6b8y2yjr8enx" path="res://textures/Milkyway.jpg" id="3_074og"]
 [ext_resource type="PackedScene" uid="uid://datumxyio33qi" path="res://Props/rat.tscn" id="3_efxa6"]
 [ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
 [ext_resource type="Texture2D" uid="uid://dayrd1ojttbs0" path="res://textures/MoonMap.png" id="3_yaehf"]
@@ -33,6 +34,9 @@ shader = ExtResource("2_vivmo")
 shader_parameter/cloud_base_height = 0.12
 shader_parameter/cloud_horizon_fade_start = 0.02
 shader_parameter/cloud_horizon_fade_end = 0.2
+shader_parameter/milky_way_map = ExtResource("3_074og")
+shader_parameter/milky_way_brightness = 0.038000001805
+shader_parameter/milky_way_rotation = 0.0
 shader_parameter/day_zenith = Color(0.12, 0.34, 0.68, 1)
 shader_parameter/day_horizon = Color(0.72, 0.64, 0.55, 1)
 shader_parameter/sunset_color = Color(1, 0.3, 0.1, 1)
@@ -118,10 +122,10 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-time_scale = 3.0
-cloud_coverage = 0.56
+update_sky_every_frame = true
+cloud_coverage = 0.59
 wind_direction = Vector2(1, 0.2)
-wind_speed = 0.025
+wind_speed = 0.00019999999999999998
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
