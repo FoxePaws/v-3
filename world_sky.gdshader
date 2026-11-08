@@ -75,17 +75,7 @@ void sky() {
 	vec3 night_sky = mix(night_horizon, night_zenith, pow(sky_height, 0.55));
 	vec3 sky_color = mix(night_sky, day_sky, day_amount);
 
-	float horizon_glow = exp(-abs(view_dir.y) * 9.0) * twilight;
-	sky_color = mix(
-		sky_color,
-		sunset_color,
-		clamp(horizon_glow * atmosphere_strength, 0.0, 1.0)
-	);
-
-	// Темнее под горизонтом — при этом sky shader остаётся небом, не землёй.
-	sky_color = mix(sky_color, ground_color, smoothstep(0.0, -0.08, view_dir.y));
-
-	// Солнце следует за основным DirectionalLight3D.
+// Солнце следует за основным DirectionalLight3D.
 	float sun_dot = clamp(dot(view_dir, sun_dir), -1.0, 1.0);
 	float sun_angle = acos(sun_dot);
 	float sun_disk = 1.0 - smoothstep(
@@ -95,9 +85,19 @@ void sky() {
 	);
 	float sun_halo = pow(max(sun_dot, 0.0), 180.0);
 
+	float sun_halo2 = pow(max(sun_dot, 0.0), 5.0) ;
+	
+	float horizon_glow = exp(-abs(view_dir.y) * 6.0) * twilight;
+	sky_color = mix(
+		sky_color,
+		sunset_color,
+		clamp(horizon_glow * atmosphere_strength * sun_halo2 , 0.0, 1.0)
+	);
+
+
 // Слабее свечение вокруг солнца.
-	sky_color += vec3(1.0, 0.30, 0.10) * sun_halo * twilight * 0.5;
-	sky_color += vec3(1.0, 0.72, 0.42) * sun_halo * day_amount * 0.1;
+	sky_color += vec3(1.0, 0.30, 0.10) * sun_halo * twilight * 0.1;
+	sky_color += vec3(1.0, 0.72, 0.42) * sun_halo * day_amount * 0.2;
 
 	// Более тёплый и менее яркий диск.
 	vec3 sun_disk_color = mix(
@@ -107,21 +107,26 @@ void sky() {
 	);
 	sky_color += sun_disk_color * sun_disk * 0.87;
 
-// Звёзды и Млечный Путь используют эквидистантные карты
-// и скрываются при дневном свете.
-vec2 star_uv = direction_to_spherical_uv(view_dir);
+	// Темнее под горизонтом — при этом sky shader остаётся небом, не землёй.
+	sky_color = mix(sky_color, ground_color, smoothstep(0.0, -0.08, view_dir.y));
 
-vec2 rotated_star_uv = star_uv;
-rotated_star_uv.x = fract(rotated_star_uv.x + star_rotation);
-vec3 stars = texture(star_map, rotated_star_uv).rgb;
+	
 
-vec2 milky_way_uv = star_uv;
-milky_way_uv.x = fract(milky_way_uv.x + milky_way_rotation);
-vec3 milky_way = texture(milky_way_map, milky_way_uv).rgb;
+	// Звёзды и Млечный Путь используют эквидистантные карты
+	// и скрываются при дневном свете.
+	vec2 star_uv = direction_to_spherical_uv(view_dir);
 
-float stars_visible = night_amount * (1.0 - twilight * 0.65);
-sky_color += stars * star_brightness * stars_visible;
-sky_color += milky_way * milky_way_brightness * stars_visible;
+	vec2 rotated_star_uv = star_uv;
+	rotated_star_uv.x = fract(rotated_star_uv.x + star_rotation);
+	vec3 stars = texture(star_map, rotated_star_uv).rgb;
+
+	vec2 milky_way_uv = star_uv;
+	milky_way_uv.x = fract(milky_way_uv.x + milky_way_rotation);
+	vec3 milky_way = texture(milky_way_map, milky_way_uv).rgb;
+
+	float stars_visible = night_amount * (1.0 - twilight * 0.65);	
+	sky_color += stars * star_brightness * stars_visible;
+	sky_color += milky_way * milky_way_brightness * stars_visible;
 
 	// Лунный диск: отдельное направление, не обязательно строго напротив Солнца.
 	float moon_dot = clamp(dot(view_dir, moon_dir), -1.0, 1.0);
@@ -249,7 +254,7 @@ sky_color += milky_way * milky_way_brightness * stars_visible;
 	cloud_color = mix(
 		cloud_color,
 		sunset_color,
-		twilight * horizon_factor * 0.5
+		twilight * horizon_factor * 12.0
 	);
 
 	COLOR = mix(sky_color, cloud_color, clamp(cloud_alpha, 0.0, 1.0));
