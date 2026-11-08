@@ -66,6 +66,14 @@ sky_material = SubResource("ShaderMaterial_vivmo")
 [sub_resource type="Environment" id="Environment_2cqfq"]
 background_mode = 2
 sky = SubResource("Sky_yaehf")
+fog_light_color = Color(0.49680004, 0.51264006, 0.54, 1)
+fog_sun_scatter = 0.5
+fog_density = 0.135
+fog_sky_affect = 0.0
+fog_depth_curve = 11.313718
+fog_depth_begin = 134.2
+fog_depth_end = 671.1
+adjustment_contrast = 0.97
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sqlk1"]
 emission_shape = 1
@@ -122,10 +130,14 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
+time_scale = 752.7
 update_sky_every_frame = true
-cloud_coverage = 0.59
+cloud_coverage = 0.45
+cloud_opacity = 0.21
 wind_direction = Vector2(1, 0.2)
 wind_speed = 0.00019999999999999998
+fog_enabled = false
+fog_density = 0.045
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=34638048]
 environment = SubResource("Environment_2cqfq")
