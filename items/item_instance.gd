@@ -19,12 +19,19 @@ var durability: float = -1.0
 @export var secondary_grip_point: Marker3D
 
 
+signal total_weight_changed(old_weight: float, new_weight: float)
+
+var base_weight: float = 0.0
+var total_weight: float = 0.0
+
+
 func _ready() -> void:
 	if instance_id.is_empty():
 		instance_id = str(ResourceUID.create_id())
 
 	if primary_grip_point == null:
 		primary_grip_point = get_node_or_null("PrimaryGripPoint") as Marker3D
+
 	if secondary_grip_point == null:
 		secondary_grip_point = get_node_or_null("SecondaryGripPoint") as Marker3D
 
@@ -35,25 +42,51 @@ func _ready() -> void:
 	if durability < 0.0:
 		durability = data.max_durability
 
+	_initialize_weight()
 	_apply_item_data()
+	
 
 
 func setup(item_data: ItemData, initial_state: Dictionary = {}) -> void:
 	data = item_data
-
-	# Словарь сохранения содержит instance_id и вложенный state.
-	# Старые вызовы setup(data, {"custom_key": value}) продолжают работать.
+	
 	if initial_state.has("instance_id") or initial_state.has("durability"):
 		load_state_dict(initial_state)
 	else:
 		state = initial_state.duplicate(true)
 
+	_initialize_weight()
+
 	if is_inside_tree():
 		if instance_id.is_empty():
 			instance_id = str(ResourceUID.create_id())
+
 		if data != null and durability < 0.0:
 			durability = data.max_durability
 		_apply_item_data()
+
+
+func _initialize_weight() -> void:
+	if data == null:
+		base_weight = 0.0
+		total_weight = 0.0
+		return
+
+	base_weight = maxf(data.item_weight, 0.0)
+	total_weight = base_weight
+
+
+func change_contents_weight(weight_delta: float) -> void:
+	if is_zero_approx(weight_delta):
+		return
+
+	var old_weight: float = total_weight
+	total_weight = maxf(base_weight, total_weight + weight_delta)
+
+	if not is_equal_approx(old_weight, total_weight):
+		total_weight_changed.emit(old_weight, total_weight)
+
+
 
 func make_state_dict() -> Dictionary:
 	return {
@@ -148,3 +181,26 @@ func enable_collision() -> void:
 	sleeping = false
 	collision_layer = saved_collision_layer
 	collision_mask = saved_collision_mask
+
+
+func set_total_weight(new_weight: float) -> void:
+	var clamped_weight: float = maxf(base_weight, new_weight)
+	if is_equal_approx(total_weight, clamped_weight):
+		return
+
+	var old_weight: float = total_weight
+	total_weight = clamped_weight
+	total_weight_changed.emit(old_weight, total_weight)
+
+
+func recalculate_total_weight() -> float:
+	var contents_weight: float = 0.0
+
+	for child: Node in get_children():
+		if child is ItemContainer:
+			var container: ItemContainer = child as ItemContainer
+			contents_weight += container.recalculate_contents_weight()
+
+	var recalculated_weight: float = base_weight + contents_weight
+	set_total_weight(recalculated_weight)
+	return total_weight

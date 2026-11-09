@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_tyc82"]
 [ext_resource type="Texture2D" uid="uid://bfyafyeeabueh" path="res://textures/ui ic/ui_PL.png" id="2_idl6u"]
+[ext_resource type="Script" uid="uid://n77l3xetfruv" path="res://items/item_container.gd" id="3_idl6u"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vn14l"]
 albedo_texture = ExtResource("2_idl6u")
@@ -31,3 +32,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.51937973, 0)
 
 [node name="AttachPoint" type="Marker3D" parent="." unique_id=1451120272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.51937973, 0)
+
+[node name="ItemContainer" type="Node3D" parent="." unique_id=1506414563]
+script = ExtResource("3_idl6u")
+capacity = 2

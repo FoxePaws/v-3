@@ -210,6 +210,13 @@ func load_game(slot_name: String = DEFAULT_SLOT) -> bool:
 			scene
 		)
 
+	for item: ItemInstance in restored_items:
+		item.recalculate_total_weight()
+
+	player.equipment.recalculate_equipment_weight()
+
+
+
 	# Время восстанавливаем до эффектов: PlayerStats подключён к сигналу
 	# мирового времени основной сцены.
 	_restore_world_time_from_save(scene, save_data)

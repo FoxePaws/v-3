@@ -25,4 +25,5 @@ equipment_slot = &"Shirt"
 clothing_visual_id = &"Sweater"
 hide_clothing_visuals = Array[StringName]([&"Bra"])
 bone_name = &"Head"
+item_weight = 1.5
 body_shape_keys = Array[ExtResource("1_qqmqd")]([SubResource("Resource_2cqfq")])

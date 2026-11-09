@@ -37,6 +37,17 @@ signal status_effects_changed()
 @export_range(0.0, 1.0, 0.01) var exhausted_sprint_multiplier: float = 0.5
 @export_range(0.0, 1.0, 0.01) var exhausted_jump_multiplier: float = 0.5
 
+@export_category("Carried weight")
+@export_range(0.1, 10000.0, 0.1) var max_carry_weight: float = 30.0
+@export_range(0.0, 1.0, 0.01) var max_walk_weight_penalty: float = 0.25
+@export_range(0.0, 1.0, 0.01) var max_sprint_weight_penalty: float = 0.25
+@export_range(0.0, 1.0, 0.01) var max_jump_weight_penalty: float = 0.25
+@export_range(0.0, 10.0, 0.01) var max_stamina_cost_weight_penalty: float = 0.25
+
+var equipment_weight: float = 0.0
+
+
+
 var current_willpower: float = 100.0
 var current_stamina: float = 100.0
 
@@ -86,6 +97,14 @@ func _process(_delta: float) -> void:
 	# Восстановление и таймеры идут через world_time_advanced,
 	# чтобы time_scale влиял на них так же, как на игровой календарь.
 	pass
+
+func set_equipment_weight(weight: float) -> void:
+	var clamped_weight: float = maxf(weight, 0.0)
+	if is_equal_approx(equipment_weight, clamped_weight):
+		return
+
+	equipment_weight = clamped_weight
+	recalculate_stats()
 
 
 func _on_world_time_advanced(delta_world_seconds: float) -> void:
@@ -284,6 +303,21 @@ func recalculate_stats() -> void:
 		(base_willpower_cost_multiplier + _add_value(all_modifiers, "willpower_cost_multiplier_add"))
 		* _multiplier_value(all_modifiers, "willpower_cost_multiplier_multiplier")
 	)
+
+	var load_ratio: float = clampf(
+		equipment_weight / max_carry_weight,
+		0.0,
+		1.0
+	)
+	var load_factor: float = load_ratio * load_ratio
+
+	walk_speed *= 1.0 - max_walk_weight_penalty * load_factor
+	sprint_speed *= 1.0 - max_sprint_weight_penalty * load_factor
+	jump_velocity *= 1.0 - max_jump_weight_penalty * load_factor
+	stamina_cost_multiplier *= (
+		1.0 + max_stamina_cost_weight_penalty * load_factor
+	)
+
 
 	current_willpower = clampf(current_willpower, 0.0, max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, max_stamina)

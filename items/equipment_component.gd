@@ -23,6 +23,8 @@ var player: Player
 # Mesh instance ID -> { shape name -> original value }
 var _base_shape_values: Dictionary = {}
 
+var _weight_connected_items: Array[ItemInstance] = []
+
 
 func _ready() -> void:
 	for slot_id in slot_ids:
@@ -117,6 +119,7 @@ func equip(item: ItemInstance, slot_id: StringName) -> bool:
 	item.current_holder = self
 	item.current_hand = null
 
+	_refresh_equipment_weight_connections()
 	_refresh_clothing_visibility()
 	refresh_equipment_blend_shapes()
 
@@ -132,6 +135,8 @@ func unequip(slot_id: StringName) -> ItemInstance:
 		return null
 
 	slots[slot_id] = null
+	
+	_refresh_equipment_weight_connections()
 
 	var scene_root := get_tree().current_scene
 	if scene_root != null:
@@ -307,6 +312,50 @@ func clear_slots_for_load() -> void:
 
 	_refresh_clothing_visibility()
 	refresh_equipment_blend_shapes()
+	_refresh_equipment_weight_connections()
+
 
 	if player != null:
 		player.recalculate_equipment_stats()
+
+func recalculate_equipment_weight() -> void:
+	var total_weight: float = 0.0
+
+	for slot_id: StringName in slot_ids:
+		var item: ItemInstance = get_item(slot_id)
+		if item == null:
+			continue
+
+		total_weight += item.total_weight
+
+	if player != null and player.stats != null:
+		player.stats.set_equipment_weight(total_weight)
+
+
+func _refresh_equipment_weight_connections() -> void:
+	for item: ItemInstance in _weight_connected_items:
+		if is_instance_valid(item):
+			var callback: Callable = _on_equipped_item_weight_changed
+			if item.total_weight_changed.is_connected(callback):
+				item.total_weight_changed.disconnect(callback)
+
+	_weight_connected_items.clear()
+
+	for slot_id: StringName in slot_ids:
+		var item: ItemInstance = get_item(slot_id)
+		if item == null or _weight_connected_items.has(item):
+			continue
+
+		item.total_weight_changed.connect(
+			_on_equipped_item_weight_changed
+		)
+		_weight_connected_items.append(item)
+
+	recalculate_equipment_weight()
+
+
+func _on_equipped_item_weight_changed(
+	_old_weight: float,
+	_new_weight: float
+) -> void:
+	recalculate_equipment_weight()
