@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c54qajd2uulcy"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_k6vxc"]
+[ext_resource type="PackedScene" uid="uid://bt20djls4hg77" path="res://items/data/buzz.tscn" id="2_b5yth"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="2_m7o2p"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dv8pr"]
+load_path = "res://.godot/imported/Tx_Doll_Fox.png-f68e5abed386b3e6e6116154820976a4.ctex"
+
+[resource]
+script = ExtResource("2_m7o2p")
+item_id = &"buzz"
+display_name = "buzz"
+item_scene = ExtResource("2_b5yth")
+icon = SubResource("CompressedTexture2D_dv8pr")

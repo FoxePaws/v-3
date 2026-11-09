@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://dwwmfn3eu633b"]
+
+[ext_resource type="Texture2D" uid="uid://68p63j5hkoc3" path="res://textures/1c1.png" id="1_rbxyu"]
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/status_effect_data.gd" id="2_qb8wx"]
+
+[resource]
+script = ExtResource("2_qb8wx")
+effect_id = &"buzz"
+display_name = "buzz"
+icon = ExtResource("1_rbxyu")
+modifiers = Dictionary[String, float]({
+"max_willpower_add": -20.0,
+"stamina_recovery_add": 5.0
+})

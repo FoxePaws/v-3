@@ -48,12 +48,12 @@ enum ItemType {
 @export var protection: float = 0.0
 @export var warmth: float = 0.0
 
-@export_category("Container")
-@export var container_capacity: int = 0
-@export var max_item_size: float = 0.0
-@export var item_size: float = 1.0
+@export_category("Item")
+@export_range(0.0, 10000.0, 0.01) var item_size: float = 1.0
+@export_range(0.0, 10000.0, 0.01) var item_weight: float = 1.0
 
-@export_group("Body Blend Shapes")
+
+@export_category("Body Blend Shapes")
 @export var body_shape_keys: Array[BlendShapeSetting] = []
 @export var head_shape_keys: Array[BlendShapeSetting] = []
 @export var sweater_shape_keys: Array[BlendShapeSetting] = []

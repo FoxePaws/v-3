@@ -2,7 +2,7 @@
 class_name ItemInstance
 extends RigidBody3D
 
-@export var data: ItemData
+var data: ItemData
 
 var instance_id: String = ""
 var state: Dictionary = {}

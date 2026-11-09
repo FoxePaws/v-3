@@ -9,4 +9,4 @@ extends Resource
 # Модификаторы с ключами PlayerStats, например:
 # max_willpower_add, stamina_recovery_multiplier,
 # walk_speed_multiplier, jump_velocity_multiplier.
-@export var modifiers: Dictionary = {}
+@export var modifiers: Dictionary[String, float] = {}

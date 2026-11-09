@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
 [ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
 [ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
+[ext_resource type="Resource" uid="uid://c54qajd2uulcy" path="res://items/data/buzz_item.tres" id="19_cegan"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -149,12 +150,11 @@ material = SubResource("StandardMaterial3D_as5ja")
 
 [node name="World" type="Node3D" unique_id=633478889]
 script = ExtResource("1_vivmo")
-time_scale = 0.0
 update_sky_every_frame = true
 cloud_coverage = 0.91
 cloud_opacity = 0.35
 wind_direction = Vector2(1, 0.3)
-wind_speed = 0.00019999999999999998
+wind_speed = 0.00019999999999999
 cloud_layer_coverage_multiplier = 0.29
 far_cloud_coverage = 0.63
 far_cloud_opacity = 0.38
@@ -263,3 +263,7 @@ item_data = ExtResource("13_w48qg")
 [node name="ItemSpawner7" parent="." unique_id=267184787 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.232813, 0.124922335, -5.4139047)
 item_data = ExtResource("14_vivmo")
+
+[node name="ItemSpawner8" parent="." unique_id=1390014951 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.153965, -0.010000229, 2.2933846)
+item_data = ExtResource("19_cegan")

@@ -1,7 +1,9 @@
 class_name ItemContainer
 extends Node
 
+
 @export_range(1, 100) var capacity: int = 8
+@export_range(0.0, 10000.0, 0.01) var max_item_size: float = 0.0
 @export var hide_item_models: bool = true
 
 var items: Array[ItemInstance] = []
@@ -31,14 +33,8 @@ func can_accept(item: ItemInstance, index: int = -1) -> bool:
 		if _first_empty_slot() < 0:
 			return false
 
-	var max_size := 0.0
-	var container_item := get_parent() as ItemInstance
-
-	if container_item != null and container_item.data != null:
-		max_size = container_item.data.max_item_size
-
-	if max_size > 0.0 and item.data != null:
-		if item.data.item_size > max_size:
+	if max_item_size > 0.0 and item.data != null:
+		if item.data.item_size > max_item_size:
 			return false
 
 	return true

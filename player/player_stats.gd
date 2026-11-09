@@ -410,12 +410,20 @@ func _recalculate_status_modifiers() -> void:
 	set_status_modifiers(combined)
 	status_effects_changed.emit()
 
-
 func make_status_effects_save_data() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 
 	for effect: Dictionary in active_status_effects:
-		result.append(effect.duplicate(true))
+		var remaining: float = float(
+			effect.get("remaining_world_seconds", 0.0)
+		)
+		if remaining <= 0.0:
+			continue
+
+		result.append({
+			"resource_path": str(effect.get("resource_path", "")),
+			"remaining_world_seconds": remaining,
+		})
 
 	return result
 
@@ -431,23 +439,43 @@ func restore_status_effects_save_data(raw_effects: Variant) -> void:
 		if not raw_effect is Dictionary:
 			continue
 
-		var effect: Dictionary = (raw_effect as Dictionary).duplicate(true)
+		var saved: Dictionary = raw_effect as Dictionary
+		var resource_path: String = str(
+			saved.get("resource_path", "")
+		)
 		var remaining: float = float(
-			effect.get("remaining_world_seconds", 0.0)
+			saved.get("remaining_world_seconds", 0.0)
 		)
 
-		if remaining <= 0.0:
+		if resource_path.is_empty() or remaining <= 0.0:
+			continue
+		if not ResourceLoader.exists(resource_path):
+			push_warning(
+				"PlayerStats: ресурс эффекта не найден: %s"
+				% resource_path
+			)
 			continue
 
-		# По возможности перезагружаем Resource-источник.
-		var resource_path: String = str(effect.get("resource_path", ""))
-		if not resource_path.is_empty() and ResourceLoader.exists(resource_path):
-			var loaded: Resource = load(resource_path)
-			if loaded is StatusEffectData:
-				var effect_data: StatusEffectData = loaded as StatusEffectData
-				effect["effect_id"] = str(effect_data.effect_id)
-				effect["modifiers"] = effect_data.modifiers.duplicate(true)
+		var loaded: Resource = load(resource_path)
+		if not loaded is StatusEffectData:
+			push_warning(
+				"PlayerStats: ресурс не является StatusEffectData: %s"
+				% resource_path
+			)
+			continue
 
-		active_status_effects.append(effect)
+		var effect_data: StatusEffectData = loaded as StatusEffectData
+
+		active_status_effects.append({
+			"effect_id": str(effect_data.effect_id),
+			"resource_path": resource_path,
+			"remaining_world_seconds": remaining,
+			"modifiers": effect_data.modifiers.duplicate(true),
+			"icon_path": (
+				effect_data.icon.resource_path
+				if effect_data.icon != null
+				else ""
+			),
+		})
 
 	_recalculate_status_modifiers()
