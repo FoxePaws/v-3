@@ -1,9 +1,10 @@
 class_name StatBarUI
 extends PanelContainer
 
-@onready var name_label: Label = $Margin/Column/Header/NameLabel
-@onready var value_label: Label = $Margin/Column/Header/ValueLabel
 @onready var progress_bar: ProgressBar = $Margin/Column/ProgressBar
+@onready var value_label: Label = $Margin/Column/ProgressBar/ValueLabel
+
+
 
 
 func set_stat(
@@ -14,8 +15,8 @@ func set_stat(
 	var safe_maximum: float = maxf(maximum_value, 0.0)
 	var safe_current: float = clampf(current_value, 0.0, safe_maximum)
 
-	name_label.text = stat_name
-	value_label.text = "%s / %s" % [
+	value_label.text = "%s  %s / %s" % [
+		stat_name,
 		_format_number(safe_current),
 		_format_number(safe_maximum),
 	]

@@ -16,16 +16,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="BottomLeft" type="VBoxContainer" parent="Layout" unique_id=1609206371]
+[node name="BottomLeft" type="HBoxContainer" parent="Layout" unique_id=277068615]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 7.0
+offset_top = 526.0
+offset_right = 271.0
+offset_bottom = 642.0
+
+[node name="Bars" type="VBoxContainer" parent="Layout/BottomLeft" unique_id=1999435690]
+layout_mode = 2
+
+[node name="StaminaBar" parent="Layout/BottomLeft/Bars" unique_id=8740677 instance=ExtResource("2_546lt")]
+layout_mode = 2
+
+[node name="WillpowerBar" parent="Layout/BottomLeft/Bars" unique_id=1573466186 instance=ExtResource("2_546lt")]
+layout_mode = 2
 
 [node name="StatusEffects" type="HBoxContainer" parent="Layout/BottomLeft" unique_id=2026784765]
-layout_mode = 2
-
-[node name="StaminaBar" parent="Layout/BottomLeft" unique_id=8740677 instance=ExtResource("2_546lt")]
-layout_mode = 2
-
-[node name="WillpowerBar" parent="Layout/BottomLeft" unique_id=1573466186 instance=ExtResource("2_546lt")]
 layout_mode = 2

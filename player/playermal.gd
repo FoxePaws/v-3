@@ -11,6 +11,7 @@ enum BodyState {
 	CROUCHING,
 	LYING
 }
+@onready var hud: PlayerHUD = $HUD
 @onready var inventory_ui: InventoryUI = $InventoryUI
 @onready var stats: PlayerStats = $PlayerStats
 @export_category("Movement")
@@ -129,6 +130,8 @@ func _ready() -> void:
 	# После загрузки визуальных узлов заполните clothing_visuals.
 	recalculate_equipment_stats()
 	_apply_body_collision_shapes()
+	hud.bind_stats(stats)
+
 
 
 func recalculate_equipment_stats() -> void:

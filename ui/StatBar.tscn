@@ -2,25 +2,33 @@
 
 [ext_resource type="Script" uid="uid://c7kll6nwcfps7" path="res://ui/stat_bar.gd" id="1_ebqpe"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_x2jpn"]
+font_size = 12
+
 [node name="StatBar" type="PanelContainer" unique_id=8740677]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 128.0
+offset_bottom = 30.0
 script = ExtResource("1_ebqpe")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=496375144]
+propagate_maximum_size = false
 layout_mode = 2
 
 [node name="Column" type="VBoxContainer" parent="Margin" unique_id=1613356222]
 layout_mode = 2
 
-[node name="Header" type="HBoxContainer" parent="Margin/Column" unique_id=2040702639]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="Margin/Column/Header" unique_id=1058701353]
-layout_mode = 2
-
-[node name="ValueLabel" type="Label" parent="Margin/Column/Header" unique_id=1928539445]
-layout_mode = 2
-
 [node name="ProgressBar" type="ProgressBar" parent="Margin/Column" unique_id=1520726559]
+custom_minimum_size = Vector2(128, 30)
 layout_mode = 2
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="Margin/Column/ProgressBar" unique_id=1928539445]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 4.0
+offset_right = 129.0
+offset_bottom = 27.0
+text = "Name : 123/123"
+label_settings = SubResource("LabelSettings_x2jpn")
+vertical_alignment = 1
+max_lines_visible = 1

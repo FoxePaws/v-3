@@ -14,3 +14,7 @@ func setup(
 		effect_name,
 		effect_description,
 	]
+
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	icon_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
