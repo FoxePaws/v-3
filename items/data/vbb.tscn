@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://dkoifjgl5i1mb"]
+
+[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_ig4dg"]
+[ext_resource type="Resource" uid="uid://bt3xaepy07rwk" path="res://items/moods/vbb1.tres" id="2_nu43j"]
+[ext_resource type="Resource" uid="uid://b4ti8vouxhjfg" path="res://items/moods/vbb2.tres" id="3_qgn71"]
+[ext_resource type="Resource" uid="uid://clnl7bih5saiv" path="res://items/moods/vbb3.tres" id="4_4ede7"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu43j"]
+radius = 0.02
+height = 0.08
+
+[sub_resource type="SphereMesh" id="SphereMesh_nb5cy"]
+radius = 0.02
+height = 0.08
+
+[node name="vbb" type="RigidBody3D" unique_id=1960892598 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("1_ig4dg")
+clothing_effect_type = 1
+mode_effect_1 = ExtResource("2_nu43j")
+mode_effect_2 = ExtResource("3_qgn71")
+mode_effect_3 = ExtResource("4_4ede7")
+primary_grip_point = NodePath("PrimaryGripPoint")
+secondary_grip_point = NodePath("SecondaryGripPoint")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1116049985]
+shape = SubResource("CapsuleShape3D_nu43j")
+
+[node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=2071500203]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.015647829, 0, 0)
+
+[node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=2120325954]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -0.010950491, 0, 0)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=760199011]
+mesh = SubResource("SphereMesh_nb5cy")
+
+[node name="AttachPoint" type="Marker3D" parent="." unique_id=1208551601]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0.00059788674, 0.010702111, 0)

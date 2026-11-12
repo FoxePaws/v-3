@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://bg4octynad4iw"]
+
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/status_effect_data.gd" id="1_psngy"]
+
+[resource]
+script = ExtResource("1_psngy")
+effect_id = &"plp3"
+display_name = "plp3"
+description = "plp3"
+duration_world_seconds = -1.0
+modifiers = Dictionary[String, float]({
+"max_willpower_multiplier": 0.9
+})

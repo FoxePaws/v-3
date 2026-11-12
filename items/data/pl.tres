@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b373b4pxysmh4"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_fnyaf"]
+[ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/data/pl.tscn" id="2_wxvfk"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="3_bopjq"]
+
+[resource]
+script = ExtResource("3_bopjq")
+item_id = &"pl"
+display_name = "pl"
+description = "pl"
+item_scene = ExtResource("2_wxvfk")
+item_type = 2
+walk_speed_multiplier = 0.9000000000000057
+sprint_speed_multiplier = 0.7999999999999972
+equipment_slot = &"Ass"
+bone_name = &"AnusRoot"

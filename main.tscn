@@ -20,6 +20,8 @@
 [ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
 [ext_resource type="Resource" uid="uid://c54qajd2uulcy" path="res://items/data/buzz_item.tres" id="19_cegan"]
 [ext_resource type="Resource" uid="uid://cot7obpbepdqv" path="res://items/data/cons.tres" id="20_82xsv"]
+[ext_resource type="Resource" uid="uid://b373b4pxysmh4" path="res://items/data/pl.tres" id="21_ryguw"]
+[ext_resource type="Resource" uid="uid://c8666pwoagohb" path="res://items/data/vbb.tres" id="22_d13ii"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -260,3 +262,11 @@ item_data = ExtResource("19_cegan")
 [node name="ItemSpawner9" parent="." unique_id=997635769 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0838585, -0.00999999, 2.2833242)
 item_data = ExtResource("20_82xsv")
+
+[node name="ItemSpawner10" parent="." unique_id=447416722 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.620364, -0.009999752, -5.3321695)
+item_data = ExtResource("21_ryguw")
+
+[node name="ItemSpawner11" parent="." unique_id=1204302647 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.039635, -0.010000229, -5.3638144)
+item_data = ExtResource("22_d13ii")

@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://boxl2ab0qwxes"]
+
+[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_fv73r"]
+[ext_resource type="Resource" uid="uid://bxv58usog777y" path="res://items/moods/pl1.tres" id="2_0v041"]
+[ext_resource type="Resource" uid="uid://dq2l3cv8njddn" path="res://items/moods/pl2.tres" id="3_4e3xx"]
+[ext_resource type="Resource" uid="uid://bg4octynad4iw" path="res://items/moods/pl3.tres" id="4_bcoud"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2nldk"]
+top_radius = 0.01
+bottom_radius = 0.02
+height = 0.01
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ng75h"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 0.02
+
+[sub_resource type="SphereMesh" id="SphereMesh_nb5cy"]
+radius = 0.02
+height = 0.08
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_a5su6"]
+height = 0.09287109
+radius = 0.022949219
+
+[node name="pl" type="RigidBody3D" unique_id=1960892598 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("1_fv73r")
+meter_gain_per_second = 0.7
+meter_decay_per_second = 0.1
+movement_effect_1 = ExtResource("2_0v041")
+movement_effect_2 = ExtResource("3_4e3xx")
+movement_effect_3 = ExtResource("4_bcoud")
+primary_grip_point = NodePath("PrimaryGripPoint")
+secondary_grip_point = NodePath("SecondaryGripPoint")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=529465246]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.021569595, 0)
+mesh = SubResource("CylinderMesh_2nldk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1104269149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0125497505, 0)
+mesh = SubResource("CylinderMesh_ng75h")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MeshInstance3D" unique_id=760199011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.050919443, 0)
+mesh = SubResource("SphereMesh_nb5cy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1116049985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.021435546, 0)
+shape = SubResource("CylinderShape3D_a5su6")
+
+[node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=2071500203]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.015647829, 0, 0)
+
+[node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=2120325954]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -0.014039017, 0, 0)
+
+[node name="AttachPoint" type="Marker3D" parent="." unique_id=1010438642]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9489398e-05, 0.048051387, 0)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c8666pwoagohb"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_owfo2"]
+[ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/data/vbb.tscn" id="2_r63fw"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="3_xo63g"]
+
+[resource]
+script = ExtResource("3_xo63g")
+item_id = &"vbb"
+display_name = "vbb"
+description = "vbb"
+item_scene = ExtResource("2_r63fw")
+item_type = 2
+equipment_slot = &"Va"
+bone_name = &"GenitalsRoot"
