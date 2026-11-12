@@ -66,6 +66,11 @@ var satiety_restoration_multiplier: float = 1.0
 @export_range(0.0, 1000.0, 0.01)
 var thirst_restoration_multiplier: float = 1.0
 
+@export_range(0.05, 10.0, 0.05)
+var needs_update_interval: float = 0.25
+
+var _needs_update_accumulator: float = 0.0
+
 @export_category("Survival status effects")
 @export var hunger_mild_effect: StatusEffectData
 @export var hunger_moderate_effect: StatusEffectData
@@ -74,9 +79,7 @@ var thirst_restoration_multiplier: float = 1.0
 @export var thirst_moderate_effect: StatusEffectData
 @export var thirst_severe_effect: StatusEffectData
 
-@export_category("UI update")
-@export_range(0.05, 5.0, 0.05)
-var needs_ui_update_interval: float = 0.25
+
 
 var _needs_ui_accumulator: float = 0.0
 var _last_hunger_effect_id: StringName = &""
@@ -184,39 +187,41 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 	if effects_changed:
 		_recalculate_status_modifiers()
 
-	var needs_changed_local: bool = false
+	_needs_update_accumulator += delta_world_seconds
 
-	if current_satiety > 0.0:
-		var new_satiety: float = maxf(
-			current_satiety
-			- satiety_loss_per_world_second * delta_world_seconds,
-			0.0
-		)
-		if not is_equal_approx(current_satiety, new_satiety):
-			current_satiety = new_satiety
-			needs_changed_local = true
+	var update_interval: float = maxf(needs_update_interval, 0.05)
 
-	if current_thirst > 0.0:
-		var new_thirst: float = maxf(
-			current_thirst
-			- thirst_loss_per_world_second * delta_world_seconds,
-			0.0
-		)
-		if not is_equal_approx(current_thirst, new_thirst):
-			current_thirst = new_thirst
-			needs_changed_local = true
+	while _needs_update_accumulator >= update_interval:
+		_needs_update_accumulator -= update_interval
 
-	# Проверка дешёвая; реальные эффекты меняются только при переходе уровня.
-	if needs_changed_local:
-		_update_survival_status_effects()
+		var needs_changed_local: bool = false
 
-		_needs_ui_accumulator += delta_world_seconds
-		if _needs_ui_accumulator >= needs_ui_update_interval:
-			_needs_ui_accumulator = fmod(
-				_needs_ui_accumulator,
-				needs_ui_update_interval
+		if current_satiety > 0.0:
+			var new_satiety: float = maxf(
+				current_satiety
+				- satiety_loss_per_world_second * update_interval,
+				0.0
 			)
+
+			if not is_equal_approx(current_satiety, new_satiety):
+				current_satiety = new_satiety
+				needs_changed_local = true
+
+		if current_thirst > 0.0:
+			var new_thirst: float = maxf(
+				current_thirst
+				- thirst_loss_per_world_second * update_interval,
+				0.0
+			)
+
+			if not is_equal_approx(current_thirst, new_thirst):
+				current_thirst = new_thirst
+				needs_changed_local = true
+
+		if needs_changed_local:
+			_update_survival_status_effects()
 			_emit_needs_changed()
+
 
 	if _recovery_timer > 0.0:
 		_recovery_timer = maxf(
