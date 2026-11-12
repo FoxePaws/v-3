@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://v1jj35n0drwc"]
+
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/status_effect_data.gd" id="1_1galv"]
+
+[resource]
+script = ExtResource("1_1galv")
+effect_id = &"thirst3"
+display_name = "thirst3"
+description = "thirst3"
+duration_world_seconds = -1.0

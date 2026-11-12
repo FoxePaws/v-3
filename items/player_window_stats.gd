@@ -22,38 +22,32 @@ func setup(stats: PlayerStats) -> void:
 		return
 
 	if _stats != null:
-		if _stats.stats_recalculated.is_connected(_refresh):
-			_stats.stats_recalculated.disconnect(_refresh)
-		if _stats.resources_changed.is_connected(_refresh):
-			_stats.resources_changed.disconnect(_refresh)
-		if _stats.needs_changed.is_connected(_refresh):
-			_stats.needs_changed.disconnect(_refresh)
+		if _stats.stats_recalculated.is_connected(_refresh_stats):
+			_stats.stats_recalculated.disconnect(_refresh_stats)
+		if _stats.resources_changed.is_connected(_refresh_stats):
+			_stats.resources_changed.disconnect(_refresh_stats)
+		if _stats.needs_changed.is_connected(_refresh_needs):
+			_stats.needs_changed.disconnect(_refresh_needs)
 
 	_stats = stats
 
-	if not _stats.stats_recalculated.is_connected(_refresh):
-		_stats.stats_recalculated.connect(_refresh)
-	if not _stats.resources_changed.is_connected(_refresh):
-		_stats.resources_changed.connect(_refresh)
-	if not _stats.needs_changed.is_connected(_refresh):
-		_stats.needs_changed.connect(_refresh)
+	if not _stats.stats_recalculated.is_connected(_refresh_stats):
+		_stats.stats_recalculated.connect(_refresh_stats)
+	if not _stats.resources_changed.is_connected(_refresh_stats):
+		_stats.resources_changed.connect(_refresh_stats)
+	if not _stats.needs_changed.is_connected(_refresh_needs):
+		_stats.needs_changed.connect(_refresh_needs)
 
-	_refresh()
+	_refresh_stats()
+	_refresh_needs()
 
 
-func _refresh(
-	_arg_1: float = 0.0,
-	_arg_2: float = 0.0,
-	_arg_3: float = 0.0,
-	_arg_4: float = 0.0
-) -> void:
+func _refresh_stats() -> void:
 	if _stats == null:
 		return
 
-	stamina_recovery_label.text = "Восстановление стамины: %.1f/с" % \
-		_stats.stamina_recovery
-	willpower_recovery_label.text = "Восстановление силы воли: %.1f/с" % \
-		_stats.willpower_recovery
+	stamina_recovery_label.text = "Восстановление стамины: %.1f/с" % _stats.stamina_recovery
+	willpower_recovery_label.text = "Восстановление силы воли: %.1f/с" % _stats.willpower_recovery
 	walk_speed_label.text = "Скорость ходьбы: %.2f" % _stats.walk_speed
 	sprint_speed_label.text = "Скорость бега: %.2f" % _stats.sprint_speed
 	jump_velocity_label.text = "Сила прыжка: %.2f" % _stats.jump_velocity
@@ -61,6 +55,16 @@ func _refresh(
 		_stats.equipment_weight,
 		_stats.max_carry_weight,
 	]
+
+
+func _refresh_needs(
+	_current_satiety: float = 0.0,
+	_max_satiety: float = 0.0,
+	_current_thirst: float = 0.0,
+	_max_thirst: float = 0.0
+) -> void:
+	if _stats == null:
+		return
 
 	satiety_bar.set_stat(
 		"СЫТОСТЬ",

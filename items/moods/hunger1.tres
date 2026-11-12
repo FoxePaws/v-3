@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://bxucr7wbquqvg"]
+
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/status_effect_data.gd" id="1_bjo5b"]
+
+[resource]
+script = ExtResource("1_bjo5b")
+effect_id = &"hunger1"
+display_name = "hunger1"
+description = "hunger1"
+duration_world_seconds = -1.0

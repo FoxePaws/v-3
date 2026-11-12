@@ -66,29 +66,22 @@ var satiety_restoration_multiplier: float = 1.0
 @export_range(0.0, 1000.0, 0.01)
 var thirst_restoration_multiplier: float = 1.0
 
-@export_category("Survival penalties")
+@export_category("Survival status effects")
+@export var hunger_mild_effect: StatusEffectData
+@export var hunger_moderate_effect: StatusEffectData
+@export var hunger_severe_effect: StatusEffectData
+@export var thirst_mild_effect: StatusEffectData
+@export var thirst_moderate_effect: StatusEffectData
+@export var thirst_severe_effect: StatusEffectData
 
-@export_range(0.0, 1.0, 0.01)
-var max_satiety_walk_penalty: float = 0.10
-@export_range(0.0, 1.0, 0.01)
-var max_satiety_sprint_penalty: float = 0.20
-@export_range(0.0, 1.0, 0.01)
-var max_satiety_jump_penalty: float = 0.10
-@export_range(0.0, 10.0, 0.01)
-var max_satiety_stamina_cost_penalty: float = 0.25
-@export_range(0.0, 1.0, 0.01)
-var max_satiety_stamina_recovery_penalty: float = 0.50
+@export_category("UI update")
+@export_range(0.05, 5.0, 0.05)
+var needs_ui_update_interval: float = 0.25
 
-@export_range(0.0, 1.0, 0.01)
-var max_thirst_walk_penalty: float = 0.15
-@export_range(0.0, 1.0, 0.01)
-var max_thirst_sprint_penalty: float = 0.25
-@export_range(0.0, 1.0, 0.01)
-var max_thirst_jump_penalty: float = 0.10
-@export_range(0.0, 10.0, 0.01)
-var max_thirst_stamina_cost_penalty: float = 0.50
-@export_range(0.0, 1.0, 0.01)
-var max_thirst_stamina_recovery_penalty: float = 0.75
+var _needs_ui_accumulator: float = 0.0
+var _last_hunger_effect_id: StringName = &""
+var _last_thirst_effect_id: StringName = &""
+
 
 
 var equipment_weight: float = 0.0
@@ -131,6 +124,7 @@ func _ready() -> void:
 	current_thirst = max_thirst
 	recalculate_stats()
 	_connect_world_clock()
+	_update_survival_status_effects()
 
 
 func _connect_world_clock() -> void:
@@ -162,7 +156,6 @@ func set_equipment_weight(weight: float) -> void:
 	equipment_weight = clamped_weight
 	recalculate_stats()
 
-
 func _on_world_time_advanced(delta_world_seconds: float) -> void:
 	if delta_world_seconds <= 0.0:
 		return
@@ -173,7 +166,13 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 		var effect: Dictionary = active_status_effects[index]
 		var remaining: float = float(
 			effect.get("remaining_world_seconds", 0.0)
-		) - delta_world_seconds
+		)
+
+		# Отрицательная длительность означает бесконечный эффект.
+		if remaining < 0.0:
+			continue
+
+		remaining -= delta_world_seconds
 
 		if remaining <= 0.0:
 			active_status_effects.remove_at(index)
@@ -207,9 +206,17 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 			current_thirst = new_thirst
 			needs_changed_local = true
 
+	# Проверка дешёвая; реальные эффекты меняются только при переходе уровня.
 	if needs_changed_local:
-		_emit_needs_changed()
+		_update_survival_status_effects()
 
+		_needs_ui_accumulator += delta_world_seconds
+		if _needs_ui_accumulator >= needs_ui_update_interval:
+			_needs_ui_accumulator = fmod(
+				_needs_ui_accumulator,
+				needs_ui_update_interval
+			)
+			_emit_needs_changed()
 
 	if _recovery_timer > 0.0:
 		_recovery_timer = maxf(
@@ -218,24 +225,102 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 		)
 		return
 
-	var resources_changed: bool = false
+	var resources_changed_local: bool = false
 
 	if current_stamina < max_stamina:
 		current_stamina = minf(
 			current_stamina + stamina_recovery * delta_world_seconds,
 			max_stamina
 		)
-		resources_changed = true
+		resources_changed_local = true
 
 	if current_willpower < max_willpower and willpower_recovery > 0.0:
 		current_willpower = minf(
 			current_willpower + willpower_recovery * delta_world_seconds,
 			max_willpower
 		)
-		resources_changed = true
+		resources_changed_local = true
 
-	if resources_changed:
+	if resources_changed_local:
 		_emit_resources_changed()
+
+func _update_survival_status_effects() -> void:
+	var hunger_effect: StatusEffectData = _get_need_effect(
+		current_satiety,
+		max_satiety,
+		hunger_mild_effect,
+		hunger_moderate_effect,
+		hunger_severe_effect
+	)
+
+	var thirst_effect: StatusEffectData = _get_need_effect(
+		current_thirst,
+		max_thirst,
+		thirst_mild_effect,
+		thirst_moderate_effect,
+		thirst_severe_effect
+	)
+
+	_set_need_effect(hunger_effect, true)
+	_set_need_effect(thirst_effect, false)
+
+
+func _get_need_effect(
+	current_value: float,
+	maximum_value: float,
+	mild_effect: StatusEffectData,
+	moderate_effect: StatusEffectData,
+	severe_effect: StatusEffectData
+) -> StatusEffectData:
+	if maximum_value <= 0.0:
+		return severe_effect
+
+	var ratio: float = clampf(current_value / maximum_value, 0.0, 1.0)
+
+	if ratio > 0.5:
+		return null
+	if ratio > 0.25:
+		return mild_effect
+	if ratio > 0.1:
+		return moderate_effect
+
+	return severe_effect
+
+
+func _set_need_effect(
+	new_effect: StatusEffectData,
+	is_hunger: bool
+) -> void:
+	var previous_id: StringName = (
+		_last_hunger_effect_id
+		if is_hunger
+		else _last_thirst_effect_id
+	)
+	var new_id: StringName = (
+		new_effect.effect_id
+		if new_effect != null
+		else &""
+	)
+
+	if previous_id == new_id:
+		return
+
+	if previous_id != &"":
+		remove_status_effect(previous_id)
+
+	if new_effect != null:
+		if new_effect.effect_id == &"":
+			push_warning(
+				"PlayerStats: у эффекта потребности пустой effect_id"
+			)
+		else:
+			add_status_effect(new_effect)
+
+	if is_hunger:
+		_last_hunger_effect_id = new_id
+	else:
+		_last_thirst_effect_id = new_id
+
 
 func restore_satiety(base_amount: float) -> void:
 	if base_amount <= 0.0:
@@ -429,14 +514,6 @@ func recalculate_stats() -> void:
 	)
 	var load_factor: float = load_ratio * load_ratio
 
-	var satiety_factor: float = _get_need_penalty_factor(
-		current_satiety,
-		max_satiety
-	)
-	var thirst_factor: float = _get_need_penalty_factor(
-		current_thirst,
-		max_thirst
-	)
 
 	walk_speed *= 1.0 - max_walk_weight_penalty * load_factor
 	sprint_speed *= 1.0 - max_sprint_weight_penalty * load_factor
@@ -445,52 +522,12 @@ func recalculate_stats() -> void:
 		1.0 + max_stamina_cost_weight_penalty * load_factor
 	)
 
-	walk_speed *= 1.0 - max_satiety_walk_penalty * satiety_factor
-	sprint_speed *= 1.0 - max_satiety_sprint_penalty * satiety_factor
-	jump_velocity *= 1.0 - max_satiety_jump_penalty * satiety_factor
-	stamina_cost_multiplier *= (
-		1.0 + max_satiety_stamina_cost_penalty * satiety_factor
-	)
-	stamina_recovery *= (
-		1.0
-		- max_satiety_stamina_recovery_penalty * satiety_factor
-	)
-
-	walk_speed *= 1.0 - max_thirst_walk_penalty * thirst_factor
-	sprint_speed *= 1.0 - max_thirst_sprint_penalty * thirst_factor
-	jump_velocity *= 1.0 - max_thirst_jump_penalty * thirst_factor
-	stamina_cost_multiplier *= (
-		1.0 + max_thirst_stamina_cost_penalty * thirst_factor
-	)
-	stamina_recovery *= (
-		1.0
-		- max_thirst_stamina_recovery_penalty * thirst_factor
-	)
-
-
 
 	current_willpower = clampf(current_willpower, 0.0, max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, max_stamina)
 
 	stats_recalculated.emit()
 	_emit_resources_changed()
-
-
-func _get_need_penalty_factor(
-	current_value: float,
-	maximum_value: float
-) -> float:
-	if maximum_value <= 0.0:
-		return 0.0
-
-	var ratio: float = clampf(current_value / maximum_value, 0.0, 1.0)
-	var deficit_below_half: float = clampf(
-		(0.5 - ratio) / 0.5,
-		0.0,
-		1.0
-	)
-
-	return deficit_below_half * deficit_below_half
 
 
 func make_save_data() -> Dictionary:
@@ -645,7 +682,7 @@ func make_status_effects_save_data() -> Array[Dictionary]:
 		var remaining: float = float(
 			effect.get("remaining_world_seconds", 0.0)
 		)
-		if remaining <= 0.0:
+		if remaining == 0.0:
 			continue
 
 		result.append({
@@ -675,7 +712,7 @@ func restore_status_effects_save_data(raw_effects: Variant) -> void:
 			saved.get("remaining_world_seconds", 0.0)
 		)
 
-		if resource_path.is_empty() or remaining <= 0.0:
+		if resource_path.is_empty() or remaining == 0.0:
 			continue
 		if not ResourceLoader.exists(resource_path):
 			push_warning(

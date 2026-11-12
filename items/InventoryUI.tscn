@@ -255,18 +255,18 @@ max_lines_visible = 1
 layout_mode = 2
 max_lines_visible = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PlayerWindow" unique_id=1053366298]
+[node name="NeedsBars" type="VBoxContainer" parent="PlayerWindow" unique_id=1053366298]
 layout_mode = 0
-offset_left = 212.0
-offset_top = 283.0
-offset_right = 340.0
-offset_bottom = 347.0
+offset_left = 287.0
+offset_top = 282.0
+offset_right = 415.0
+offset_bottom = 346.0
 metadata/_edit_group_ = true
 
-[node name="SatietyBar" parent="PlayerWindow/VBoxContainer" unique_id=8740677 instance=ExtResource("19_wmq11")]
+[node name="SatietyBar" parent="PlayerWindow/NeedsBars" unique_id=8740677 instance=ExtResource("19_wmq11")]
 layout_mode = 2
 
-[node name="ThirstBar" parent="PlayerWindow/VBoxContainer" unique_id=2056682473 instance=ExtResource("19_wmq11")]
+[node name="ThirstBar" parent="PlayerWindow/NeedsBars" unique_id=2056682473 instance=ExtResource("19_wmq11")]
 layout_mode = 2
 
 [editable path="PlayerWindow/GridContainer/Head"]

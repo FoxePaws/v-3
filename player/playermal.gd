@@ -106,7 +106,7 @@ var warmth: float = 0.0
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	inventory_ui.player = self
+	inventory_ui.setup(self)
 	right_hand.player = self
 	right_hand.is_right_hand = true
 
