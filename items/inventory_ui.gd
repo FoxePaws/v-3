@@ -5,6 +5,9 @@ extends CanvasLayer
 @export var hand_slots: Array[ItemSlotUI] = []
 @export var equipment_slots: Array[ItemSlotUI] = []
 
+@onready var player_stats_panel: PlayerWindowStats = \
+	$PlayerWindow/PlayerStats
+
 @onready var player_window: Control = $PlayerWindow
 @onready var player_close_button: Button = $PlayerWindow/CloseButton
 
@@ -23,6 +26,7 @@ func _ready() -> void:
 
 func setup(new_player: Player) -> void:
 	player = new_player
+	player_stats_panel.setup(new_player.stats)
 	refresh_player_ui()
 
 

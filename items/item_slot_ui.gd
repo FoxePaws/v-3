@@ -21,10 +21,32 @@ func set_item(value: ItemInstance) -> void:
 	if item == null or item.data == null:
 		icon.texture = null
 		label.text = ""
+		tooltip_text = ""
 		return
 
 	icon.texture = item.data.icon
 	label.text = item.data.display_name
+	tooltip_text = _make_item_tooltip(item)
+
+
+func _make_item_tooltip(target: ItemInstance) -> String:
+	if target == null or target.data == null:
+		return ""
+
+	var description: String = target.data.description.strip_edges()
+	var weight_text: String = "Вес: %.2f кг" % target.total_weight
+
+	if description.is_empty():
+		return "%s\n%s" % [
+			target.data.display_name,
+			weight_text,
+		]
+
+	return "%s\n%s\n%s" % [
+		target.data.display_name,
+		description,
+		weight_text,
+	]
 
 
 func refresh() -> void:

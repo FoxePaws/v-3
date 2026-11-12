@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cot7obpbepdqv"]
+
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="1_4moam"]
+[ext_resource type="PackedScene" uid="uid://c1f6xerly1ko5" path="res://items/data/consumable_item.tscn" id="2_jn3d7"]
+[ext_resource type="Script" uid="uid://cj0l0ucevbkq5" path="res://items/item_data.gd" id="3_ikn4k"]
+
+[resource]
+script = ExtResource("3_ikn4k")
+item_id = &"cons"
+display_name = "cons"
+description = "cons"
+item_scene = ExtResource("2_jn3d7")
+satiety_restoration = 20.0
+thirst_restoration = 10.0
+consumable_durability_cost = 2.0

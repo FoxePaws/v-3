@@ -8,18 +8,22 @@ font_size = 12
 [node name="StatBar" type="PanelContainer" unique_id=8740677]
 offset_right = 128.0
 offset_bottom = 30.0
+mouse_filter = 2
 script = ExtResource("1_ebqpe")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=496375144]
 propagate_maximum_size = false
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Column" type="VBoxContainer" parent="Margin" unique_id=1613356222]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="ProgressBar" type="ProgressBar" parent="Margin/Column" unique_id=1520726559]
 custom_minimum_size = Vector2(128, 30)
 layout_mode = 2
+mouse_filter = 2
 show_percentage = false
 
 [node name="ValueLabel" type="Label" parent="Margin/Column/ProgressBar" unique_id=1928539445]

@@ -19,6 +19,7 @@
 [ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
 [ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
 [ext_resource type="Resource" uid="uid://c54qajd2uulcy" path="res://items/data/buzz_item.tres" id="19_cegan"]
+[ext_resource type="Resource" uid="uid://cot7obpbepdqv" path="res://items/data/cons.tres" id="20_82xsv"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -238,23 +239,6 @@ transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 
 
 [node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("10_4c57u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-prone_speed = null
-slow_walk_multiplier = null
-jump_velocity = null
-gravity = null
-ground_acceleration = null
-ground_deceleration = null
-air_control = null
-body_turn_speed = null
-body_turn_acceleration = null
-mouse_sensitivity = null
-min_pitch = null
-max_pitch = null
-crouch_root_pitch = null
-lying_root_offset = null
-lying_root_pitch = null
-body_pose_speed = null
-heavy_support_smoothing = null
 
 [node name="ItemSpawner6" parent="." unique_id=2120406206 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0825243, 0.124922335, -5.4139047)
@@ -267,3 +251,7 @@ item_data = ExtResource("14_vivmo")
 [node name="ItemSpawner8" parent="." unique_id=1390014951 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.153965, -0.010000229, 2.2933846)
 item_data = ExtResource("19_cegan")
+
+[node name="ItemSpawner9" parent="." unique_id=997635769 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0838585, -0.00999999, 2.2833242)
+item_data = ExtResource("20_82xsv")

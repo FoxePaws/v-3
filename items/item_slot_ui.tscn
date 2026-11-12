@@ -7,9 +7,6 @@ custom_minimum_size = Vector2(64, 64)
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_qqaqf")
-slot_kind = null
-slot_id = null
-slot_index = null
 metadata/_custom_type_script = "uid://c4umom4qojvvo"
 
 [node name="Label" type="Label" parent="." unique_id=988964760]

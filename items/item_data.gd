@@ -54,6 +54,14 @@ enum ItemType {
 @export_range(0.0, 10000.0, 0.01) var item_size: float = 1.0
 @export_range(0.0, 10000.0, 0.01) var item_weight: float = 1.0
 
+@export_category("Consumable")
+@export_range(0.0, 100000.0, 0.1)
+var satiety_restoration: float = 0.0
+@export_range(0.0, 100000.0, 0.1)
+var thirst_restoration: float = 0.0
+@export_range(0.0, 100000.0, 0.1)
+var consumable_durability_cost: float = 1.0
+
 
 @export_category("Body Blend Shapes")
 @export var body_shape_keys: Array[BlendShapeSetting] = []

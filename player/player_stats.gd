@@ -10,6 +10,14 @@ signal resources_changed(
 signal stats_recalculated()
 signal status_effects_changed()
 
+signal needs_changed(
+	current_satiety: float,
+	max_satiety: float,
+	current_thirst: float,
+	max_thirst: float
+)
+
+
 @export_category("Base resources")
 @export_range(0.0, 100000.0, 0.1) var base_max_willpower: float = 100.0
 @export_range(0.0, 100000.0, 0.1) var base_max_stamina: float = 100.0
@@ -44,7 +52,51 @@ signal status_effects_changed()
 @export_range(0.0, 1.0, 0.01) var max_jump_weight_penalty: float = 0.25
 @export_range(0.0, 10.0, 0.01) var max_stamina_cost_weight_penalty: float = 0.25
 
+@export_category("Survival needs")
+@export_range(0.0, 100000.0, 0.1)
+var base_max_satiety: float = 100.0
+@export_range(0.0, 100000.0, 0.1)
+var base_max_thirst: float = 100.0
+@export_range(0.0, 100000.0, 0.001)
+var satiety_loss_per_world_second: float = 0.01
+@export_range(0.0, 100000.0, 0.001)
+var thirst_loss_per_world_second: float = 0.02
+@export_range(0.0, 1000.0, 0.01)
+var satiety_restoration_multiplier: float = 1.0
+@export_range(0.0, 1000.0, 0.01)
+var thirst_restoration_multiplier: float = 1.0
+
+@export_category("Survival penalties")
+
+@export_range(0.0, 1.0, 0.01)
+var max_satiety_walk_penalty: float = 0.10
+@export_range(0.0, 1.0, 0.01)
+var max_satiety_sprint_penalty: float = 0.20
+@export_range(0.0, 1.0, 0.01)
+var max_satiety_jump_penalty: float = 0.10
+@export_range(0.0, 10.0, 0.01)
+var max_satiety_stamina_cost_penalty: float = 0.25
+@export_range(0.0, 1.0, 0.01)
+var max_satiety_stamina_recovery_penalty: float = 0.50
+
+@export_range(0.0, 1.0, 0.01)
+var max_thirst_walk_penalty: float = 0.15
+@export_range(0.0, 1.0, 0.01)
+var max_thirst_sprint_penalty: float = 0.25
+@export_range(0.0, 1.0, 0.01)
+var max_thirst_jump_penalty: float = 0.10
+@export_range(0.0, 10.0, 0.01)
+var max_thirst_stamina_cost_penalty: float = 0.50
+@export_range(0.0, 1.0, 0.01)
+var max_thirst_stamina_recovery_penalty: float = 0.75
+
+
 var equipment_weight: float = 0.0
+
+var current_satiety: float = 100.0
+var current_thirst: float = 100.0
+var max_satiety: float = 100.0
+var max_thirst: float = 100.0
 
 
 
@@ -73,6 +125,10 @@ var _world_clock: Node = null
 func _ready() -> void:
 	current_willpower = clampf(current_willpower, 0.0, base_max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, base_max_stamina)
+	max_satiety = base_max_satiety
+	max_thirst = base_max_thirst
+	current_satiety = max_satiety
+	current_thirst = max_thirst
 	recalculate_stats()
 	_connect_world_clock()
 
@@ -129,6 +185,32 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 	if effects_changed:
 		_recalculate_status_modifiers()
 
+	var needs_changed_local: bool = false
+
+	if current_satiety > 0.0:
+		var new_satiety: float = maxf(
+			current_satiety
+			- satiety_loss_per_world_second * delta_world_seconds,
+			0.0
+		)
+		if not is_equal_approx(current_satiety, new_satiety):
+			current_satiety = new_satiety
+			needs_changed_local = true
+
+	if current_thirst > 0.0:
+		var new_thirst: float = maxf(
+			current_thirst
+			- thirst_loss_per_world_second * delta_world_seconds,
+			0.0
+		)
+		if not is_equal_approx(current_thirst, new_thirst):
+			current_thirst = new_thirst
+			needs_changed_local = true
+
+	if needs_changed_local:
+		_emit_needs_changed()
+
+
 	if _recovery_timer > 0.0:
 		_recovery_timer = maxf(
 			_recovery_timer - delta_world_seconds,
@@ -154,6 +236,41 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 
 	if resources_changed:
 		_emit_resources_changed()
+
+func restore_satiety(base_amount: float) -> void:
+	if base_amount <= 0.0:
+		return
+
+	current_satiety = clampf(
+		current_satiety
+		+ base_amount * satiety_restoration_multiplier,
+		0.0,
+		max_satiety
+	)
+	_emit_needs_changed()
+
+
+func restore_thirst(base_amount: float) -> void:
+	if base_amount <= 0.0:
+		return
+
+	current_thirst = clampf(
+		current_thirst
+		+ base_amount * thirst_restoration_multiplier,
+		0.0,
+		max_thirst
+	)
+	_emit_needs_changed()
+
+
+func _emit_needs_changed() -> void:
+	needs_changed.emit(
+		current_satiety,
+		max_satiety,
+		current_thirst,
+		max_thirst
+	)
+
 
 
 
@@ -304,12 +421,22 @@ func recalculate_stats() -> void:
 		* _multiplier_value(all_modifiers, "willpower_cost_multiplier_multiplier")
 	)
 
+	var safe_max_carry_weight: float = maxf(max_carry_weight, 0.01)
 	var load_ratio: float = clampf(
-		equipment_weight / max_carry_weight,
+		equipment_weight / safe_max_carry_weight,
 		0.0,
 		1.0
 	)
 	var load_factor: float = load_ratio * load_ratio
+
+	var satiety_factor: float = _get_need_penalty_factor(
+		current_satiety,
+		max_satiety
+	)
+	var thirst_factor: float = _get_need_penalty_factor(
+		current_thirst,
+		max_thirst
+	)
 
 	walk_speed *= 1.0 - max_walk_weight_penalty * load_factor
 	sprint_speed *= 1.0 - max_sprint_weight_penalty * load_factor
@@ -317,6 +444,29 @@ func recalculate_stats() -> void:
 	stamina_cost_multiplier *= (
 		1.0 + max_stamina_cost_weight_penalty * load_factor
 	)
+
+	walk_speed *= 1.0 - max_satiety_walk_penalty * satiety_factor
+	sprint_speed *= 1.0 - max_satiety_sprint_penalty * satiety_factor
+	jump_velocity *= 1.0 - max_satiety_jump_penalty * satiety_factor
+	stamina_cost_multiplier *= (
+		1.0 + max_satiety_stamina_cost_penalty * satiety_factor
+	)
+	stamina_recovery *= (
+		1.0
+		- max_satiety_stamina_recovery_penalty * satiety_factor
+	)
+
+	walk_speed *= 1.0 - max_thirst_walk_penalty * thirst_factor
+	sprint_speed *= 1.0 - max_thirst_sprint_penalty * thirst_factor
+	jump_velocity *= 1.0 - max_thirst_jump_penalty * thirst_factor
+	stamina_cost_multiplier *= (
+		1.0 + max_thirst_stamina_cost_penalty * thirst_factor
+	)
+	stamina_recovery *= (
+		1.0
+		- max_thirst_stamina_recovery_penalty * thirst_factor
+	)
+
 
 
 	current_willpower = clampf(current_willpower, 0.0, max_willpower)
@@ -326,8 +476,27 @@ func recalculate_stats() -> void:
 	_emit_resources_changed()
 
 
+func _get_need_penalty_factor(
+	current_value: float,
+	maximum_value: float
+) -> float:
+	if maximum_value <= 0.0:
+		return 0.0
+
+	var ratio: float = clampf(current_value / maximum_value, 0.0, 1.0)
+	var deficit_below_half: float = clampf(
+		(0.5 - ratio) / 0.5,
+		0.0,
+		1.0
+	)
+
+	return deficit_below_half * deficit_below_half
+
+
 func make_save_data() -> Dictionary:
 	return {
+		"current_satiety": current_satiety,
+		"current_thirst": current_thirst,
 		"current_willpower": current_willpower,
 		"current_stamina": current_stamina,
 		"recovery_timer": _recovery_timer,
@@ -346,6 +515,20 @@ func restore_save_data(data: Dictionary) -> void:
 		max_stamina
 	)
 	_recovery_timer = maxf(float(data.get("recovery_timer", 0.0)), 0.0)
+	
+	current_satiety = clampf(
+		float(data.get("current_satiety", max_satiety)),
+		0.0,
+		max_satiety
+	)
+	current_thirst = clampf(
+		float(data.get("current_thirst", max_thirst)),
+		0.0,
+		max_thirst
+	)
+	_emit_needs_changed()
+
+	
 	_emit_resources_changed()
 
 

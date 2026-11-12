@@ -18,6 +18,8 @@
 [ext_resource type="Texture2D" uid="uid://dyeywm8epieif" path="res://textures/ui ic/ui_SH.png" id="17_iiuqj"]
 [ext_resource type="PackedScene" uid="uid://god5bgbp0ki2" path="res://items/item_slot_ui.tscn" id="17_t3n1z"]
 [ext_resource type="Texture2D" uid="uid://csml2mm18nddb" path="res://textures/ui ic/ui_P.png" id="18_ntcqj"]
+[ext_resource type="Script" uid="uid://cvv1e6xb4yhm1" path="res://items/player_window_stats.gd" id="19_lps7h"]
+[ext_resource type="PackedScene" uid="uid://by3rpm8mxwfcf" path="res://ui/StatBar.tscn" id="19_wmq11"]
 
 [node name="InventoryUI" type="CanvasLayer" unique_id=2047850519 node_paths=PackedStringArray("hand_slots", "equipment_slots")]
 script = ExtResource("1_wlaer")
@@ -27,8 +29,8 @@ equipment_slots = [NodePath("PlayerWindow/GridContainer/Head"), NodePath("Player
 
 [node name="PlayerWindow" type="Panel" parent="." unique_id=107057571]
 custom_minimum_size = Vector2(420, 400)
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 420.0
+offset_bottom = 502.0
 
 [node name="CloseButton" type="Button" parent="PlayerWindow" unique_id=1662354254]
 custom_minimum_size = Vector2(64, 64)
@@ -49,13 +51,11 @@ offset_bottom = 67.0
 
 [node name="LeftHandSlot" parent="PlayerWindow/HBoxContainer" unique_id=720572908 instance=ExtResource("17_t3n1z")]
 layout_mode = 2
-slot_kind = 0
 slot_id = &"LeftHandSlot"
 slot_index = 1
 
 [node name="RightHandSlot" parent="PlayerWindow/HBoxContainer" unique_id=1205559359 instance=ExtResource("17_t3n1z")]
 layout_mode = 2
-slot_kind = 0
 slot_id = &"RightHandSlot"
 
 [node name="GridContainer" type="GridContainer" parent="PlayerWindow" unique_id=892741722]
@@ -217,6 +217,57 @@ layout_mode = 2
 slot_kind = 1
 slot_id = &"Eee"
 slot_index = 3
+
+[node name="PlayerStats" type="VBoxContainer" parent="PlayerWindow" unique_id=2042068726]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 283.0
+offset_right = 208.0
+offset_bottom = 468.0
+script = ExtResource("19_lps7h")
+metadata/_edit_group_ = true
+
+[node name="Label7" type="Label" parent="PlayerWindow/PlayerStats" unique_id=1000458712]
+layout_mode = 2
+text = "Stats :"
+
+[node name="StaminaRecoveryLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=23844097]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="WillpowerRecoveryLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=315783079]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="WalkSpeedLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=1670850625]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="SprintSpeedLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=2067052146]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="JumpVelocityLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=86628259]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="WeightLabel" type="Label" parent="PlayerWindow/PlayerStats" unique_id=674342851]
+layout_mode = 2
+max_lines_visible = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlayerWindow" unique_id=1053366298]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 283.0
+offset_right = 340.0
+offset_bottom = 347.0
+metadata/_edit_group_ = true
+
+[node name="SatietyBar" parent="PlayerWindow/VBoxContainer" unique_id=8740677 instance=ExtResource("19_wmq11")]
+layout_mode = 2
+
+[node name="ThirstBar" parent="PlayerWindow/VBoxContainer" unique_id=2056682473 instance=ExtResource("19_wmq11")]
+layout_mode = 2
 
 [editable path="PlayerWindow/GridContainer/Head"]
 [editable path="PlayerWindow/GridContainer/Eyes"]
