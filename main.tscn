@@ -122,7 +122,12 @@ angle_min = -438.8
 angle_max = 315.2
 direction = Vector3(0, -1, 0)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_82xsv"]
+shading_mode = 0
+albedo_color = Color(0.8346143, 0.8346143, 0.8346143, 1)
+
 [sub_resource type="SphereMesh" id="SphereMesh_5i8rw"]
+material = SubResource("StandardMaterial3D_82xsv")
 radius = 0.05
 height = 0.01
 radial_segments = 4

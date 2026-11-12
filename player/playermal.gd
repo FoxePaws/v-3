@@ -757,9 +757,6 @@ func _handle_movement() -> void:
 		current_speed *= slow_walk_multiplier
 
 
-	if Input.is_action_pressed("slow_walk"):
-		current_speed *= slow_walk_multiplier
-
 	var delta: float = get_physics_process_delta_time()
 
 	if not is_on_floor():

@@ -8,3 +8,12 @@ effect_id = &"hunger2"
 display_name = "hunger2"
 description = "hunger2"
 duration_world_seconds = -1.0
+modifiers = Dictionary[String, float]({
+"jump_velocity_multiplier": 0.8,
+"max_stamina_multiplier": 0.6,
+"max_willpower_multiplier": 0.8,
+"sprint_speed_multiplier": 0.6,
+"stamina_recovery_multiplier": 0.6,
+"walk_speed_multiplier": 0.8,
+"willpower_recovery_multiplier": 0.6
+})

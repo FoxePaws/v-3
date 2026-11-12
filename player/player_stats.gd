@@ -57,9 +57,9 @@ signal needs_changed(
 var base_max_satiety: float = 100.0
 @export_range(0.0, 100000.0, 0.1)
 var base_max_thirst: float = 100.0
-@export_range(0.0, 100000.0, 0.001)
+@export_range(0.0, 100000.0, 0.0001)
 var satiety_loss_per_world_second: float = 0.01
-@export_range(0.0, 100000.0, 0.001)
+@export_range(0.0, 100000.0, 0.0001)
 var thirst_loss_per_world_second: float = 0.02
 @export_range(0.0, 1000.0, 0.01)
 var satiety_restoration_multiplier: float = 1.0
@@ -202,7 +202,7 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 				0.0
 			)
 
-			if not is_equal_approx(current_satiety, new_satiety):
+			if new_satiety != current_satiety:
 				current_satiety = new_satiety
 				needs_changed_local = true
 
@@ -213,37 +213,54 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 				0.0
 			)
 
-			if not is_equal_approx(current_thirst, new_thirst):
+			if new_thirst != current_thirst:
 				current_thirst = new_thirst
 				needs_changed_local = true
+
 
 		if needs_changed_local:
 			_update_survival_status_effects()
 			_emit_needs_changed()
 
+	var recovery_was_delayed: bool = _recovery_timer > 0.0
 
-	if _recovery_timer > 0.0:
+	if recovery_was_delayed:
 		_recovery_timer = maxf(
 			_recovery_timer - delta_world_seconds,
 			0.0
 		)
-		return
 
+	var positive_recovery_allowed: bool = (
+		not recovery_was_delayed
+		or _recovery_timer <= 0.0
+	)
 	var resources_changed_local: bool = false
 
-	if current_stamina < max_stamina:
-		current_stamina = minf(
+	# Отрицательное значение означает потерю ресурса в секунду.
+	# Такая потеря действует даже во время задержки восстановления.
+	if stamina_recovery < 0.0 or (
+		stamina_recovery > 0.0 and positive_recovery_allowed
+	):
+		var old_stamina: float = current_stamina
+		current_stamina = clampf(
 			current_stamina + stamina_recovery * delta_world_seconds,
+			0.0,
 			max_stamina
 		)
-		resources_changed_local = true
+		if not is_equal_approx(old_stamina, current_stamina):
+			resources_changed_local = true
 
-	if current_willpower < max_willpower and willpower_recovery > 0.0:
-		current_willpower = minf(
+	if willpower_recovery < 0.0 or (
+		willpower_recovery > 0.0 and positive_recovery_allowed
+	):
+		var old_willpower: float = current_willpower
+		current_willpower = clampf(
 			current_willpower + willpower_recovery * delta_world_seconds,
+			0.0,
 			max_willpower
 		)
-		resources_changed_local = true
+		if not is_equal_approx(old_willpower, current_willpower):
+			resources_changed_local = true
 
 	if resources_changed_local:
 		_emit_resources_changed()
@@ -502,16 +519,23 @@ func recalculate_stats() -> void:
 		* _multiplier_value(all_modifiers, "jump_velocity_multiplier")
 	)
 
-	stamina_recovery = maxf(
-		0.0,
-		(base_stamina_recovery + _add_value(all_modifiers, "stamina_recovery_add"))
-		* _multiplier_value(all_modifiers, "stamina_recovery_multiplier")
+	stamina_recovery = (
+		base_stamina_recovery
+		+ _add_value(all_modifiers, "stamina_recovery_add")
+	) * _multiplier_value(
+		all_modifiers,
+		"stamina_recovery_multiplier"
 	)
-	willpower_recovery = maxf(
-		0.0,
-		(base_willpower_recovery + _add_value(all_modifiers, "willpower_recovery_add"))
-		* _multiplier_value(all_modifiers, "willpower_recovery_multiplier")
+
+	willpower_recovery = (
+		base_willpower_recovery
+		+ _add_value(all_modifiers, "willpower_recovery_add")
+	) * _multiplier_value(
+		all_modifiers,
+		"willpower_recovery_multiplier"
 	)
+
+
 	stamina_cost_multiplier = maxf(
 		0.0,
 		(base_stamina_cost_multiplier + _add_value(all_modifiers, "stamina_cost_multiplier_add"))
