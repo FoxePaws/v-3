@@ -41,8 +41,12 @@ func setup(stats: PlayerStats) -> void:
 	_refresh_stats()
 	_refresh_needs()
 
-
-func _refresh_stats() -> void:
+func _refresh_stats(
+	_current_willpower: float = 0.0,
+	_max_willpower: float = 0.0,
+	_current_stamina: float = 0.0,
+	_max_stamina: float = 0.0
+) -> void:
 	if _stats == null:
 		return
 

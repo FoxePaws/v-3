@@ -81,7 +81,6 @@ var _needs_update_accumulator: float = 0.0
 
 
 
-var _needs_ui_accumulator: float = 0.0
 var _last_hunger_effect_id: StringName = &""
 var _last_thirst_effect_id: StringName = &""
 
@@ -331,12 +330,18 @@ func restore_satiety(base_amount: float) -> void:
 	if base_amount <= 0.0:
 		return
 
+	var previous_value: float = current_satiety
 	current_satiety = clampf(
 		current_satiety
 		+ base_amount * satiety_restoration_multiplier,
 		0.0,
 		max_satiety
 	)
+
+	if is_equal_approx(previous_value, current_satiety):
+		return
+
+	_update_survival_status_effects()
 	_emit_needs_changed()
 
 
@@ -344,13 +349,20 @@ func restore_thirst(base_amount: float) -> void:
 	if base_amount <= 0.0:
 		return
 
+	var previous_value: float = current_thirst
 	current_thirst = clampf(
 		current_thirst
 		+ base_amount * thirst_restoration_multiplier,
 		0.0,
 		max_thirst
 	)
+
+	if is_equal_approx(previous_value, current_thirst):
+		return
+
+	_update_survival_status_effects()
 	_emit_needs_changed()
+
 
 
 func _emit_needs_changed() -> void:

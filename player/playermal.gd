@@ -757,15 +757,6 @@ func _handle_movement() -> void:
 		current_speed *= slow_walk_multiplier
 
 
-	match body_state:
-		BodyState.STANDING:
-			if Input.is_action_pressed("sprint"):
-				current_speed = sprint_speed
-		BodyState.CROUCHING:
-			current_speed = crouch_speed
-		BodyState.LYING:
-			current_speed = prone_speed
-
 	if Input.is_action_pressed("slow_walk"):
 		current_speed *= slow_walk_multiplier
 

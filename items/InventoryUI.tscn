@@ -261,7 +261,6 @@ offset_left = 287.0
 offset_top = 282.0
 offset_right = 415.0
 offset_bottom = 346.0
-metadata/_edit_group_ = true
 
 [node name="SatietyBar" parent="PlayerWindow/NeedsBars" unique_id=8740677 instance=ExtResource("19_wmq11")]
 layout_mode = 2
