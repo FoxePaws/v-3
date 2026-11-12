@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dqmlcn20f6fk0"]
+
+[ext_resource type="Script" uid="uid://dgcfxfe7tnklw" path="res://hud.gd" id="1_276te"]
+[ext_resource type="PackedScene" uid="uid://dlcgp2k5ffaru" path="res://ui/StatusEffectIcon.tscn" id="2_7ihmi"]
+[ext_resource type="PackedScene" uid="uid://by3rpm8mxwfcf" path="res://ui/StatBar.tscn" id="2_546lt"]
+
+[node name="HUD" type="CanvasLayer" unique_id=893815597]
+script = ExtResource("1_276te")
+effect_icon_scene = ExtResource("2_7ihmi")
+
+[node name="Layout" type="Control" parent="." unique_id=949572900]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BottomLeft" type="VBoxContainer" parent="Layout" unique_id=1609206371]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="StatusEffects" type="HBoxContainer" parent="Layout/BottomLeft" unique_id=2026784765]
+layout_mode = 2
+
+[node name="StaminaBar" parent="Layout/BottomLeft" unique_id=8740677 instance=ExtResource("2_546lt")]
+layout_mode = 2
+
+[node name="WillpowerBar" parent="Layout/BottomLeft" unique_id=1573466186 instance=ExtResource("2_546lt")]
+layout_mode = 2

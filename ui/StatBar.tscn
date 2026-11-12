@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://by3rpm8mxwfcf"]
+
+[ext_resource type="Script" uid="uid://c7kll6nwcfps7" path="res://ui/stat_bar.gd" id="1_ebqpe"]
+
+[node name="StatBar" type="PanelContainer" unique_id=8740677]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_ebqpe")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=496375144]
+layout_mode = 2
+
+[node name="Column" type="VBoxContainer" parent="Margin" unique_id=1613356222]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Margin/Column" unique_id=2040702639]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Margin/Column/Header" unique_id=1058701353]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="Margin/Column/Header" unique_id=1928539445]
+layout_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="Margin/Column" unique_id=1520726559]
+layout_mode = 2

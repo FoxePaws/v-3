@@ -381,12 +381,17 @@ func add_status_effect(effect: StatusEffectData) -> bool:
 		push_warning("PlayerStats: некорректный StatusEffectData")
 		return false
 
-	# Повторное применение того же эффекта обновляет его длительность,
-	# не создавая дубликат в списке.
 	for index: int in range(active_status_effects.size()):
 		var active: Dictionary = active_status_effects[index]
 		if str(active.get("effect_id", "")) == str(effect.effect_id):
 			active["remaining_world_seconds"] = effect.duration_world_seconds
+			active["display_name"] = effect.display_name
+			active["description"] = effect.description
+			active["icon_path"] = (
+				effect.icon.resource_path
+				if effect.icon != null
+				else ""
+			)
 			active_status_effects[index] = active
 			_recalculate_status_modifiers()
 			return true
@@ -394,9 +399,15 @@ func add_status_effect(effect: StatusEffectData) -> bool:
 	active_status_effects.append({
 		"effect_id": str(effect.effect_id),
 		"resource_path": effect.resource_path,
+		"display_name": effect.display_name,
+		"description": effect.description,
 		"remaining_world_seconds": effect.duration_world_seconds,
 		"modifiers": effect.modifiers.duplicate(true),
-		"icon_path": effect.icon.resource_path if effect.icon != null else "",
+		"icon_path": (
+			effect.icon.resource_path
+			if effect.icon != null
+			else ""
+		),
 	})
 
 	_recalculate_status_modifiers()
@@ -510,6 +521,8 @@ func restore_status_effects_save_data(raw_effects: Variant) -> void:
 				if effect_data.icon != null
 				else ""
 			),
+			"display_name": effect_data.display_name,
+			"description": effect_data.description,
 		})
 
 	_recalculate_status_modifiers()

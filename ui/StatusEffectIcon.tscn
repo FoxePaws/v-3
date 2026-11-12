@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dlcgp2k5ffaru"]
+
+[ext_resource type="Script" uid="uid://c3lfi8phoqu0c" path="res://ui/status_effect_icon.gd" id="1_v8cht"]
+
+[node name="StatusEffectIcon" type="PanelContainer" unique_id=1461382453]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_v8cht")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=2053617052]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+stretch_mode = 5

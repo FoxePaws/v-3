@@ -8,6 +8,15 @@ enum ItemType {
 	CONTAINER
 }
 
+@export_category("Identity")
+@export var item_id: StringName = &""
+@export var display_name: String = ""
+@export_multiline var description: String = ""
+@export var item_scene: PackedScene
+@export var icon: Texture2D
+@export var item_type: ItemType = ItemType.GENERIC
+
+
 @export_category("Player Stats")
 @export var max_willpower_modifier: float = 0.0
 @export var max_stamina_modifier: float = 0.0
@@ -20,13 +29,6 @@ enum ItemType {
 @export_range(-100, 100.0, 0.01) var sprint_speed_multiplier: float = 0.0
 @export_range(-100, 100.0, 0.01) var jump_velocity_multiplier: float = 0.0
 
-
-@export_category("Identity")
-@export var item_id: StringName = &""
-@export var display_name: String = ""
-@export var item_scene: PackedScene
-@export var icon: Texture2D
-@export var item_type: ItemType = ItemType.GENERIC
 
 @export_category("Interaction")
 @export var can_grab: bool = true

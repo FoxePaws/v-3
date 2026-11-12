@@ -3,8 +3,10 @@ extends Resource
 
 @export var effect_id: StringName = &""
 @export var display_name: String = ""
+@export_multiline var description: String = ""
 @export var icon: Texture2D
-@export_range(0.01, 100000.0, 0.1) var duration_world_seconds: float = 10.0
+@export_range(0.01, 100000.0, 0.1)
+var duration_world_seconds: float = 10.0
 
 # Модификаторы с ключами PlayerStats, например:
 # max_willpower_add, stamina_recovery_multiplier,
