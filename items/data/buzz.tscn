@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bt20djls4hg77"]
 
-[ext_resource type="Script" uid="uid://dr0ckudxgprd8" path="res://buzz_item.gd" id="1_ml1w5"]
+[ext_resource type="Script" uid="uid://dr0ckudxgprd8" path="res://items/data/buzz_item.gd" id="1_ml1w5"]
 [ext_resource type="Resource" uid="uid://dwwmfn3eu633b" path="res://items/data/buzz.tres" id="2_2nldk"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2nldk"]
