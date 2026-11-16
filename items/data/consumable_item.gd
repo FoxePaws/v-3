@@ -1,46 +1,41 @@
 class_name ConsumableItem
-extends ItemInstance
+extends ItemComponent
+
+@export_category("Restoration")
+@export_range(0.0, 10000.0, 0.1) var satiety_restoration: float = 0.0
+@export_range(0.0, 10000.0, 0.1) var thirst_restoration: float = 0.0
+@export_range(0.0, 10000.0, 0.1) var durability_cost: float = 1.0
 
 
 func on_primary_action() -> void:
-	if data == null:
+	if item == null or item.current_hand == null:
 		return
 
-	if current_hand == null or current_hand.player == null:
+	var player: Player = item.current_hand.player
+	if player == null or player.stats == null:
 		return
 
-	var has_restoration: bool = (
-		data.satiety_restoration > 0.0
-		or data.thirst_restoration > 0.0
-	)
-	if not has_restoration:
-		return
-
-	var player: Player = current_hand.player
 	var stats: PlayerStats = player.stats
 	var can_restore_satiety: bool = (
-		data.satiety_restoration > 0.0
+		satiety_restoration > 0.0
 		and stats.current_satiety < stats.max_satiety
 	)
 	var can_restore_thirst: bool = (
-		data.thirst_restoration > 0.0
+		thirst_restoration > 0.0
 		and stats.current_thirst < stats.max_thirst
 	)
 
 	if not can_restore_satiety and not can_restore_thirst:
 		return
 
-	var durability_cost: float = maxf(
-		data.consumable_durability_cost,
-		0.0
-	)
-	if durability < durability_cost:
+	var cost: float = maxf(durability_cost, 0.0)
+	if item.durability < cost:
 		return
 
 	if can_restore_satiety:
-		stats.restore_satiety(data.satiety_restoration)
+		stats.restore_satiety(satiety_restoration)
 
 	if can_restore_thirst:
-		stats.restore_thirst(data.thirst_restoration)
+		stats.restore_thirst(thirst_restoration)
 
-	durability = maxf(durability - durability_cost, 0.0)
+	item.durability = maxf(item.durability - cost, 0.0)

@@ -102,7 +102,6 @@ func _ensure_instance_id() -> void:
 	if instance_id.is_empty():
 		instance_id = str(ResourceUID.create_id())
 
-
 func get_components() -> Array[ItemComponent]:
 	var result: Array[ItemComponent] = []
 	_collect_components(self, result)
@@ -111,8 +110,14 @@ func get_components() -> Array[ItemComponent]:
 
 func _collect_components(node: Node, result: Array[ItemComponent]) -> void:
 	for child: Node in node.get_children():
+		# Вложенный предмет — отдельный владелец компонентов.
+		# Не включаем его компоненты в список текущего предмета.
+		if child is ItemInstance:
+			continue
+
 		if child is ItemComponent:
 			result.append(child as ItemComponent)
+
 		_collect_components(child, result)
 
 

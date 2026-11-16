@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://b0ko3jtu4avhm" path="res://items/data/Leuka_s.tscn" id="14_lswn8"]
 [ext_resource type="PackedScene" uid="uid://d0qjli0sj4rpe" path="res://items/data/Br.tscn" id="17_a6jrf"]
 [ext_resource type="PackedScene" uid="uid://5etdi4rh1jou" path="res://items/data/Pa.tscn" id="18_xuqvo"]
+[ext_resource type="PackedScene" uid="uid://c1f6xerly1ko5" path="res://items/data/consumable_item.tscn" id="19_ryguw"]
 [ext_resource type="PackedScene" uid="uid://bt20djls4hg77" path="res://items/data/buzz.tscn" id="20_kq58d"]
 [ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/data/vbb.tscn" id="21_seu75"]
 [ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/data/pl.tscn" id="22_htxhm"]
@@ -273,6 +274,7 @@ item_scene = ExtResource("18_xuqvo")
 
 [node name="ItemSpawner8" parent="." unique_id=1390014951 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.153965, -0.010000229, 2.2933846)
+item_scene = ExtResource("19_ryguw")
 
 [node name="ItemSpawner9" parent="." unique_id=997635769 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0838585, -0.00999999, 2.2833242)
