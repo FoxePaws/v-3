@@ -22,7 +22,7 @@ local_rotation_axis = Vector3(0, 1, 0)
 [node name="Pivot" type="Marker3D" parent="." unique_id=1472111202]
 
 [node name="GripMarker" type="Marker3D" parent="Pivot" unique_id=20693545]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44591734, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.0022976815, -0.9999974, 0, 0.9999974, -0.0022976815, -0.44591734, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Pivot/GripMarker" unique_id=344121317]
 mesh = SubResource("SphereMesh_onkwe")

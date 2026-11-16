@@ -13,6 +13,7 @@ size = Vector3(0.2, 0.2, 0.2)
 script = ExtResource("2_8qj6n")
 
 [node name="Marker3D" type="Marker3D" parent="." unique_id=20693545]
+transform = Transform3D(0.007280479, 0.005182268, 0.99996, 0.99997336, -3.77304e-05, -0.007280382, 0, 0.9999865, -0.0051824045, 0, 0, 0)
 
 [node name="InteractionHandle" type="Area3D" parent="Marker3D" unique_id=1760966550 node_paths=PackedStringArray("grip_marker", "action")]
 script = ExtResource("1_r7kjp")

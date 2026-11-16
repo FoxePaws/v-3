@@ -249,6 +249,10 @@ item_scene = ExtResource("13_0odxb")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.970517, -0.009999752, 2.3047128)
 item_scene = ExtResource("14_lswn8")
 
+[node name="ItemSpawner12" parent="." unique_id=1953436315 instance=ExtResource("3_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.479267, -0.009999752, 2.3047128)
+item_scene = ExtResource("14_lswn8")
+
 [node name="bodylove" parent="." unique_id=1890260861 instance=ExtResource("7_272bh")]
 transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 0, 1, -4.2001705, 0.6435559, 8.317532)
 

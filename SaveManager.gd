@@ -110,7 +110,7 @@ func load_game(_slot_name: String = "quick") -> bool:
 
 	var instances: Dictionary[String, ItemInstance] = {}
 	var restored_items: Array[ItemInstance] = []
-	var records_by_item: Dictionary[String, Dictionary] = {}
+	var records_by_item: Dictionary = {}
 
 	# Сначала создаём все узлы. Связи parent_id устанавливаются после _ready().
 	for record: Dictionary in all_records:
@@ -124,18 +124,20 @@ func load_game(_slot_name: String = "quick") -> bool:
 		var instance_id: String = str(record.get("instance_id", ""))
 		if not instance_id.is_empty():
 			instances[instance_id] = item
-			records_by_item[instance_id] = record
+			records_by_item[item] = record
 
 	await get_tree().process_frame
 
 	# Восстанавливаем изменяемые данные после того, как компоненты прошли _ready().
 	for item: ItemInstance in restored_items:
-		var record: Dictionary = records_by_item.get(item.instance_id, {})
+		var record: Dictionary = records_by_item.get(item, {})
+
 		item.restore_save_data(record)
 
 	# Все ссылки на родительские предметы уже доступны через instances.
 	for item: ItemInstance in restored_items:
-		var record: Dictionary = records_by_item.get(item.instance_id, {})
+		var record: Dictionary = records_by_item.get(item, {})
+
 		_restore_location(item, record, instances, player, scene)
 
 	for item: ItemInstance in restored_items:
@@ -326,6 +328,7 @@ func _restore_world_transform(item: ItemInstance, record: Dictionary) -> void:
 	item.reparent(get_tree().current_scene, false)
 	item.global_transform = Transform3D(Basis(rotation).scaled(scale), position)
 	item.enable_collision()
+
 
 
 func _is_player_item(item: ItemInstance) -> bool:
