@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://boxl2ab0qwxes"]
 
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_3jxn0"]
 [ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_fv73r"]
 [ext_resource type="Resource" uid="uid://bxv58usog777y" path="res://items/moods/pl1.tres" id="2_0v041"]
 [ext_resource type="Resource" uid="uid://dq2l3cv8njddn" path="res://items/moods/pl2.tres" id="3_4e3xx"]
@@ -27,12 +28,7 @@ radius = 0.022949219
 [node name="pl" type="RigidBody3D" unique_id=1960892598 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
 collision_layer = 8
 collision_mask = 3
-script = ExtResource("1_fv73r")
-meter_gain_per_second = 0.7
-meter_decay_per_second = 0.1
-movement_effect_1 = ExtResource("2_0v041")
-movement_effect_2 = ExtResource("3_4e3xx")
-movement_effect_3 = ExtResource("4_bcoud")
+script = ExtResource("1_3jxn0")
 item_id = &"pl"
 display_name = "pl"
 description = "pl"
@@ -69,3 +65,9 @@ script = ExtResource("5_4e3xx")
 equip_kind = 1
 equipment_slot = &"Ass"
 bone_name = &"AnusRoot"
+
+[node name="ClothingEffect" type="Node3D" parent="." unique_id=274495477]
+script = ExtResource("1_fv73r")
+movement_effect_1 = ExtResource("2_0v041")
+movement_effect_2 = ExtResource("3_4e3xx")
+movement_effect_3 = ExtResource("4_bcoud")

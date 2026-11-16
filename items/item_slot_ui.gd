@@ -250,7 +250,6 @@ func _get_hand() -> HandController:
 
 	return player.left_hand
 
-
 func _gui_input(event: InputEvent) -> void:
 	if not (
 		event is InputEventMouseButton
@@ -263,12 +262,12 @@ func _gui_input(event: InputEvent) -> void:
 	if item == null:
 		return
 
-	var item_container: ItemContainer = _get_item_container(item)
+	var item_container: ItemContainer = item.get_component(
+		ItemContainer
+	) as ItemContainer
+
+	# ПКМ по предмету без контейнера — обычное действие без предупреждения.
 	if item_container == null:
-		push_warning(
-			"У предмета-контейнера %s нет дочернего ItemContainer"
-			% item.display_name
-		)
 		return
 
 	if player == null or player.inventory_ui == null:

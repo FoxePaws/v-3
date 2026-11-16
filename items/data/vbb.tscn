@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://dkoifjgl5i1mb"]
 
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_4ede7"]
 [ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_ig4dg"]
 [ext_resource type="Resource" uid="uid://bt3xaepy07rwk" path="res://items/moods/vbb1.tres" id="2_nu43j"]
 [ext_resource type="Resource" uid="uid://b4ti8vouxhjfg" path="res://items/moods/vbb2.tres" id="3_qgn71"]
@@ -14,19 +15,13 @@ height = 0.08
 radius = 0.02
 height = 0.08
 
-[node name="vbb" type="RigidBody3D" unique_id=1960892598 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
+[node name="vbb" type="RigidBody3D" unique_id=1960892598]
 collision_layer = 8
 collision_mask = 3
-script = ExtResource("1_ig4dg")
-clothing_effect_type = 1
-mode_effect_1 = ExtResource("2_nu43j")
-mode_effect_2 = ExtResource("3_qgn71")
-mode_effect_3 = ExtResource("4_4ede7")
+script = ExtResource("1_4ede7")
 item_id = &"vbb"
 display_name = "vbb"
 description = "vbb"
-primary_grip_point = NodePath("PrimaryGripPoint")
-secondary_grip_point = NodePath("SecondaryGripPoint")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1116049985]
 shape = SubResource("CapsuleShape3D_nu43j")
@@ -48,3 +43,10 @@ script = ExtResource("5_qgn71")
 equip_kind = 1
 equipment_slot = &"Va"
 bone_name = &"GenitalsRoot"
+
+[node name="ClothingEffect" type="Node3D" parent="." unique_id=2057429314]
+script = ExtResource("1_ig4dg")
+clothing_effect_type = 1
+mode_effect_1 = ExtResource("2_nu43j")
+mode_effect_2 = ExtResource("3_qgn71")
+mode_effect_3 = ExtResource("4_4ede7")
