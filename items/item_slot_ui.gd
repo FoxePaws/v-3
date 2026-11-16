@@ -1,9 +1,15 @@
 class_name ItemSlotUI
 extends Panel
 
-enum SlotKind { HAND, EQUIPMENT, CONTAINER }
 
-@export var slot_kind: SlotKind
+enum SlotKind {
+	HAND,
+	EQUIPMENT,
+	CONTAINER
+}
+
+
+@export var slot_kind: SlotKind = SlotKind.HAND
 @export var slot_id: StringName = &""
 @export var slot_index: int = 0
 
@@ -18,63 +24,73 @@ var item: ItemInstance
 func set_item(value: ItemInstance) -> void:
 	item = value
 
-	if item == null or item.data == null:
+	if item == null:
 		icon.texture = null
 		label.text = ""
 		tooltip_text = ""
 		return
 
-	icon.texture = item.data.icon
-	label.text = item.data.display_name
+	icon.texture = item.icon
+	label.text = item.display_name
 	tooltip_text = _make_item_tooltip(item)
 
 
 func _make_item_tooltip(target: ItemInstance) -> String:
-	if target == null or target.data == null:
+	if target == null:
 		return ""
 
-	var description: String = target.data.description.strip_edges()
+	var description: String = target.description.strip_edges()
 	var weight_text: String = "Вес: %.2f кг" % target.total_weight
 
 	if description.is_empty():
-		return "%s\n%s" % [
-			target.data.display_name,
-			weight_text,
-		]
+		return "%s\n%s" % [target.display_name, weight_text]
 
 	return "%s\n%s\n%s" % [
-		target.data.display_name,
+		target.display_name,
 		description,
-		weight_text,
+		weight_text
 	]
+
+
+func _get_item_container(target: ItemInstance) -> ItemContainer:
+	if target == null:
+		return null
+
+	for child: Node in target.get_children():
+		if child is ItemContainer:
+			return child as ItemContainer
+
+	return null
 
 
 func refresh() -> void:
 	match slot_kind:
 		SlotKind.HAND:
-			var hand := _get_hand()
+			var hand: HandController = _get_hand()
 			set_item(hand.held_item if hand != null else null)
 
 		SlotKind.EQUIPMENT:
 			if player == null or player.equipment == null:
 				set_item(null)
 				return
-
 			set_item(player.equipment.get_item(slot_id))
 
 		SlotKind.CONTAINER:
-			set_item(container.get_item_at(slot_index) if container != null else null)
+			set_item(
+				container.get_item_at(slot_index)
+				if container != null
+				else null
+			)
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	refresh()
-
 	if item == null:
 		return null
 
-	var preview := TextureRect.new()
-	preview.texture = item.data.icon
-	preview.custom_minimum_size = Vector2(48, 48)
+	var preview: TextureRect = TextureRect.new()
+	preview.texture = item.icon
+	preview.custom_minimum_size = Vector2(48.0, 48.0)
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	set_drag_preview(preview)
 
@@ -88,8 +104,9 @@ func _can_drop_data(_at_position: Vector2, drag_data: Variant) -> bool:
 	if not drag_data is Dictionary:
 		return false
 
-	var dragged_item := drag_data.get("item") as ItemInstance
-	var source := drag_data.get("source") as ItemSlotUI
+	var data: Dictionary = drag_data as Dictionary
+	var dragged_item: ItemInstance = data.get("item") as ItemInstance
+	var source: ItemSlotUI = data.get("source") as ItemSlotUI
 
 	if dragged_item == null or source == null or source == self:
 		return false
@@ -102,7 +119,7 @@ func _can_drop_data(_at_position: Vector2, drag_data: Variant) -> bool:
 
 	match slot_kind:
 		SlotKind.HAND:
-			var hand := _get_hand()
+			var hand: HandController = _get_hand()
 			return hand != null and hand.held_item == null
 
 		SlotKind.EQUIPMENT:
@@ -125,22 +142,27 @@ func _drop_data(_at_position: Vector2, drag_data: Variant) -> void:
 	if not drag_data is Dictionary:
 		return
 
-	var dragged_item := drag_data.get("item") as ItemInstance
-	var source := drag_data.get("source") as ItemSlotUI
+	var data: Dictionary = drag_data as Dictionary
+	var dragged_item: ItemInstance = data.get("item") as ItemInstance
+	var source: ItemSlotUI = data.get("source") as ItemSlotUI
 
 	if dragged_item == null or source == null:
 		return
-
 	if not _can_drop_data(Vector2.ZERO, drag_data):
 		return
-
 	if not source._remove_item(dragged_item):
 		return
 
 	if not _put_item(dragged_item):
-		# Если целевой слот не принял предмет, возвращаем его в исходный слот.
+		# Если целевой слот не принял предмет — возвращаем его обратно.
 		if not source._put_item(dragged_item):
-			push_error("Не удалось вернуть предмет в исходный слот: %s" % dragged_item.name)
+			push_error(
+				"Не удалось вернуть предмет в исходный слот: %s"
+				% dragged_item.name
+			)
+		source.refresh()
+		refresh()
+		return
 
 	source.refresh()
 	refresh()
@@ -155,8 +177,7 @@ func _drop_data(_at_position: Vector2, drag_data: Variant) -> void:
 func _remove_item(target: ItemInstance) -> bool:
 	match slot_kind:
 		SlotKind.HAND:
-			var hand := _get_hand()
-
+			var hand: HandController = _get_hand()
 			if hand == null or hand.held_item != target:
 				return false
 
@@ -164,22 +185,21 @@ func _remove_item(target: ItemInstance) -> bool:
 			target.current_holder = null
 			target.current_hand = null
 
-			var world := get_tree().current_scene
+			var world: Node = get_tree().current_scene
 			if world != null:
 				target.reparent(world, true)
-
-			target.enable_collision()
+				target.enable_collision()
 			return true
 
 		SlotKind.EQUIPMENT:
 			if player == null or player.equipment == null:
 				return false
-
 			if player.equipment.get_item(slot_id) != target:
 				return false
 
-			# В этой системе unequip() возвращает снятый ItemInstance.
-			var removed_item: ItemInstance = player.equipment.unequip(slot_id)
+			var removed_item: ItemInstance = (
+				player.equipment.unequip(slot_id)
+			)
 			return removed_item == target
 
 		SlotKind.CONTAINER:
@@ -191,9 +211,10 @@ func _remove_item(target: ItemInstance) -> bool:
 func _put_item(target: ItemInstance) -> bool:
 	match slot_kind:
 		SlotKind.HAND:
-			var hand := _get_hand()
-
+			var hand: HandController = _get_hand()
 			if hand == null or hand.held_item != null:
+				return false
+			if hand.held_item_point == null:
 				return false
 
 			hand.held_item = target
@@ -212,7 +233,10 @@ func _put_item(target: ItemInstance) -> bool:
 			)
 
 		SlotKind.CONTAINER:
-			return container != null and container.add_item(target, slot_index)
+			return (
+				container != null
+				and container.add_item(target, slot_index)
+			)
 
 	return false
 
@@ -226,6 +250,7 @@ func _get_hand() -> HandController:
 
 	return player.left_hand
 
+
 func _gui_input(event: InputEvent) -> void:
 	if not (
 		event is InputEventMouseButton
@@ -235,21 +260,14 @@ func _gui_input(event: InputEvent) -> void:
 		return
 
 	refresh()
-
-	if item == null or item.data == null:
+	if item == null:
 		return
 
-
-	var item_container := item.find_child(
-		"ItemContainer",
-		true,
-		false
-	) as ItemContainer
-
+	var item_container: ItemContainer = _get_item_container(item)
 	if item_container == null:
 		push_warning(
-			"У предмета-контейнера %s не найден дочерний узел ItemContainer"
-			% item.data.display_name
+			"У предмета-контейнера %s нет дочернего ItemContainer"
+			% item.display_name
 		)
 		return
 

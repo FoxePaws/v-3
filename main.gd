@@ -1,5 +1,6 @@
 extends Node3D
 
+
 @onready var sun: DirectionalLight3D = $Sun
 @onready var world_environment: WorldEnvironment = $WorldEnvironment
 @onready var rain: GPUParticles3D = $Weather/Rain
@@ -9,6 +10,9 @@ extends Node3D
 var current_weather: String = "clear"
 
 signal world_time_advanced(delta_world_seconds: float)
+
+@export var location_id: StringName = &"main"
+
 
 @export_group("Calendar")
 @export_range(1, 9999, 1) var start_year: int = 2010

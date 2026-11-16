@@ -4,6 +4,7 @@
 [ext_resource type="Resource" uid="uid://bt3xaepy07rwk" path="res://items/moods/vbb1.tres" id="2_nu43j"]
 [ext_resource type="Resource" uid="uid://b4ti8vouxhjfg" path="res://items/moods/vbb2.tres" id="3_qgn71"]
 [ext_resource type="Resource" uid="uid://clnl7bih5saiv" path="res://items/moods/vbb3.tres" id="4_4ede7"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="5_qgn71"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu43j"]
 radius = 0.02
@@ -21,6 +22,9 @@ clothing_effect_type = 1
 mode_effect_1 = ExtResource("2_nu43j")
 mode_effect_2 = ExtResource("3_qgn71")
 mode_effect_3 = ExtResource("4_4ede7")
+item_id = &"vbb"
+display_name = "vbb"
+description = "vbb"
 primary_grip_point = NodePath("PrimaryGripPoint")
 secondary_grip_point = NodePath("SecondaryGripPoint")
 
@@ -38,3 +42,9 @@ mesh = SubResource("SphereMesh_nb5cy")
 
 [node name="AttachPoint" type="Marker3D" parent="." unique_id=1208551601]
 transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0.00059788674, 0.010702111, 0)
+
+[node name="Equipment" type="Node3D" parent="." unique_id=753396828]
+script = ExtResource("5_qgn71")
+equip_kind = 1
+equipment_slot = &"Va"
+bone_name = &"GenitalsRoot"

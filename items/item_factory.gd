@@ -3,17 +3,19 @@ extends RefCounted
 
 
 static func create_item(
-	data: ItemData,
+	item_scene: PackedScene,
 	initial_state: Dictionary = {}
 ) -> ItemInstance:
-	if data == null or data.item_scene == null:
-		push_error("Для ItemData не назначена сцена предмета")
+	if item_scene == null:
+		push_error("ItemFactory: не передана сцена предмета")
 		return null
 
-	var item: ItemInstance = data.item_scene.instantiate() as ItemInstance
-	if item == null:
-		push_error("Корень сцены предмета должен наследоваться от ItemInstance")
+	var node: Node = item_scene.instantiate()
+	if not node is ItemInstance:
+		push_error("ItemFactory: корень сцены должен наследоваться от ItemInstance")
+		node.free()
 		return null
 
-	item.setup(data, initial_state)
-	return item
+	var item_instance: ItemInstance = node as ItemInstance
+	item_instance.setup(initial_state)
+	return item_instance

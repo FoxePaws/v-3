@@ -1,33 +1,55 @@
-# item_instance.gd
 class_name ItemInstance
 extends RigidBody3D
 
-var data: ItemData
+signal total_weight_changed(old_weight: float, new_weight: float)
 
-var instance_id: String = ""
-var state: Dictionary = {}
+@export_category("Identity")
+@export var item_id: StringName = &""
+@export var display_name: String = ""
+@export_multiline var description: String = ""
+@export var icon: Texture2D
 
-var current_holder: Node = null
-var current_hand: HandController = null
-var saved_collision_layer: int = 8
-var saved_collision_mask: int = 1
 
-var flags: Dictionary = {}
-var durability: float = -1.0
+@export_category("Interaction")
+@export var can_grab: bool = true
+@export var can_throw: bool = true
+@export var heavy_item: bool = false
+@export var throw_force: float = 8.0
+@export var secondary_hand_offset: Vector3 = Vector3.ZERO
+@export var secondary_hand_rotation: Vector3 = Vector3.ZERO
 
+@export_category("Size and weight")
+@export_range(0.0, 10000.0, 0.01) var item_size: float = 1.0
+@export_range(0.0, 10000.0, 0.01) var item_weight: float = 1.0
+
+@export_category("Durability")
+@export_range(0.0, 100000.0, 0.1) var max_durability: float = 100.0
+
+@export_category("Collision")
+@export_flags_3d_physics var item_collision_layer: int = 8
+@export_flags_3d_physics var item_collision_mask: int = 1
+
+@export_category("Grip points")
 @export var primary_grip_point: Marker3D
 @export var secondary_grip_point: Marker3D
 
+var instance_id: String = ""
+var durability: float = -1.0
+var state: Dictionary = {}
+var flags: Dictionary = {}
 
-signal total_weight_changed(old_weight: float, new_weight: float)
+var current_holder: Node = null
+var current_hand: HandController = null
+
+var saved_collision_layer: int = 8
+var saved_collision_mask: int = 1
 
 var base_weight: float = 0.0
 var total_weight: float = 0.0
 
 
 func _ready() -> void:
-	if instance_id.is_empty():
-		instance_id = str(ResourceUID.create_id())
+	_ensure_instance_id()
 
 	if primary_grip_point == null:
 		primary_grip_point = get_node_or_null("PrimaryGripPoint") as Marker3D
@@ -35,107 +57,74 @@ func _ready() -> void:
 	if secondary_grip_point == null:
 		secondary_grip_point = get_node_or_null("SecondaryGripPoint") as Marker3D
 
-	if data == null:
-		push_error("У предмета '%s' не назначен ItemData" % get_path())
-		return
-
 	if durability < 0.0:
-		durability = data.max_durability
+		durability = maxf(max_durability, 0.0)
 
-	_initialize_weight()
-	_apply_item_data()
-	
-
-
-func setup(item_data: ItemData, initial_state: Dictionary = {}) -> void:
-	data = item_data
-	
-	if initial_state.has("instance_id") or initial_state.has("durability"):
-		load_state_dict(initial_state)
-	else:
-		state = initial_state.duplicate(true)
-
-	_initialize_weight()
-
-	if is_inside_tree():
-		if instance_id.is_empty():
-			instance_id = str(ResourceUID.create_id())
-
-		if data != null and durability < 0.0:
-			durability = data.max_durability
-		_apply_item_data()
-
-
-func _initialize_weight() -> void:
-	if data == null:
-		base_weight = 0.0
-		total_weight = 0.0
-		return
-
-	base_weight = maxf(data.item_weight, 0.0)
-	total_weight = base_weight
-
-
-func change_contents_weight(weight_delta: float) -> void:
-	if is_zero_approx(weight_delta):
-		return
-
-	var old_weight: float = total_weight
-	total_weight = maxf(base_weight, total_weight + weight_delta)
-
-	if not is_equal_approx(old_weight, total_weight):
-		total_weight_changed.emit(old_weight, total_weight)
-
-
-
-func make_state_dict() -> Dictionary:
-	return {
-		"instance_id": instance_id,
-		"item_id": data.item_id if data != null else &"",
-		"item_data_path": data.resource_path if data != null else "",
-		"state": state.duplicate(true),
-		"durability": durability,
-		"flags": flags.duplicate(true),
-	}
-
-func load_state_dict(saved: Dictionary) -> void:
-	var saved_id: Variant = saved.get("instance_id", "")
-	if saved_id is String and not saved_id.is_empty():
-		instance_id = saved_id
-
-	var saved_state: Variant = saved.get("state", {})
-	if saved_state is Dictionary:
-		state = saved_state.duplicate(true)
-
-	var saved_durability: Variant = saved.get(
-		"durability",
-		data.max_durability if data != null else 100.0
-	)
-	if saved_durability is int or saved_durability is float:
-		var maximum: float = data.max_durability if data != null else 100.0
-		durability = clampf(float(saved_durability), 0.0, maximum)
-
-	var saved_flags: Variant = saved.get("flags", {})
-	if saved_flags is Dictionary:
-		flags.clear()
-		for key: Variant in saved_flags:
-			var value: Variant = saved_flags[key]
-			if value is bool:
-				flags[StringName(str(key))] = value
-
-func _apply_item_data() -> void:
-	saved_collision_layer = data.collision_layer
-	saved_collision_mask = data.collision_mask
+	saved_collision_layer = item_collision_layer
+	saved_collision_mask = item_collision_mask
 	collision_layer = saved_collision_layer
 	collision_mask = saved_collision_mask
 
+	base_weight = maxf(item_weight, 0.0)
+	if total_weight < base_weight:
+		total_weight = base_weight
 
-func can_be_grabbed() -> bool:
-	return data != null and data.can_grab and current_holder == null
 
 
 func is_heavy() -> bool:
-	return data != null and data.is_heavy
+	return heavy_item
+ 
+func setup(saved: Dictionary = {}) -> void:
+	if saved.has("instance_id"):
+		var saved_id: String = str(saved["instance_id"])
+		if not saved_id.is_empty():
+			instance_id = saved_id
+
+	if saved.has("durability"):
+		durability = clampf(float(saved["durability"]), 0.0, maxf(max_durability, 0.0))
+
+	var saved_state: Variant = saved.get("state", {})
+	if saved_state is Dictionary:
+		state = (saved_state as Dictionary).duplicate(true)
+
+	var saved_flags: Variant = saved.get("flags", {})
+	if saved_flags is Dictionary:
+		flags = (saved_flags as Dictionary).duplicate(true)
+
+	if instance_id.is_empty():
+		_ensure_instance_id()
+
+	if durability < 0.0:
+		durability = maxf(max_durability, 0.0)
+
+
+func _ensure_instance_id() -> void:
+	if instance_id.is_empty():
+		instance_id = str(ResourceUID.create_id())
+
+
+func get_components() -> Array[ItemComponent]:
+	var result: Array[ItemComponent] = []
+	_collect_components(self, result)
+	return result
+
+
+func _collect_components(node: Node, result: Array[ItemComponent]) -> void:
+	for child: Node in node.get_children():
+		if child is ItemComponent:
+			result.append(child as ItemComponent)
+		_collect_components(child, result)
+
+
+func get_component(component_type: Variant) -> ItemComponent:
+	for component: ItemComponent in get_components():
+		if is_instance_of(component, component_type):
+			return component
+	return null
+
+
+func can_be_grabbed() -> bool:
+	return can_grab and current_holder == null
 
 
 func on_grab(holder: Node) -> void:
@@ -154,19 +143,23 @@ func on_throw(direction: Vector3, force: float) -> void:
 
 
 func on_primary_action() -> void:
-	pass
+	for component: ItemComponent in get_components():
+		component.on_primary_action()
 
 
 func on_secondary_action() -> void:
-	pass
+	for component: ItemComponent in get_components():
+		component.on_secondary_action()
 
 
 func on_primary_action_released() -> void:
-	pass
+	for component: ItemComponent in get_components():
+		component.on_primary_action_released()
 
 
-func on_mouse_motion(_relative: Vector2) -> void:
-	pass
+func on_mouse_motion(relative: Vector2) -> void:
+	for component: ItemComponent in get_components():
+		component.on_mouse_motion(relative)
 
 
 func disable_collision() -> void:
@@ -183,6 +176,17 @@ func enable_collision() -> void:
 	collision_mask = saved_collision_mask
 
 
+func change_contents_weight(weight_delta: float) -> void:
+	if is_zero_approx(weight_delta):
+		return
+
+	var old_weight: float = total_weight
+	total_weight = maxf(base_weight, total_weight + weight_delta)
+
+	if not is_equal_approx(old_weight, total_weight):
+		total_weight_changed.emit(old_weight, total_weight)
+
+
 func set_total_weight(new_weight: float) -> void:
 	var clamped_weight: float = maxf(base_weight, new_weight)
 	if is_equal_approx(total_weight, clamped_weight):
@@ -196,11 +200,43 @@ func set_total_weight(new_weight: float) -> void:
 func recalculate_total_weight() -> float:
 	var contents_weight: float = 0.0
 
-	for child: Node in get_children():
-		if child is ItemContainer:
-			var container: ItemContainer = child as ItemContainer
-			contents_weight += container.recalculate_contents_weight()
+	for component: ItemComponent in get_components():
+		if component is ItemContainer:
+			contents_weight += (component as ItemContainer).recalculate_contents_weight()
 
-	var recalculated_weight: float = base_weight + contents_weight
-	set_total_weight(recalculated_weight)
+	set_total_weight(base_weight + contents_weight)
 	return total_weight
+
+
+func make_save_data() -> Dictionary:
+	var component_states: Dictionary = {}
+
+	for component: ItemComponent in get_components():
+		var component_path: String = str(get_path_to(component))
+		component_states[component_path] = component.make_save_data()
+
+	return {
+		"scene_path": scene_file_path,
+		"item_id": str(item_id),
+		"instance_id": instance_id,
+		"durability": durability,
+		"state": state.duplicate(true),
+		"flags": flags.duplicate(true),
+		"components": component_states,
+	}
+
+
+func restore_save_data(saved: Dictionary) -> void:
+	setup(saved)
+
+	var raw_components: Variant = saved.get("components", {})
+	if not raw_components is Dictionary:
+		return
+
+	var component_states: Dictionary = raw_components as Dictionary
+
+	for component: ItemComponent in get_components():
+		var component_path: String = str(get_path_to(component))
+		var raw_state: Variant = component_states.get(component_path, {})
+		if raw_state is Dictionary:
+			component.restore_save_data(raw_state as Dictionary)

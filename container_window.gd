@@ -42,8 +42,8 @@ func _setup_window() -> void:
 
 func _get_container_name() -> String:
 	var container_item := container.get_parent() as ItemInstance
-	if container_item != null and container_item.data != null:
-		return container_item.data.display_name
+	if container_item != null :
+		return container_item.display_name
 
 	return "Container"
 

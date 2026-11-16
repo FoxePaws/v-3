@@ -24,5 +24,5 @@ func on_primary_action() -> void:
 func on_secondary_action() -> void:
 	durability = minf(
 		durability + durability_change,
-		data.max_durability if data != null else durability
+		max_durability 
 	)

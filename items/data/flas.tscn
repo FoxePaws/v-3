@@ -21,6 +21,9 @@ radius = 0.2
 collision_layer = 8
 collision_mask = 3
 script = ExtResource("1_kwhqp")
+item_id = &"flas"
+display_name = "flas"
+description = "flas"
 primary_grip_point = NodePath("PrimaryGripPoint")
 secondary_grip_point = NodePath("SecondaryGripPoint")
 

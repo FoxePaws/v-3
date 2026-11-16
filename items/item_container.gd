@@ -1,6 +1,7 @@
 class_name ItemContainer
-extends Node
+extends ItemComponent
 
+signal changed
 
 @export_range(1, 100) var capacity: int = 8
 @export_range(0.0, 10000.0, 0.01) var max_item_size: float = 100.0
@@ -10,7 +11,19 @@ var items: Array[ItemInstance] = []
 
 
 func _ready() -> void:
-	items.resize(maxi(capacity, 0))
+	super._ready()
+	_rebuild_items()
+
+
+func _rebuild_items() -> void:
+	items.clear()
+
+	for child: Node in get_children():
+		if child is ItemInstance:
+			items.append(child as ItemInstance)
+
+	while items.size() < maxi(capacity, 0):
+		items.append(null)
 
 
 func get_item_at(index: int) -> ItemInstance:
@@ -19,116 +32,104 @@ func get_item_at(index: int) -> ItemInstance:
 	return items[index]
 
 
-func can_accept(item: ItemInstance, index: int = -1) -> bool:
-	if item == null:
+func can_accept(item_instance: ItemInstance, index: int = -1) -> bool:
+	if item_instance == null or item_instance == item:
 		return false
 
-	if item == get_parent() or item.is_ancestor_of(self):
+	if item_instance.is_ancestor_of(self):
+		return false
+
+	if max_item_size > 0.0 and item_instance.item_size > max_item_size:
 		return false
 
 	if index >= 0:
-		if index >= items.size() or items[index] != null:
-			return false
-	else:
-		if _first_empty_slot() < 0:
-			return false
+		return index < items.size() and items[index] == null
 
-	if max_item_size > 0.0 and item.data != null:
-		if item.data.item_size > max_item_size:
-			return false
+	return _first_empty_slot() >= 0
 
-	return true
 
-func add_item(item: ItemInstance, index: int = -1) -> bool:
+func add_item(item_instance: ItemInstance, index: int = -1) -> bool:
 	if index < 0:
 		index = _first_empty_slot()
 
-	if not can_accept(item, index):
+	if not can_accept(item_instance, index):
 		return false
 
-	items[index] = item
-	item.current_holder = self
-	item.current_hand = null
+	var old_holder: Node = item_instance.current_holder
+	if old_holder is ItemContainer:
+		var old_container: ItemContainer = old_holder as ItemContainer
+		if not old_container.remove_item(item_instance):
+			return false
+
+	items[index] = item_instance
+	item_instance.current_holder = self
+	item_instance.current_hand = null
+	item_instance.disable_collision()
+	item_instance.reparent(self, false)
+	item_instance.visible = not hide_item_models
 
 	var weight_callback: Callable = _on_item_total_weight_changed
-	if not item.total_weight_changed.is_connected(weight_callback):
-		item.total_weight_changed.connect(weight_callback)
+	if not item_instance.total_weight_changed.is_connected(weight_callback):
+		item_instance.total_weight_changed.connect(weight_callback)
 
-	item.disable_collision()
-	item.reparent(self, false)
-	item.visible = not hide_item_models
-
-	var owner_item: ItemInstance = get_parent() as ItemInstance
-	if owner_item != null:
-		owner_item.change_contents_weight(item.total_weight)
-
+	_update_owner_weight(item_instance.total_weight)
 	changed.emit()
 	return true
 
 
-func remove_item(item: ItemInstance) -> bool:
-	var index: int = items.find(item)
+func remove_item(item_instance: ItemInstance) -> bool:
+	var index: int = items.find(item_instance)
 	if index < 0:
 		return false
 
-	var owner_item: ItemInstance = get_parent() as ItemInstance
-	if owner_item != null:
-		owner_item.change_contents_weight(-item.total_weight)
+	_update_owner_weight(-item_instance.total_weight)
 
 	var weight_callback: Callable = _on_item_total_weight_changed
-	if item.total_weight_changed.is_connected(weight_callback):
-		item.total_weight_changed.disconnect(weight_callback)
+	if item_instance.total_weight_changed.is_connected(weight_callback):
+		item_instance.total_weight_changed.disconnect(weight_callback)
 
 	items[index] = null
-	item.current_holder = null
-	item.current_hand = null
-	item.visible = true
-
+	item_instance.current_holder = null
+	item_instance.current_hand = null
+	item_instance.visible = true
 	changed.emit()
 	return true
 
 
-func _on_item_total_weight_changed(
-	old_weight: float,
-	new_weight: float
-) -> void:
-	var weight_delta: float = new_weight - old_weight
-	var owner_item: ItemInstance = get_parent() as ItemInstance
-
+func _update_owner_weight(weight_delta: float) -> void:
+	var owner_item: ItemInstance = item
 	if owner_item != null:
 		owner_item.change_contents_weight(weight_delta)
 
+
+func _on_item_total_weight_changed(old_weight: float, new_weight: float) -> void:
+	_update_owner_weight(new_weight - old_weight)
 	changed.emit()
 
 
 func recalculate_contents_weight() -> float:
 	var contents_weight: float = 0.0
 
-	for item: ItemInstance in items:
-		if item == null:
+	for contained_item: ItemInstance in items:
+		if contained_item == null:
 			continue
-
-		contents_weight += item.recalculate_total_weight()
-
-	var owner_item: ItemInstance = get_parent() as ItemInstance
-	if owner_item != null:
-		owner_item.set_total_weight(
-			owner_item.base_weight + contents_weight
-		)
+		contents_weight += contained_item.recalculate_total_weight()
 
 	return contents_weight
 
 
-
-
 func _first_empty_slot() -> int:
-	for i in range(items.size()):
-		if items[i] == null:
-			return i
+	for index: int in range(items.size()):
+		if items[index] == null:
+			return index
 	return -1
-
-signal changed
 
 
 func notify_changed() -> void:
 	changed.emit()
+
+
+func make_save_data() -> Dictionary:
+	var saved_state: Dictionary = super.make_save_data()
+	saved_state["capacity"] = capacity
+	return saved_state

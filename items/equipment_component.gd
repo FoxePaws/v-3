@@ -38,13 +38,14 @@ func _ready() -> void:
 func get_item(slot_id: StringName) -> ItemInstance:
 	return slots.get(slot_id) as ItemInstance
 
-
 func can_equip(item: ItemInstance, slot_id: StringName) -> bool:
+	var equip_component: ItemEquip = _get_item_equip(item)
+
 	return (
 		item != null
-		and item.data != null
+		and equip_component != null
 		and slots.has(slot_id)
-		and item.data.equipment_slot == slot_id
+		and equip_component.equipment_slot == slot_id
 		and slots[slot_id] == null
 	)
 
@@ -75,24 +76,32 @@ func _set_clothing_visible(visual_id: StringName, value: bool) -> void:
 
 	visuals.set_visible(visual_id, value)
 
-
 func _attach_to_bone(item: ItemInstance) -> bool:
-	if item == null or item.data == null:
+	var equip_component: ItemEquip = _get_item_equip(item)
+	if item == null or equip_component == null:
 		return false
 
-	var bone_attachment := _get_bone_attachment(item.data.bone_name)
+	var bone_attachment: BoneAttachment3D = _get_bone_attachment(
+		equip_component.bone_name
+	)
 	if bone_attachment == null:
-		push_warning("Не найдена точка крепления для кости: %s" % item.data.bone_name)
+		push_warning(
+			"Не найдена точка крепления для кости: %s"
+			% equip_component.bone_name
+		)
 		return false
 
-	var attach_point := item.get_node_or_null("AttachPoint") as Marker3D
+	var attach_point: Marker3D = item.get_node_or_null("AttachPoint") as Marker3D
 	if attach_point == null:
-		push_warning("У предмета %s нет Marker3D AttachPoint" % item.data.display_name)
+		push_warning("У предмета %s нет Marker3D AttachPoint" % item.display_name)
 		return false
 
 	item.disable_collision()
 	item.reparent(bone_attachment, false)
-	item.global_transform = bone_attachment.global_transform * attach_point.transform.affine_inverse()
+	item.global_transform = (
+		bone_attachment.global_transform
+		* attach_point.transform.affine_inverse()
+	)
 	return true
 
 
@@ -100,7 +109,11 @@ func equip(item: ItemInstance, slot_id: StringName) -> bool:
 	if not can_equip(item, slot_id):
 		return false
 
-	if item.data.item_type == ItemData.ItemType.CLOTHING:
+	var equip_component: ItemEquip = _get_item_equip(item)
+	if equip_component == null:
+		return false
+
+	if equip_component.equip_kind == ItemEquip.EquipKind.CLOTHING:
 		if player == null:
 			push_warning("EquipmentComponent: player не назначен")
 			return false
@@ -108,8 +121,7 @@ func equip(item: ItemInstance, slot_id: StringName) -> bool:
 		item.reparent(player, true)
 		item.disable_collision()
 		item.visible = false
-
-	elif item.data.item_type == ItemData.ItemType.EQUIPMENT:
+	elif equip_component.equip_kind == ItemEquip.EquipKind.EQUIPMENT:
 		if not _attach_to_bone(item):
 			return false
 	else:
@@ -127,6 +139,8 @@ func equip(item: ItemInstance, slot_id: StringName) -> bool:
 		player.recalculate_equipment_stats()
 
 	return true
+
+
 
 
 func unequip(slot_id: StringName) -> ItemInstance:
@@ -156,7 +170,7 @@ func unequip(slot_id: StringName) -> ItemInstance:
 	return item
 
 func _refresh_clothing_visibility() -> void:
-	var visuals := clothing_visuals
+	var visuals: ClothingVisuals = clothing_visuals
 	if visuals == null and player != null:
 		visuals = player.get_node_or_null("ClothingVisuals") as ClothingVisuals
 
@@ -164,29 +178,30 @@ func _refresh_clothing_visibility() -> void:
 		push_warning("EquipmentComponent: ClothingVisuals не назначен")
 		return
 
-	# Сбрасываем визуалы, в том числе визуал только что снятой вещи.
 	visuals.hide_all()
 
 	var hidden_visuals: Dictionary = {}
 
 	for slot_value: Variant in slots.values():
-		var item := slot_value as ItemInstance
-		if item == null or item.data == null:
+		var item: ItemInstance = slot_value as ItemInstance
+		var equip_component: ItemEquip = _get_item_equip(item)
+		if equip_component == null:
 			continue
-		if item.data.item_type != ItemData.ItemType.CLOTHING:
+		if equip_component.equip_kind != ItemEquip.EquipKind.CLOTHING:
 			continue
 
-		for visual_id in item.data.hide_clothing_visuals:
+		for visual_id: StringName in equip_component.hide_clothing_visuals:
 			hidden_visuals[visual_id] = true
 
 	for slot_value: Variant in slots.values():
-		var item := slot_value as ItemInstance
-		if item == null or item.data == null:
+		var item: ItemInstance = slot_value as ItemInstance
+		var equip_component: ItemEquip = _get_item_equip(item)
+		if equip_component == null:
 			continue
-		if item.data.item_type != ItemData.ItemType.CLOTHING:
+		if equip_component.equip_kind != ItemEquip.EquipKind.CLOTHING:
 			continue
 
-		var visual_id: StringName = item.data.clothing_visual_id
+		var visual_id: StringName = equip_component.clothing_visual_id
 		if visual_id == &"" or hidden_visuals.has(visual_id):
 			continue
 
@@ -212,18 +227,32 @@ func refresh_equipment_blend_shapes() -> void:
 func _collect_winning_settings(property_name: StringName) -> Dictionary:
 	var winners: Dictionary = {}
 
-	for slot_id in slot_ids:
-		var item := get_item(slot_id)
-		if item == null or item.data == null:
+	for slot_id: StringName in slot_ids:
+		var item: ItemInstance = get_item(slot_id)
+		var equip_component: ItemEquip = _get_item_equip(item)
+		if equip_component == null:
 			continue
 
-		var settings: Array = item.data.get(property_name)
-		for setting_value in settings:
-			var setting := setting_value as BlendShapeSetting
+		var settings: Array[BlendShapeSetting] = []
+
+		match property_name:
+			&"body_shape_keys":
+				settings = equip_component.body_shape_keys
+			&"head_shape_keys":
+				settings = equip_component.head_shape_keys
+			&"sweater_shape_keys":
+				settings = equip_component.sweater_shape_keys
+			_:
+				push_warning("Неизвестное свойство blend shape: %s" % property_name)
+				continue
+
+		for setting: BlendShapeSetting in settings:
 			if setting == null or setting.shape_name == &"":
 				continue
 
-			var existing: BlendShapeSetting = winners.get(setting.shape_name) as BlendShapeSetting
+			var existing: BlendShapeSetting = (
+				winners.get(setting.shape_name) as BlendShapeSetting
+			)
 			if existing == null or setting.priority >= existing.priority:
 				winners[setting.shape_name] = setting
 
@@ -359,3 +388,11 @@ func _on_equipped_item_weight_changed(
 	_new_weight: float
 ) -> void:
 	recalculate_equipment_weight()
+
+
+func _get_item_equip(item_instance: ItemInstance) -> ItemEquip:
+	if item_instance == null:
+		return null
+
+	var component: ItemComponent = item_instance.get_component(ItemEquip)
+	return component as ItemEquip

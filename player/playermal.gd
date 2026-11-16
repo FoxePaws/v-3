@@ -133,85 +133,32 @@ func _ready() -> void:
 	hud.bind_stats(stats)
 
 
-
 func recalculate_equipment_stats() -> void:
-	walk_speed = base_walk_speed
-	sprint_speed = base_sprint_speed
-	protection = 0.0
-	warmth = 0.0
+	if stats == null:
+		return
 
-	var modifiers: Dictionary = {}
+	var equipped_components: Array[ItemEquip] = []
 
 	if equipment != null:
 		for item_variant: Variant in equipment.slots.values():
-			var item: ItemInstance = item_variant as ItemInstance
-			if item == null or item.data == null:
+			var item_instance: ItemInstance = item_variant as ItemInstance
+			if item_instance == null:
 				continue
 
-			walk_speed += item.data.walk_speed_modifier
-			sprint_speed += item.data.sprint_speed_modifier
-			protection += item.data.protection
-			warmth += item.data.warmth
+			var component: ItemComponent = item_instance.get_component(ItemEquip)
+			if component is ItemEquip:
+				equipped_components.append(component as ItemEquip)
 
-			# Эти поля добавляются в ItemData ниже.
-			_add_equipment_modifier(
-				modifiers,
-				"max_willpower_add",
-				item.data.max_willpower_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"max_stamina_add",
-				item.data.max_stamina_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"stamina_threshold_add",
-				item.data.stamina_threshold_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"stamina_recovery_add",
-				item.data.stamina_recovery_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"willpower_recovery_add",
-				item.data.willpower_recovery_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"stamina_cost_multiplier_multiplier",
-				item.data.stamina_cost_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"willpower_cost_multiplier_multiplier",
-				item.data.willpower_cost_modifier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"walk_speed_multiplier",
-				item.data.walk_speed_multiplier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"sprint_speed_multiplier",
-				item.data.sprint_speed_multiplier
-			)
-			_add_equipment_modifier(
-				modifiers,
-				"jump_velocity_multiplier",
-				item.data.jump_velocity_multiplier
-			)
+	stats.set_equipment_components(equipped_components)
 
-	stats.set_equipment_modifiers(modifiers)
-
-	# Синхронизируем устаревшие поля игрока с итоговыми значениями,
-	# чтобы другие существующие функции продолжали работать.
+	# Оставляем эти свойства синхронизированными для существующих
+	# частей Player, которые ещё могут читать их напрямую.
 	walk_speed = stats.walk_speed
 	sprint_speed = stats.sprint_speed
 	jump_velocity = stats.jump_velocity
+	protection = stats.protection
+	warmth = stats.warmth
+
 
 
 func _add_equipment_modifier(
@@ -452,8 +399,8 @@ func _throw_active_hand_item() -> void:
 	item.reparent(get_tree().current_scene, true)
 
 	var throw_force: float = 8.0
-	if item.data != null:
-		throw_force = item.data.throw_force
+	
+	throw_force = item.throw_force
 
 	item.enable_collision()
 	item.on_throw(-camera.global_basis.z, throw_force)

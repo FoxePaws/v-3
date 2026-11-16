@@ -8,20 +8,19 @@
 [ext_resource type="PackedScene" uid="uid://datumxyio33qi" path="res://Props/rat.tscn" id="3_efxa6"]
 [ext_resource type="PackedScene" uid="uid://cnr5cm15ysi40" path="res://ItemSpawner.tscn" id="3_h2yge"]
 [ext_resource type="Texture2D" uid="uid://dayrd1ojttbs0" path="res://textures/MoonMap.png" id="3_yaehf"]
-[ext_resource type="Resource" uid="uid://b7v4hkv3hgvoq" path="res://items/data/flas.tres" id="4_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://dja6ya1pigwv2" path="res://textures/StarField.jpg" id="4_074og"]
-[ext_resource type="Resource" uid="uid://iuswp188omqg" path="res://items/data/Stick.tres" id="5_lquwl"]
-[ext_resource type="Resource" uid="uid://nbyewndav4kn" path="res://items/data/leuka2_s.tres" id="6_7mycd"]
-[ext_resource type="Resource" uid="uid://b26djfr6je75u" path="res://items/data/Sponge.tres" id="6_efxa6"]
 [ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://Props/static_bodylove_3d.tscn" id="7_272bh"]
-[ext_resource type="Resource" uid="uid://bnyr7aipx1a0e" path="res://items/data/Sweater.tres" id="8_dg77c"]
 [ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
-[ext_resource type="Resource" uid="uid://bws3wcm57x01w" path="res://items/data/pa.tres" id="13_w48qg"]
-[ext_resource type="Resource" uid="uid://dbbl4w26tooho" path="res://items/data/br.tres" id="14_vivmo"]
-[ext_resource type="Resource" uid="uid://c54qajd2uulcy" path="res://items/data/buzz_item.tres" id="19_cegan"]
-[ext_resource type="Resource" uid="uid://cot7obpbepdqv" path="res://items/data/cons.tres" id="20_82xsv"]
-[ext_resource type="Resource" uid="uid://b373b4pxysmh4" path="res://items/data/pl.tres" id="21_ryguw"]
-[ext_resource type="Resource" uid="uid://c8666pwoagohb" path="res://items/data/vbb.tres" id="22_d13ii"]
+[ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/data/Sw.tscn" id="10_ryguw"]
+[ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/data/sponge.tscn" id="11_d13ii"]
+[ext_resource type="PackedScene" uid="uid://oo6qsa1hu3tj" path="res://items/data/flas.tscn" id="12_1u8w0"]
+[ext_resource type="PackedScene" uid="uid://bmxuh4swu04u2" path="res://items/data/Stick.tscn" id="13_0odxb"]
+[ext_resource type="PackedScene" uid="uid://b0ko3jtu4avhm" path="res://items/data/Leuka_s.tscn" id="14_lswn8"]
+[ext_resource type="PackedScene" uid="uid://d0qjli0sj4rpe" path="res://items/data/Br.tscn" id="17_a6jrf"]
+[ext_resource type="PackedScene" uid="uid://5etdi4rh1jou" path="res://items/data/Pa.tscn" id="18_xuqvo"]
+[ext_resource type="PackedScene" uid="uid://bt20djls4hg77" path="res://items/data/buzz.tscn" id="20_kq58d"]
+[ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/data/vbb.tscn" id="21_seu75"]
+[ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/data/pl.tscn" id="22_htxhm"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -223,50 +222,66 @@ mesh = SubResource("BoxMesh_onkwe")
 
 [node name="ItemSpawner5" parent="." unique_id=1290192550 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.504463, 0.124922335, -5.4139047)
-item_data = ExtResource("8_dg77c")
+item_scene = ExtResource("10_ryguw")
 
 [node name="ItemSpawner4" parent="." unique_id=1743032417 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6462502, 0.17278421, -2.9897919)
-item_data = ExtResource("6_efxa6")
+item_scene = ExtResource("11_d13ii")
 
 [node name="ItemSpawner" parent="." unique_id=886245822 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8231251, -0.00999999, -1.4948959)
-item_data = ExtResource("4_1bvp3")
+item_scene = ExtResource("12_1u8w0")
 
 [node name="ItemSpawner2" parent="." unique_id=1765085527 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0272546, 0.9385525, 5.826148)
-item_data = ExtResource("5_lquwl")
+item_scene = ExtResource("13_0odxb")
 
 [node name="ItemSpawner3" parent="." unique_id=302078809 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.970517, -0.009999752, 2.3047128)
-item_data = ExtResource("6_7mycd")
+item_scene = ExtResource("14_lswn8")
 
 [node name="bodylove" parent="." unique_id=1890260861 instance=ExtResource("7_272bh")]
 transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 0, 1, -4.2001705, 0.6435559, 8.317532)
 
 [node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("10_4c57u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+prone_speed = 1.0
+slow_walk_multiplier = 0.55
+jump_velocity = 5.0
+gravity = 9.4
+ground_acceleration = 35.0
+ground_deceleration = 45.0
+air_control = 0.5
+body_turn_speed = 5.0
+body_turn_acceleration = 12.0
+mouse_sensitivity = 0.0025
+min_pitch = -1.4835298641951802
+max_pitch = 1.4835298641951802
+crouch_root_pitch = -8.0
+lying_root_offset = -0.75
+lying_root_pitch = -90.0
+body_pose_speed = 10.0
+heavy_support_smoothing = 15.0
 
 [node name="ItemSpawner6" parent="." unique_id=2120406206 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0825243, 0.124922335, -5.4139047)
-item_data = ExtResource("13_w48qg")
+item_scene = ExtResource("17_a6jrf")
 
 [node name="ItemSpawner7" parent="." unique_id=267184787 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.232813, 0.124922335, -5.4139047)
-item_data = ExtResource("14_vivmo")
+item_scene = ExtResource("18_xuqvo")
 
 [node name="ItemSpawner8" parent="." unique_id=1390014951 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.153965, -0.010000229, 2.2933846)
-item_data = ExtResource("19_cegan")
 
 [node name="ItemSpawner9" parent="." unique_id=997635769 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.0838585, -0.00999999, 2.2833242)
-item_data = ExtResource("20_82xsv")
+item_scene = ExtResource("20_kq58d")
 
 [node name="ItemSpawner10" parent="." unique_id=447416722 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.620364, -0.009999752, -5.3321695)
-item_data = ExtResource("21_ryguw")
+item_scene = ExtResource("21_seu75")
 
 [node name="ItemSpawner11" parent="." unique_id=1204302647 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.039635, -0.010000229, -5.3638144)
-item_data = ExtResource("22_d13ii")
+item_scene = ExtResource("22_htxhm")

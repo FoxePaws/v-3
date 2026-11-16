@@ -52,6 +52,11 @@ signal needs_changed(
 @export_range(0.0, 1.0, 0.01) var max_jump_weight_penalty: float = 0.25
 @export_range(0.0, 10.0, 0.01) var max_stamina_cost_weight_penalty: float = 0.25
 
+@export_category("Base equipment stats")
+@export var base_protection: float = 0.0
+@export var base_warmth: float = 0.0
+
+
 @export_category("Survival needs")
 @export_range(0.0, 100000.0, 0.1)
 var base_max_satiety: float = 100.0
@@ -93,6 +98,10 @@ var current_thirst: float = 100.0
 var max_satiety: float = 100.0
 var max_thirst: float = 100.0
 
+
+var protection: float = 0.0
+var warmth: float = 0.0
+var _equipment_components: Array[ItemEquip] = []
 
 
 var current_willpower: float = 100.0
@@ -563,6 +572,18 @@ func recalculate_stats() -> void:
 		1.0 + max_stamina_cost_weight_penalty * load_factor
 	)
 
+	protection = maxf(
+		0.0,
+		(base_protection + _add_value(all_modifiers, "protection_add"))
+		* _multiplier_value(all_modifiers, "protection_multiplier")
+	)
+
+	warmth = maxf(
+		0.0,
+		(base_warmth + _add_value(all_modifiers, "warmth_add"))
+		* _multiplier_value(all_modifiers, "warmth_multiplier")
+	)
+
 
 	current_willpower = clampf(current_willpower, 0.0, max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, max_stamina)
@@ -787,3 +808,70 @@ func restore_status_effects_save_data(raw_effects: Variant) -> void:
 		})
 
 	_recalculate_status_modifiers()
+
+
+func set_equipment_components(components: Array[ItemEquip]) -> void:
+	_equipment_components = components.duplicate()
+	var combined: Dictionary = {}
+
+	for equip_component: ItemEquip in _equipment_components:
+		if equip_component == null or not is_instance_valid(equip_component):
+			continue
+
+		for raw_key: Variant in equip_component.player_modifiers.keys():
+			var key: String = str(raw_key)
+			var raw_value: Variant = equip_component.player_modifiers[raw_key]
+
+			if not (raw_value is int or raw_value is float):
+				push_warning(
+					"PlayerStats: значение модификатора '%s' должно быть числом"
+					% key
+				)
+				continue
+
+			if not _is_supported_equipment_modifier(key):
+				push_warning(
+					"PlayerStats: неизвестный модификатор экипировки '%s'"
+					% key
+				)
+				continue
+
+			var value: float = float(raw_value)
+			var default_value: float = 1.0 if key.ends_with("_multiplier") else 0.0
+
+			if key.ends_with("_multiplier"):
+				combined[key] = float(combined.get(key, default_value)) + value - 1.0
+			else:
+				combined[key] = float(combined.get(key, default_value)) + value
+
+	_equipment_modifiers = combined
+	recalculate_stats()
+
+
+func _is_supported_equipment_modifier(key: String) -> bool:
+	const ALLOWED_KEYS: Array[String] = [
+		"max_willpower_add",
+		"max_willpower_multiplier",
+		"max_stamina_add",
+		"max_stamina_multiplier",
+		"stamina_threshold_add",
+		"stamina_recovery_add",
+		"stamina_recovery_multiplier",
+		"willpower_recovery_add",
+		"willpower_recovery_multiplier",
+		"stamina_cost_multiplier_add",
+		"stamina_cost_multiplier_multiplier",
+		"willpower_cost_multiplier_add",
+		"willpower_cost_multiplier_multiplier",
+		"walk_speed_add",
+		"walk_speed_multiplier",
+		"sprint_speed_add",
+		"sprint_speed_multiplier",
+		"jump_velocity_add",
+		"jump_velocity_multiplier",
+		"protection_add",
+		"protection_multiplier",
+		"warmth_add",
+		"warmth_multiplier",
+	]
+	return ALLOWED_KEYS.has(key)
