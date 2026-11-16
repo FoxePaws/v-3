@@ -24,6 +24,9 @@ enum BodyState {
 @export var gravity: float = 9.4
 @export var ground_acceleration: float = 35.0
 @export var ground_deceleration: float = 45.0
+@onready var hand_interaction_controller: HandInteractionController = (
+	$HandInteractionController
+)
 
 
 @export_category("Air Movement")
@@ -67,6 +70,7 @@ var lying_vertical_dead_zone_upper: float = 45.0
 @export var lying_root_offset: float = -0.75
 @export var lying_root_pitch: float = -90.0
 @export var body_pose_speed: float = 10.0
+
 
 
 @export_category("Hand Support")
@@ -233,6 +237,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		return
 
+	if hand_interaction_controller.handle_input(event):
+		get_viewport().set_input_as_handled()
+		return
+
+
 	# Переключение активной руки.
 	if event.is_action_pressed("right_hand_active"):
 		_switch_active_hand(right_hand)
@@ -314,19 +323,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 
-		if (
-			active_hand != null
-			and active_hand.held_item is Sponge
-		):
-			var sponge: Sponge = active_hand.held_item as Sponge
-
-			if sponge.attached:
-				sponge.on_mouse_motion(motion.relative)
-				get_viewport().set_input_as_handled()
-				return
-
 		_rotate_camera_by_mouse(motion.relative)
 		return
+
 
 	# Предметные действия выполняет только активная рука.
 	if event.is_action_pressed("grab_item"):

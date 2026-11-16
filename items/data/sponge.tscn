@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://dmo1ghbwifhf6"]
 
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_ehej3"]
 [ext_resource type="Script" uid="uid://2k87ppagagdj" path="res://items/data/sponge.gd" id="1_ul3mm"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_onkwe"]
@@ -14,19 +15,11 @@ height = 0.2
 lightmap_size_hint = Vector2i(2, 3)
 size = Vector2(0.1, 0.2)
 
-[node name="Sponge" type="RigidBody3D" unique_id=1831414451 node_paths=PackedStringArray("sponge_surface_cast", "primary_grip_point", "secondary_grip_point")]
-script = ExtResource("1_ul3mm")
-attach_distance = 0.8
-max_surface_slide_distance = 0.5
-reverse_surface_direction = true
-grip_forward_axis = Vector3(-1, 0, 0)
-grip_up_axis = Vector3(-1, 0, 0)
-sponge_surface_cast = NodePath("SpongeSurfaceCast")
+[node name="Sponge" type="RigidBody3D" unique_id=1831414451]
+script = ExtResource("1_ehej3")
 item_id = &"Sponge"
 display_name = "Sponge"
 description = "Sponge"
-primary_grip_point = NodePath("PrimaryGripPoint")
-secondary_grip_point = NodePath("SecondaryGripPoint")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1875837778]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
@@ -47,3 +40,10 @@ transform = Transform3D(-0.00076161616, 0.9999997, 0, -0.9999997, -0.00076161616
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.043582276, 0)
 
 [node name="SpongeSurfaceCast" type="RayCast3D" parent="." unique_id=400868476]
+
+[node name="Sponge" type="Node3D" parent="." unique_id=1844191073 node_paths=PackedStringArray("sponge_surface_cast")]
+script = ExtResource("1_ul3mm")
+max_surface_slide_distance = 0.5
+grip_forward_axis = Vector3(1, 0, 0)
+grip_up_axis = Vector3(1, 0, 0)
+sponge_surface_cast = NodePath("../SpongeSurfaceCast")

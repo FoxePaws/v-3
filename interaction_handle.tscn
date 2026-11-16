@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bjym28001jhqc"]
+
+[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://interaction_handle_3d.gd" id="1_r7kjp"]
+[ext_resource type="Script" uid="uid://c6wo0hjmmjsam" path="res://items/local_z_hand_action.gd" id="2_8qj6n"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
+radius = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_ee7t3"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="Action" type="Node3D" unique_id=1196560627]
+script = ExtResource("2_8qj6n")
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=20693545]
+
+[node name="InteractionHandle" type="Area3D" parent="Marker3D" unique_id=1760966550 node_paths=PackedStringArray("grip_marker", "action")]
+script = ExtResource("1_r7kjp")
+grip_marker = NodePath("..")
+action = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Marker3D/InteractionHandle" unique_id=1460636371]
+shape = SubResource("SphereShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Marker3D" unique_id=344121317]
+mesh = SubResource("BoxMesh_ee7t3")

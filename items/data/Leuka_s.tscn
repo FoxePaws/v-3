@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b0ko3jtu4avhm"]
 
 [ext_resource type="Script" uid="uid://duie7divy13ro" path="res://items/data/leuka2_s.gd" id="1_ib5nm"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_xtrcq"]
 [ext_resource type="Script" uid="uid://n77l3xetfruv" path="res://items/item_container.gd" id="2_g40hl"]
 [ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="3_givvn"]
 
@@ -53,14 +54,11 @@ top_radius = 0.05
 bottom_radius = 0.048574217
 height = 0.6750183
 
-[node name="RigidBody3D" type="RigidBody3D" unique_id=179585033 node_paths=PackedStringArray("primary_grip_point", "secondary_grip_point")]
+[node name="RigidBody3D" type="RigidBody3D" unique_id=179585033]
 collision_layer = 8
-script = ExtResource("1_ib5nm")
-item_id = &"Leuka_s"
-display_name = "Leuka_s"
-description = "Leuka_s"
-primary_grip_point = NodePath("PrimaryGripPoint")
-secondary_grip_point = NodePath("SecondaryGripPoint")
+script = ExtResource("1_xtrcq")
+item_id = &"leuka2_s.gd"
+display_name = "leuka2_s.gd"
 
 [node name="WaterParticles" type="GPUParticles3D" parent="." unique_id=1796128042]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4607519, 0.008021355)
@@ -97,3 +95,7 @@ script = ExtResource("3_givvn")
 equip_kind = 1
 equipment_slot = &"Head"
 bone_name = &"Head"
+
+[node name="Leuka" type="Node3D" parent="." unique_id=869020977 node_paths=PackedStringArray("water_particles")]
+script = ExtResource("1_ib5nm")
+water_particles = NodePath("../WaterParticles")

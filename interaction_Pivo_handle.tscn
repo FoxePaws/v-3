@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://dlxtblj4bs1oo"]
+
+[ext_resource type="Script" uid="uid://dug2bk0pj6ymp" path="res://pivot_rotation_hand_action.gd" id="1_ee7t3"]
+[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://interaction_handle_3d.gd" id="2_rgl2d"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
+radius = 0.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_onkwe"]
+radius = 0.02
+height = 0.3
+
+[node name="Action" type="Node3D" unique_id=1196560627 node_paths=PackedStringArray("pivot")]
+script = ExtResource("1_ee7t3")
+pivot = NodePath("Pivot")
+local_rotation_axis = Vector3(0, 1, 0)
+
+[node name="Pivot" type="Marker3D" parent="." unique_id=1472111202]
+
+[node name="GripMarker" type="Marker3D" parent="Pivot" unique_id=20693545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44591734, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pivot/GripMarker" unique_id=344121317]
+mesh = SubResource("SphereMesh_onkwe")
+
+[node name="InteractionHandle" type="Area3D" parent="Pivot/GripMarker" unique_id=1760966550 node_paths=PackedStringArray("grip_marker", "action")]
+script = ExtResource("2_rgl2d")
+grip_marker = NodePath("..")
+action = NodePath("../../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pivot/GripMarker/InteractionHandle" unique_id=1460636371]
+shape = SubResource("SphereShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pivot" unique_id=1881091152]
+mesh = SubResource("CapsuleMesh_onkwe")

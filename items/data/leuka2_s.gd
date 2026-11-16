@@ -1,26 +1,32 @@
-class_name WateringCant
-extends ItemInstance
+class_name WateringCan
+extends ItemComponent
 
 
-@onready var water_particles: GPUParticles3D = $WaterParticles
+@export var water_particles: GPUParticles3D
 
 
 func _ready() -> void:
 	super._ready()
 
-	water_particles.emitting = false
+	if water_particles == null and item != null:
+		water_particles = (
+			item.get_node_or_null("WaterParticles") as GPUParticles3D
+		)
 
-
-func _process(_delta: float) -> void:
-
-	# Если клавиша отпущена — прекращаем полив.
-	if not Input.is_action_pressed("primary_action"):
+	if water_particles != null:
 		water_particles.emitting = false
+	else:
+		push_warning("WateringCan: не найден узел WaterParticles")
 
 
 func on_primary_action() -> void:
+	if water_particles != null:
+		water_particles.emitting = true
 
-	water_particles.emitting = true
+
+func on_primary_action_released() -> void:
+	if water_particles != null:
+		water_particles.emitting = false
 
 
 func on_secondary_action() -> void:

@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://dayrd1ojttbs0" path="res://textures/MoonMap.png" id="3_yaehf"]
 [ext_resource type="Texture2D" uid="uid://dja6ya1pigwv2" path="res://textures/StarField.jpg" id="4_074og"]
 [ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://Props/static_bodylove_3d.tscn" id="7_272bh"]
+[ext_resource type="PackedScene" uid="uid://dlxtblj4bs1oo" path="res://interaction_Pivo_handle.tscn" id="8_1u8w0"]
+[ext_resource type="PackedScene" uid="uid://bjym28001jhqc" path="res://interaction_handle.tscn" id="9_d13ii"]
 [ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
 [ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/data/Sw.tscn" id="10_ryguw"]
 [ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/data/sponge.tscn" id="11_d13ii"]
@@ -212,6 +214,9 @@ shape = SubResource("BoxShape3D_onkwe")
 [node name="RigidBody3D" parent="ground/StaticBody3D" unique_id=1367486579 instance=ExtResource("3_efxa6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.251112, 0.49999976, -10.457365)
 
+[node name="Action" parent="ground/StaticBody3D" unique_id=1196560627 instance=ExtResource("8_1u8w0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6080596, 2.190816, -5.633753)
+
 [node name="StaticBody3D2" type="StaticBody3D" parent="ground" unique_id=1439521744]
 transform = Transform3D(2.997795, -4.0016527, 0, 4.0016527, 2.997795, 0, 0, 0, 5, 9.151661, -1.0860686, -16.621857)
 
@@ -220,6 +225,9 @@ shape = SubResource("BoxShape3D_nb5cy")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="ground/StaticBody3D2" unique_id=1464021320]
 mesh = SubResource("BoxMesh_onkwe")
+
+[node name="InteractionHandle" parent="ground" unique_id=1760966550 instance=ExtResource("9_d13ii")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0945659, 1.5237935, -5.8142343)
 
 [node name="ItemSpawner5" parent="." unique_id=1290192550 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.504463, 0.124922335, -5.4139047)
@@ -246,23 +254,6 @@ transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 
 
 [node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("10_4c57u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-prone_speed = 1.0
-slow_walk_multiplier = 0.55
-jump_velocity = 5.0
-gravity = 9.4
-ground_acceleration = 35.0
-ground_deceleration = 45.0
-air_control = 0.5
-body_turn_speed = 5.0
-body_turn_acceleration = 12.0
-mouse_sensitivity = 0.0025
-min_pitch = -1.4835298641951802
-max_pitch = 1.4835298641951802
-crouch_root_pitch = -8.0
-lying_root_offset = -0.75
-lying_root_pitch = -90.0
-body_pose_speed = 10.0
-heavy_support_smoothing = 15.0
 
 [node name="ItemSpawner6" parent="." unique_id=2120406206 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0825243, 0.124922335, -5.4139047)
