@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dqmlcn20f6fk0"]
 
-[ext_resource type="Script" uid="uid://dgcfxfe7tnklw" path="res://hud.gd" id="1_276te"]
+[ext_resource type="Script" uid="uid://dgcfxfe7tnklw" path="res://ui/hud.gd" id="1_276te"]
 [ext_resource type="PackedScene" uid="uid://dlcgp2k5ffaru" path="res://ui/StatusEffectIcon.tscn" id="2_7ihmi"]
 [ext_resource type="PackedScene" uid="uid://by3rpm8mxwfcf" path="res://ui/StatBar.tscn" id="2_546lt"]
 

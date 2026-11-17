@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dlxtblj4bs1oo"]
 
-[ext_resource type="Script" uid="uid://dug2bk0pj6ymp" path="res://pivot_rotation_hand_action.gd" id="1_ee7t3"]
-[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://interaction_handle_3d.gd" id="2_rgl2d"]
+[ext_resource type="Script" uid="uid://dug2bk0pj6ymp" path="res://items/actions/act/pivot_rotation_hand_action.gd" id="1_s8fui"]
+[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://items/actions/interaction_handle_3d.gd" id="2_xjpkd"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
 radius = 0.1
@@ -15,7 +15,7 @@ radius = 0.02
 height = 0.3
 
 [node name="Action" type="Node3D" unique_id=1196560627 node_paths=PackedStringArray("pivot")]
-script = ExtResource("1_ee7t3")
+script = ExtResource("1_s8fui")
 pivot = NodePath("Pivot")
 local_rotation_axis = Vector3(0, 1, 0)
 
@@ -28,7 +28,7 @@ transform = Transform3D(1, 0, 0, 0, -0.0022976815, -0.9999974, 0, 0.9999974, -0.
 mesh = SubResource("SphereMesh_onkwe")
 
 [node name="InteractionHandle" type="Area3D" parent="Pivot/GripMarker" unique_id=1760966550 node_paths=PackedStringArray("grip_marker", "action")]
-script = ExtResource("2_rgl2d")
+script = ExtResource("2_xjpkd")
 grip_marker = NodePath("..")
 action = NodePath("../../..")
 

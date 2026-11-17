@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://b0ko3jtu4avhm"]
 
-[ext_resource type="Script" uid="uid://duie7divy13ro" path="res://items/data/leuka2_s.gd" id="1_ib5nm"]
-[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_xtrcq"]
-[ext_resource type="Script" uid="uid://n77l3xetfruv" path="res://items/item_container.gd" id="2_g40hl"]
-[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="3_givvn"]
+[ext_resource type="Script" uid="uid://duie7divy13ro" path="res://items/scripts/leuka2_s.gd" id="1_ib5nm"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/core/item_instance.gd" id="1_xtrcq"]
+[ext_resource type="Script" uid="uid://n77l3xetfruv" path="res://items/core/item_container.gd" id="2_g40hl"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/core/item_equip.gd" id="3_givvn"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_onkwe"]
 lifetime_randomness = 0.16
@@ -79,10 +79,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22995555, 0)
 mesh = SubResource("CylinderMesh_ci5h5")
 
 [node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=1337710233]
-transform = Transform3D(1, 0, 0, 0, -0.93969256, -0.34202018, 0, 0.34202018, -0.93969256, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.93969256, -0.34202018, 0, 0.34202018, -0.93969256, 0.053238153, 0, 0)
 
 [node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=167813720]
-transform = Transform3D(1, 0, 0, 0, -0.9563048, -0.2923716, 0, 0.2923716, -0.9563048, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.9563048, -0.2923716, 0, 0.2923716, -0.9563048, -0.050327823, 0, 0)
 
 [node name="ItemContainer" type="Node3D" parent="." unique_id=664820213]
 script = ExtResource("2_g40hl")

@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://d30cl2vuo7ulx"]
 
-[ext_resource type="Script" uid="uid://byjee8ykm6hi5" path="res://items/inventory_ui.gd" id="1_wlaer"]
-[ext_resource type="PackedScene" uid="uid://own7u54wgyj" path="res://items/data/container_window.tscn" id="2_rqr2y"]
-[ext_resource type="Script" uid="uid://c4umom4qojvvo" path="res://items/item_slot_ui.gd" id="3_ohugl"]
+[ext_resource type="Script" uid="uid://byjee8ykm6hi5" path="res://ui/inventory_ui.gd" id="1_wlaer"]
+[ext_resource type="PackedScene" uid="uid://own7u54wgyj" path="res://items/scene/container_window.tscn" id="2_rqr2y"]
+[ext_resource type="Script" uid="uid://c4umom4qojvvo" path="res://ui/item_slot_ui.gd" id="3_ohugl"]
 [ext_resource type="Texture2D" uid="uid://b6ormepjxa8ay" path="res://textures/ui ic/ui_H.png" id="4_d48y1"]
 [ext_resource type="Texture2D" uid="uid://503c5461edst" path="res://textures/ui ic/ui_E.png" id="5_wmq11"]
 [ext_resource type="Texture2D" uid="uid://bgab1nosu7yyq" path="res://textures/ui ic/ui_b.png" id="6_lps7h"]
@@ -16,9 +16,9 @@
 [ext_resource type="Texture2D" uid="uid://rd8g7wf2vldf" path="res://textures/ui ic/ui_Pant.png" id="15_rbott"]
 [ext_resource type="Texture2D" uid="uid://dkkw41bq1e1ft" path="res://textures/ui ic/ui_Butt.png" id="16_mrt4d"]
 [ext_resource type="Texture2D" uid="uid://dyeywm8epieif" path="res://textures/ui ic/ui_SH.png" id="17_iiuqj"]
-[ext_resource type="PackedScene" uid="uid://god5bgbp0ki2" path="res://items/item_slot_ui.tscn" id="17_t3n1z"]
+[ext_resource type="PackedScene" uid="uid://god5bgbp0ki2" path="res://ui/item_slot_ui.tscn" id="17_t3n1z"]
 [ext_resource type="Texture2D" uid="uid://csml2mm18nddb" path="res://textures/ui ic/ui_P.png" id="18_ntcqj"]
-[ext_resource type="Script" uid="uid://cvv1e6xb4yhm1" path="res://items/player_window_stats.gd" id="19_lps7h"]
+[ext_resource type="Script" uid="uid://cvv1e6xb4yhm1" path="res://ui/player_window_stats.gd" id="19_lps7h"]
 [ext_resource type="PackedScene" uid="uid://by3rpm8mxwfcf" path="res://ui/StatBar.tscn" id="19_wmq11"]
 
 [node name="InventoryUI" type="CanvasLayer" unique_id=2047850519 node_paths=PackedStringArray("hand_slots", "equipment_slots")]

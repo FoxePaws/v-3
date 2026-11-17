@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://5etdi4rh1jou"]
 
-[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_ovdhr"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/core/item_instance.gd" id="1_ovdhr"]
 [ext_resource type="Texture2D" uid="uid://rd8g7wf2vldf" path="res://textures/ui ic/ui_Pant.png" id="2_vn14l"]
-[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="3_u684e"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/core/item_equip.gd" id="3_u684e"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u684e"]
 albedo_texture = ExtResource("2_vn14l")

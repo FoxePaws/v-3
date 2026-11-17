@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://boxl2ab0qwxes"]
 
-[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_3jxn0"]
-[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_fv73r"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/core/item_instance.gd" id="1_3jxn0"]
+[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/scripts/clothing_effect_item.gd" id="1_fv73r"]
 [ext_resource type="Resource" uid="uid://bxv58usog777y" path="res://items/moods/pl1.tres" id="2_0v041"]
 [ext_resource type="Resource" uid="uid://dq2l3cv8njddn" path="res://items/moods/pl2.tres" id="3_4e3xx"]
 [ext_resource type="Resource" uid="uid://bg4octynad4iw" path="res://items/moods/pl3.tres" id="4_bcoud"]
-[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="5_4e3xx"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/core/item_equip.gd" id="5_4e3xx"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2nldk"]
 top_radius = 0.01
@@ -68,6 +68,8 @@ bone_name = &"AnusRoot"
 
 [node name="ClothingEffect" type="Node3D" parent="." unique_id=274495477]
 script = ExtResource("1_fv73r")
+meter_gain_per_second = 2.8
+meter_decay_per_second = 1.4
 movement_effect_1 = ExtResource("2_0v041")
 movement_effect_2 = ExtResource("3_4e3xx")
 movement_effect_3 = ExtResource("4_bcoud")

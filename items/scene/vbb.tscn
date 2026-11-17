@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://dkoifjgl5i1mb"]
 
-[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_4ede7"]
-[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_ig4dg"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/core/item_instance.gd" id="1_4ede7"]
+[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/scripts/clothing_effect_item.gd" id="1_ig4dg"]
 [ext_resource type="Resource" uid="uid://bt3xaepy07rwk" path="res://items/moods/vbb1.tres" id="2_nu43j"]
 [ext_resource type="Resource" uid="uid://b4ti8vouxhjfg" path="res://items/moods/vbb2.tres" id="3_qgn71"]
 [ext_resource type="Resource" uid="uid://clnl7bih5saiv" path="res://items/moods/vbb3.tres" id="4_4ede7"]
-[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="5_qgn71"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/core/item_equip.gd" id="5_qgn71"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nu43j"]
 radius = 0.02

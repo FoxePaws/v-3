@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://d0qjli0sj4rpe"]
 
-[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/item_instance.gd" id="1_plumn"]
+[ext_resource type="Script" uid="uid://d0qkn6tyfxl10" path="res://items/core/item_instance.gd" id="1_plumn"]
 [ext_resource type="Texture2D" uid="uid://cquvfj8620xma" path="res://textures/ui ic/ui_Bust.png" id="2_k585u"]
-[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/item_equip.gd" id="3_bag3e"]
-[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://BlendShapeSetting.gd" id="4_m4bmp"]
+[ext_resource type="Script" uid="uid://clo28ghxwleoa" path="res://items/core/item_equip.gd" id="3_bag3e"]
+[ext_resource type="Script" uid="uid://bqvfbbv2ky2ya" path="res://items/core/BlendShapeSetting.gd" id="4_m4bmp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u684e"]
 albedo_texture = ExtResource("2_k585u")

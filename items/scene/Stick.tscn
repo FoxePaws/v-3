@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bmxuh4swu04u2"]
 
-[ext_resource type="Script" uid="uid://decu0iigg6k7b" path="res://items/data/Stick.gd" id="1_sb4sd"]
+[ext_resource type="Script" uid="uid://decu0iigg6k7b" path="res://items/scripts/Stick.gd" id="1_sb4sd"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_onkwe"]
-radius = 0.05
+radius = 0.02
 height = 0.8
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_onkwe"]
@@ -14,14 +14,14 @@ radial_segments = 16
 rings = 2
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nb5cy"]
-radius = 0.05
+radius = 0.02
 height = 0.8
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sqlk1"]
 radius = 0.05
 height = 0.8
 
-[node name="Stick" type="RigidBody3D" unique_id=857062829]
+[node name="Stick" type="RigidBody3D" unique_id=857062829 node_paths=PackedStringArray("rotation_point", "strike_cast", "primary_grip_point", "secondary_grip_point")]
 process_physics_priority = 1
 collision_layer = 8
 collision_mask = 3
@@ -34,12 +34,19 @@ return_duration = null
 stop_on_collision = null
 primary_rotation_axis = null
 secondary_rotation_axis = null
+rotation_point = NodePath("RotationPoint")
+strike_cast = NodePath("StrikeCast")
+item_id = &"Stick"
+display_name = "Stick"
+description = "Stick"
+primary_grip_point = NodePath("PrimaryGripPoint")
+secondary_grip_point = NodePath("SecondaryGripPoint")
 
 [node name="PrimaryGripPoint" type="Marker3D" parent="." unique_id=1034699201]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.1631087, 0)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.163, 0)
 
 [node name="SecondaryGripPoint" type="Marker3D" parent="." unique_id=183069547]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.31290802, 0)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.313, 0)
 
 [node name="RotationPoint" type="Marker3D" parent="." unique_id=1271028473]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.40292424, 0.17086416)

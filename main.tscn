@@ -10,20 +10,20 @@
 [ext_resource type="Texture2D" uid="uid://dayrd1ojttbs0" path="res://textures/MoonMap.png" id="3_yaehf"]
 [ext_resource type="Texture2D" uid="uid://dja6ya1pigwv2" path="res://textures/StarField.jpg" id="4_074og"]
 [ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://Props/static_bodylove_3d.tscn" id="7_272bh"]
-[ext_resource type="PackedScene" uid="uid://dlxtblj4bs1oo" path="res://interaction_Pivo_handle.tscn" id="8_1u8w0"]
-[ext_resource type="PackedScene" uid="uid://bjym28001jhqc" path="res://interaction_handle.tscn" id="9_d13ii"]
+[ext_resource type="PackedScene" uid="uid://dlxtblj4bs1oo" path="res://items/actions/act/pivot_rotation_hand_action.tscn" id="8_1u8w0"]
+[ext_resource type="PackedScene" uid="uid://bjym28001jhqc" path="res://items/actions/act/local_z_hand_action.tscn" id="9_d13ii"]
 [ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
-[ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/data/Sw.tscn" id="10_ryguw"]
-[ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/data/sponge.tscn" id="11_d13ii"]
-[ext_resource type="PackedScene" uid="uid://oo6qsa1hu3tj" path="res://items/data/flas.tscn" id="12_1u8w0"]
-[ext_resource type="PackedScene" uid="uid://bmxuh4swu04u2" path="res://items/data/Stick.tscn" id="13_0odxb"]
-[ext_resource type="PackedScene" uid="uid://b0ko3jtu4avhm" path="res://items/data/Leuka_s.tscn" id="14_lswn8"]
-[ext_resource type="PackedScene" uid="uid://d0qjli0sj4rpe" path="res://items/data/Br.tscn" id="17_a6jrf"]
-[ext_resource type="PackedScene" uid="uid://5etdi4rh1jou" path="res://items/data/Pa.tscn" id="18_xuqvo"]
-[ext_resource type="PackedScene" uid="uid://c1f6xerly1ko5" path="res://items/data/consumable_item.tscn" id="19_ryguw"]
-[ext_resource type="PackedScene" uid="uid://bt20djls4hg77" path="res://items/data/buzz.tscn" id="20_kq58d"]
-[ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/data/vbb.tscn" id="21_seu75"]
-[ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/data/pl.tscn" id="22_htxhm"]
+[ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/scene/Sw.tscn" id="10_ryguw"]
+[ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/scene/sponge.tscn" id="11_d13ii"]
+[ext_resource type="PackedScene" uid="uid://oo6qsa1hu3tj" path="res://items/scene/flas.tscn" id="12_1u8w0"]
+[ext_resource type="PackedScene" uid="uid://bmxuh4swu04u2" path="res://items/scene/Stick.tscn" id="13_0odxb"]
+[ext_resource type="PackedScene" uid="uid://b0ko3jtu4avhm" path="res://items/scene/Leuka_s.tscn" id="14_lswn8"]
+[ext_resource type="PackedScene" uid="uid://d0qjli0sj4rpe" path="res://items/scene/Br.tscn" id="17_a6jrf"]
+[ext_resource type="PackedScene" uid="uid://5etdi4rh1jou" path="res://items/scene/Pa.tscn" id="18_xuqvo"]
+[ext_resource type="PackedScene" uid="uid://c1f6xerly1ko5" path="res://items/scene/consumable_item.tscn" id="19_ryguw"]
+[ext_resource type="PackedScene" uid="uid://bt20djls4hg77" path="res://items/scene/buzz.tscn" id="20_kq58d"]
+[ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/scene/vbb.tscn" id="21_seu75"]
+[ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/scene/pl.tscn" id="22_htxhm"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -214,9 +214,6 @@ shape = SubResource("BoxShape3D_onkwe")
 [node name="RigidBody3D" parent="ground/StaticBody3D" unique_id=1367486579 instance=ExtResource("3_efxa6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.251112, 0.49999976, -10.457365)
 
-[node name="Action" parent="ground/StaticBody3D" unique_id=1196560627 instance=ExtResource("8_1u8w0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6080596, 2.190816, -5.633753)
-
 [node name="StaticBody3D2" type="StaticBody3D" parent="ground" unique_id=1439521744]
 transform = Transform3D(2.997795, -4.0016527, 0, 4.0016527, 2.997795, 0, 0, 0, 5, 9.151661, -1.0860686, -16.621857)
 
@@ -227,7 +224,10 @@ shape = SubResource("BoxShape3D_nb5cy")
 mesh = SubResource("BoxMesh_onkwe")
 
 [node name="InteractionHandle" parent="ground" unique_id=1760966550 instance=ExtResource("9_d13ii")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0945659, 1.5237935, -5.8142343)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1153243, 1.2742755, -5.8142343)
+
+[node name="Action" parent="ground" unique_id=1196560627 instance=ExtResource("8_1u8w0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6080596, 1.1671715, -5.633753)
 
 [node name="ItemSpawner5" parent="." unique_id=1290192550 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.504463, 0.124922335, -5.4139047)

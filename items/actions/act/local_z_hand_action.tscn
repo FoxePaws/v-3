@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bjym28001jhqc"]
 
-[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://interaction_handle_3d.gd" id="1_r7kjp"]
-[ext_resource type="Script" uid="uid://c6wo0hjmmjsam" path="res://items/local_z_hand_action.gd" id="2_8qj6n"]
+[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://items/actions/interaction_handle_3d.gd" id="1_r7kjp"]
+[ext_resource type="Script" uid="uid://c6wo0hjmmjsam" path="res://items/actions/act/local_z_hand_action.gd" id="2_8qj6n"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
 radius = 0.2

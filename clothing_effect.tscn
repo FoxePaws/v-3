@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ct42khhtte8f4"]
 
-[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/data/clothing_effect_item.gd" id="1_kn15f"]
+[ext_resource type="Script" uid="uid://cadrhtjwiaraw" path="res://items/scripts/clothing_effect_item.gd" id="1_kn15f"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2nldk"]
 top_radius = 0.2
@@ -16,11 +16,10 @@ height = 0.2
 height = 0.5
 radius = 0.2
 
-[node name="pl" type="RigidBody3D" unique_id=1960892598 node_paths=PackedStringArray("primary_grip_point")]
+[node name="pl" type="RigidBody3D" unique_id=1960892598]
 collision_layer = 8
 collision_mask = 3
 script = ExtResource("1_kn15f")
-primary_grip_point = NodePath("PrimaryGripPoint")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=529465246]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09326172, 0)
