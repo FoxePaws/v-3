@@ -40,7 +40,7 @@ func _on_sleep_pressed() -> void:
 	if _player_stats == null or _sleep_effect == null:
 		return
 	_player_stats.add_status_effect(_sleep_effect)
-
+	_player_stats.set_effect(_sleep_effect)
 
 func _on_cancel_pressed() -> void:
 	if _player_stats != null and _sleep_effect != null:

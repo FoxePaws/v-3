@@ -88,9 +88,17 @@ var _needs_update_accumulator: float = 0.0
 @export_range(0.0, 100000.0, 0.1) var base_max_sleepiness: float = 100.0
 @export_range(-100000.0, 100000.0, 0.0001) var base_sleepiness_change_per_world_second: float = 0.01
 @export_range(0.0, 100000.0, 0.1) var default_time_scale: float = 1.0
-@export var sleep_effect_id: StringName = &"sleep"
+@export_category("Sleepiness status effects")
+@export var sleepiness_mild_effect: StatusEffectData
+@export var sleepiness_moderate_effect: StatusEffectData
+@export var sleepiness_severe_effect: StatusEffectData
 
-var current_sleepiness: float = 100.0
+var _last_sleepiness_effect_id: StringName = &""
+
+@export var sleep_effect_id: StringName = &"Sleep_Gr"
+
+
+var current_sleepiness: float = 0.0
 var max_sleepiness: float = 100.0
 var sleepiness_change_per_world_second: float = 0.01
 var _applied_time_scale: float = -1.0
@@ -147,7 +155,6 @@ func _ready() -> void:
 
 	current_satiety = max_satiety
 	current_thirst = max_thirst
-	current_sleepiness = max_sleepiness
 
 	recalculate_stats()
 	_connect_world_clock()
@@ -223,7 +230,11 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 		if current_satiety > 0.0:
 			var new_satiety: float = maxf(
 				current_satiety
-				- satiety_loss_per_world_second * update_interval,
+				- _get_need_change_rate(
+					satiety_loss_per_world_second,
+					"hunger_change_per_world_second_add",
+					"hunger_change_per_world_second_multiplier"
+				) * update_interval,
 				0.0
 			)
 
@@ -234,9 +245,14 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 		if current_thirst > 0.0:
 			var new_thirst: float = maxf(
 				current_thirst
-				- thirst_loss_per_world_second * update_interval,
+				- _get_need_change_rate(
+					thirst_loss_per_world_second,
+					"thirst_change_per_world_second_add",
+					"thirst_change_per_world_second_multiplier"
+				) * update_interval,
 				0.0
 			)
+
 
 			if new_thirst != current_thirst:
 				current_thirst = new_thirst
@@ -258,6 +274,7 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 						and has_status_effect(sleep_effect_id)
 					):
 						remove_status_effect(sleep_effect_id)
+
 
 
 
@@ -308,12 +325,27 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 	if resources_changed_local:
 		_emit_resources_changed()
 
-
 func has_status_effect(effect_id: StringName) -> bool:
 	for effect: Dictionary in active_status_effects:
 		if str(effect.get("effect_id", "")) == str(effect_id):
 			return true
 	return false
+
+func _get_need_change_rate(
+	base_rate: float,
+	add_key: String,
+	multiplier_key: String
+) -> float:
+	var all_modifiers: Dictionary = {}
+	_merge_modifiers(all_modifiers, _equipment_modifiers)
+	_merge_modifiers(all_modifiers, _status_modifiers)
+
+	var rate: float = (
+		base_rate
+		+ _add_value(all_modifiers, add_key)
+	) * _multiplier_value(all_modifiers, multiplier_key)
+
+	return maxf(rate, 0.0)
 
 
 func restore_sleepiness(base_amount: float) -> void:
@@ -330,6 +362,7 @@ func restore_sleepiness(base_amount: float) -> void:
 	if is_equal_approx(previous_value, current_sleepiness):
 		return
 
+	_update_survival_status_effects()
 	_emit_needs_changed()
 
 
@@ -352,8 +385,6 @@ func _apply_time_scale_from_stats() -> void:
 	if scene != null and scene.has_method("set_time_scale"):
 		scene.call("set_time_scale", requested_time_scale)
 
-
-
 func _update_survival_status_effects() -> void:
 	var hunger_effect: StatusEffectData = _get_need_effect(
 		current_satiety,
@@ -362,7 +393,6 @@ func _update_survival_status_effects() -> void:
 		hunger_moderate_effect,
 		hunger_severe_effect
 	)
-
 	var thirst_effect: StatusEffectData = _get_need_effect(
 		current_thirst,
 		max_thirst,
@@ -373,6 +403,51 @@ func _update_survival_status_effects() -> void:
 
 	_set_need_effect(hunger_effect, true)
 	_set_need_effect(thirst_effect, false)
+	_set_sleepiness_effect(_get_sleepiness_effect())
+
+
+func _get_sleepiness_effect() -> StatusEffectData:
+	if max_sleepiness <= 0.0:
+		return sleepiness_severe_effect
+
+	var ratio: float = clampf(
+		current_sleepiness / max_sleepiness,
+		0.0,
+		1.0
+	)
+
+	if ratio < 0.5:
+		return null
+	if ratio < 0.75:
+		return sleepiness_mild_effect
+	if ratio < 0.9:
+		return sleepiness_moderate_effect
+	return sleepiness_severe_effect
+
+
+func _set_sleepiness_effect(new_effect: StatusEffectData) -> void:
+	var new_id: StringName = (
+		new_effect.effect_id
+		if new_effect != null
+		else &""
+	)
+
+	if _last_sleepiness_effect_id == new_id:
+		return
+
+	if _last_sleepiness_effect_id != &"":
+		remove_status_effect(_last_sleepiness_effect_id)
+
+	if new_effect != null:
+		if new_effect.effect_id == &"":
+			push_warning(
+				"PlayerStats: у эффекта сонливости пустой effect_id"
+			)
+		else:
+			add_status_effect(new_effect)
+
+	_last_sleepiness_effect_id = new_id
+
 
 
 func _get_need_effect(
@@ -760,6 +835,12 @@ func _emit_resources_changed() -> void:
 		max_stamina
 	)
 
+func set_effect(effect: StatusEffectData ):
+	if effect == null or effect.effect_id == &"":
+		push_warning("PlayerStats: некорректный StatusEffectData")
+		return false
+	sleep_effect_id = effect.effect_id
+
 func add_status_effect(effect: StatusEffectData) -> bool:
 	if effect == null or effect.effect_id == &"":
 		push_warning("PlayerStats: некорректный StatusEffectData")
@@ -975,5 +1056,11 @@ func _is_supported_equipment_modifier(key: String) -> bool:
 		"protection_multiplier",
 		"warmth_add",
 		"warmth_multiplier",
+		"hunger_change_per_world_second_add",
+		"hunger_change_per_world_second_multiplier",
+		"thirst_change_per_world_second_add",
+		"thirst_change_per_world_second_multiplier",
+		"sleepiness_change_per_world_second_add", 
+		"sleepiness_change_per_world_second_multiplier",
 	]
 	return ALLOWED_KEYS.has(key)

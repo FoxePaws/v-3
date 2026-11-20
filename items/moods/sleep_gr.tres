@@ -8,3 +8,9 @@ effect_id = &"Sleep_Gr"
 display_name = "Sleep_Gr"
 description = "Sleep_Gr"
 duration_world_seconds = 43200.0
+modifiers = Dictionary[String, float]({
+"hunger_change_per_world_second_multiplier": 0.2,
+"sleepiness_change_per_world_second_add": -0.005,
+"thirst_change_per_world_second_multiplier": 0.2,
+"time_scale_multiplier": 500.0
+})
