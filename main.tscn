@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://dkoifjgl5i1mb" path="res://items/scene/vbb.tscn" id="21_seu75"]
 [ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/scene/pl.tscn" id="22_htxhm"]
 [ext_resource type="PackedScene" uid="uid://do60kcwdw4t1m" path="res://Props/door.tscn" id="25_0odxb"]
+[ext_resource type="PackedScene" uid="uid://cnr5yhrplnrx4" path="res://Props/door_dunamic.tscn" id="26_lswn8"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -286,3 +287,6 @@ item_scene = ExtResource("22_htxhm")
 
 [node name="Door" parent="." unique_id=765488630 instance=ExtResource("25_0odxb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3680696, 0.0009570122, -5.873884)
+
+[node name="Door2" parent="." unique_id=1172547180 instance=ExtResource("26_lswn8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.89452, -0.00999999, -6.284769)

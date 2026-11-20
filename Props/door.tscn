@@ -29,6 +29,7 @@ mesh = SubResource("BoxMesh_onkwe")
 [node name="Door" type="RigidBody3D" parent="." unique_id=388285499]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15706909, 0, 0)
 collision_layer = 15
+collision_mask = 9
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Door" unique_id=650770266]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.46688974, 0.9954148, 0)
@@ -38,10 +39,14 @@ mesh = SubResource("BoxMesh_nb5cy")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47102213, 1.0134625, 0)
 shape = SubResource("BoxShape3D_sqlk1")
 
-[node name="DoorHandAction" parent="Door" unique_id=378262478 node_paths=PackedStringArray("hinge") instance=ExtResource("1_2kghv")]
+[node name="DoorHandAction" parent="Door" unique_id=378262478 node_paths=PackedStringArray("hinge", "door_body", "frame_body") instance=ExtResource("1_2kghv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8429309, 1, 0)
 hinge = NodePath("../../HingeJoint3D")
 mouse_to_speed = 0.3
+motor_max_impulse = 0.2
+door_body = NodePath("..")
+close_lock_only_while_held = true
+frame_body = NodePath("../../Frame")
 
 [node name="HingeJoint3D" type="HingeJoint3D" parent="." unique_id=558602531]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -0.11275098, 0, 0)
@@ -49,4 +54,4 @@ node_a = NodePath("../Door")
 node_b = NodePath("../Frame")
 angular_limit/enable = true
 angular_limit/upper = 2.4347343
-angular_limit/lower = 0.017453292
+angular_limit/lower = -0.017453292

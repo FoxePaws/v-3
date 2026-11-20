@@ -22,6 +22,7 @@ script = ExtResource("1_7ww84")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2381765)
 
 [node name="Marker3D" type="Marker3D" parent="HandleFront" unique_id=1623177006]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
 
 [node name="Area3D" type="Area3D" parent="HandleFront" unique_id=935472012 node_paths=PackedStringArray("grip_marker", "action")]
 script = ExtResource("2_wwaun")
@@ -39,6 +40,7 @@ mesh = SubResource("SphereMesh_onkwe")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.22560948)
 
 [node name="Marker3D" type="Marker3D" parent="HandleBack" unique_id=922197331]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 
 [node name="Area3D" type="Area3D" parent="HandleBack" unique_id=1102017243 node_paths=PackedStringArray("grip_marker", "action")]
 script = ExtResource("2_wwaun")

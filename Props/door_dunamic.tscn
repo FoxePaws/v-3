@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://cnr5yhrplnrx4"]
+
+[ext_resource type="PackedScene" uid="uid://cvomvx5cwii6e" path="res://items/actions/act/door_hand_action.tscn" id="1_rshaa"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nb5cy"]
+size = Vector3(0.19238281, 2, 0.18334961)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rshaa"]
+size = Vector3(3.0993652, 0.1743164, 2.4375)
+
+[sub_resource type="BoxMesh" id="BoxMesh_onkwe"]
+size = Vector3(0.18359375, 2, 0.17285156)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xj3wb"]
+size = Vector3(3.0871582, 0.17358398, 2.4472656)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nb5cy"]
+size = Vector3(1, 1.984375, 0.087890625)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sqlk1"]
+size = Vector3(1, 1.9581299, 0.08959961)
+
+[node name="Door" type="Node3D" unique_id=765488630]
+
+[node name="Frame" type="RigidBody3D" parent="." unique_id=506173610]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18920565, 0)
+collision_layer = 9
+collision_mask = 9
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Frame" unique_id=332320310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9919739, 0)
+shape = SubResource("BoxShape3D_nb5cy")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Frame" unique_id=352393663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.56668496, -0.09876156, -0.0004477501)
+shape = SubResource("BoxShape3D_rshaa")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Frame" unique_id=96821910]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0053267, 0)
+mesh = SubResource("BoxMesh_onkwe")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Frame" unique_id=861643133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.56066895, -0.09151626, 0)
+mesh = SubResource("BoxMesh_xj3wb")
+
+[node name="Door" type="RigidBody3D" parent="." unique_id=388285499]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15706909, 0.18920565, 0)
+collision_layer = 15
+collision_mask = 9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Door" unique_id=650770266]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.46688974, 0.9954148, 0)
+mesh = SubResource("BoxMesh_nb5cy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Door" unique_id=609151815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47102213, 1.0134625, 0)
+shape = SubResource("BoxShape3D_sqlk1")
+
+[node name="DoorHandAction" parent="Door" unique_id=378262478 node_paths=PackedStringArray("hinge", "door_body", "frame_body") instance=ExtResource("1_rshaa")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8429309, 1, 0)
+hinge = NodePath("../../HingeJoint3D")
+mouse_to_speed = 0.3
+motor_max_impulse = 0.2
+door_body = NodePath("..")
+frame_body = NodePath("../../Frame")
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="." unique_id=558602531]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -0.11275098, 0.18920565, 0)
+node_a = NodePath("../Door")
+node_b = NodePath("../Frame")
+angular_limit/enable = true
+angular_limit/upper = 2.4347343
+angular_limit/lower = -0.017453292
