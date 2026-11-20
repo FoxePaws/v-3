@@ -84,6 +84,17 @@ var _needs_update_accumulator: float = 0.0
 @export var thirst_moderate_effect: StatusEffectData
 @export var thirst_severe_effect: StatusEffectData
 
+@export_category("Sleep need")
+@export_range(0.0, 100000.0, 0.1) var base_max_sleepiness: float = 100.0
+@export_range(-100000.0, 100000.0, 0.0001) var base_sleepiness_change_per_world_second: float = 0.01
+@export_range(0.0, 100000.0, 0.1) var default_time_scale: float = 1.0
+@export var sleep_effect_id: StringName = &"sleep"
+
+var current_sleepiness: float = 100.0
+var max_sleepiness: float = 100.0
+var sleepiness_change_per_world_second: float = 0.01
+var _applied_time_scale: float = -1.0
+
 
 
 var _last_hunger_effect_id: StringName = &""
@@ -129,10 +140,15 @@ var _world_clock: Node = null
 func _ready() -> void:
 	current_willpower = clampf(current_willpower, 0.0, base_max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, base_max_stamina)
+
 	max_satiety = base_max_satiety
 	max_thirst = base_max_thirst
+	max_sleepiness = base_max_sleepiness
+
 	current_satiety = max_satiety
 	current_thirst = max_thirst
+	current_sleepiness = max_sleepiness
+
 	recalculate_stats()
 	_connect_world_clock()
 	_update_survival_status_effects()
@@ -226,6 +242,24 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 				current_thirst = new_thirst
 				needs_changed_local = true
 
+			if sleepiness_change_per_world_second != 0.0:
+				var previous_sleepiness: float = current_sleepiness
+				current_sleepiness = clampf(
+					current_sleepiness
+					+ sleepiness_change_per_world_second * update_interval,
+					0.0,
+					max_sleepiness
+				)
+				if not is_equal_approx(previous_sleepiness, current_sleepiness):
+					needs_changed_local = true
+
+					if (
+						current_sleepiness <= 0.0
+						and has_status_effect(sleep_effect_id)
+					):
+						remove_status_effect(sleep_effect_id)
+
+
 
 		if needs_changed_local:
 			_update_survival_status_effects()
@@ -273,6 +307,52 @@ func _on_world_time_advanced(delta_world_seconds: float) -> void:
 
 	if resources_changed_local:
 		_emit_resources_changed()
+
+
+func has_status_effect(effect_id: StringName) -> bool:
+	for effect: Dictionary in active_status_effects:
+		if str(effect.get("effect_id", "")) == str(effect_id):
+			return true
+	return false
+
+
+func restore_sleepiness(base_amount: float) -> void:
+	if base_amount <= 0.0:
+		return
+
+	var previous_value: float = current_sleepiness
+	current_sleepiness = clampf(
+		current_sleepiness + base_amount,
+		0.0,
+		max_sleepiness
+	)
+
+	if is_equal_approx(previous_value, current_sleepiness):
+		return
+
+	_emit_needs_changed()
+
+
+func _apply_time_scale_from_stats() -> void:
+	var multiplier: float = maxf(
+		_multiplier_value(_status_modifiers, "time_scale_multiplier"),
+		0.0
+	)
+	var requested_time_scale: float = maxf(
+		default_time_scale * multiplier,
+		0.0
+	)
+
+	if is_equal_approx(_applied_time_scale, requested_time_scale):
+		return
+
+	_applied_time_scale = requested_time_scale
+
+	var scene: Node = get_tree().current_scene
+	if scene != null and scene.has_method("set_time_scale"):
+		scene.call("set_time_scale", requested_time_scale)
+
+
 
 func _update_survival_status_effects() -> void:
 	var hunger_effect: StatusEffectData = _get_need_effect(
@@ -390,14 +470,16 @@ func restore_thirst(base_amount: float) -> void:
 	_emit_needs_changed()
 
 
-
 func _emit_needs_changed() -> void:
 	needs_changed.emit(
 		current_satiety,
 		max_satiety,
 		current_thirst,
-		max_thirst
+		max_thirst,
+		current_sleepiness,
+		max_sleepiness
 	)
+
 
 
 
@@ -489,10 +571,8 @@ func set_status_modifiers(modifiers: Dictionary) -> void:
 	_status_modifiers = modifiers.duplicate(true)
 	recalculate_stats()
 
-
 func recalculate_stats() -> void:
 	var all_modifiers: Dictionary = {}
-
 	_merge_modifiers(all_modifiers, _equipment_modifiers)
 	_merge_modifiers(all_modifiers, _status_modifiers)
 
@@ -531,29 +611,30 @@ func recalculate_stats() -> void:
 	stamina_recovery = (
 		base_stamina_recovery
 		+ _add_value(all_modifiers, "stamina_recovery_add")
-	) * _multiplier_value(
-		all_modifiers,
-		"stamina_recovery_multiplier"
-	)
+	) * _multiplier_value(all_modifiers, "stamina_recovery_multiplier")
 
 	willpower_recovery = (
 		base_willpower_recovery
 		+ _add_value(all_modifiers, "willpower_recovery_add")
-	) * _multiplier_value(
-		all_modifiers,
-		"willpower_recovery_multiplier"
-	)
-
+	) * _multiplier_value(all_modifiers, "willpower_recovery_multiplier")
 
 	stamina_cost_multiplier = maxf(
 		0.0,
-		(base_stamina_cost_multiplier + _add_value(all_modifiers, "stamina_cost_multiplier_add"))
-		* _multiplier_value(all_modifiers, "stamina_cost_multiplier_multiplier")
+		(base_stamina_cost_multiplier
+		+ _add_value(all_modifiers, "stamina_cost_multiplier_add"))
+		* _multiplier_value(
+			all_modifiers,
+			"stamina_cost_multiplier_multiplier"
+		)
 	)
 	willpower_cost_multiplier = maxf(
 		0.0,
-		(base_willpower_cost_multiplier + _add_value(all_modifiers, "willpower_cost_multiplier_add"))
-		* _multiplier_value(all_modifiers, "willpower_cost_multiplier_multiplier")
+		(base_willpower_cost_multiplier
+		+ _add_value(all_modifiers, "willpower_cost_multiplier_add"))
+		* _multiplier_value(
+			all_modifiers,
+			"willpower_cost_multiplier_multiplier"
+		)
 	)
 
 	var safe_max_carry_weight: float = maxf(max_carry_weight, 0.01)
@@ -563,7 +644,6 @@ func recalculate_stats() -> void:
 		1.0
 	)
 	var load_factor: float = load_ratio * load_ratio
-
 
 	walk_speed *= 1.0 - max_walk_weight_penalty * load_factor
 	sprint_speed *= 1.0 - max_sprint_weight_penalty * load_factor
@@ -577,19 +657,33 @@ func recalculate_stats() -> void:
 		(base_protection + _add_value(all_modifiers, "protection_add"))
 		* _multiplier_value(all_modifiers, "protection_multiplier")
 	)
-
 	warmth = maxf(
 		0.0,
 		(base_warmth + _add_value(all_modifiers, "warmth_add"))
 		* _multiplier_value(all_modifiers, "warmth_multiplier")
 	)
 
+	sleepiness_change_per_world_second = (
+		base_sleepiness_change_per_world_second
+		+ _add_value(
+			all_modifiers,
+			"sleepiness_change_per_world_second_add"
+		)
+	) * _multiplier_value(
+		all_modifiers,
+		"sleepiness_change_per_world_second_multiplier"
+	)
 
 	current_willpower = clampf(current_willpower, 0.0, max_willpower)
 	current_stamina = clampf(current_stamina, 0.0, max_stamina)
+	current_sleepiness = clampf(current_sleepiness, 0.0, max_sleepiness)
+
+	_apply_time_scale_from_stats()
 
 	stats_recalculated.emit()
 	_emit_resources_changed()
+	_emit_needs_changed()
+
 
 
 func make_save_data() -> Dictionary:
@@ -599,6 +693,7 @@ func make_save_data() -> Dictionary:
 		"current_willpower": current_willpower,
 		"current_stamina": current_stamina,
 		"recovery_timer": _recovery_timer,
+		"current_sleepiness": current_sleepiness,
 	}
 
 
@@ -625,6 +720,13 @@ func restore_save_data(data: Dictionary) -> void:
 		0.0,
 		max_thirst
 	)
+	current_sleepiness = clampf(
+		float(data.get("current_sleepiness", max_sleepiness)),
+		0.0,
+		max_sleepiness
+	)
+
+
 	_emit_needs_changed()
 
 	

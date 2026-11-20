@@ -47,6 +47,8 @@ var saved_collision_mask: int = 1
 var base_weight: float = 0.0
 var total_weight: float = 0.0
 
+var _sleep_zone_collision_states: Dictionary = {}
+
 
 func _ready() -> void:
 	_ensure_instance_id()
@@ -166,12 +168,29 @@ func on_mouse_motion(relative: Vector2) -> void:
 	for component: ItemComponent in get_components():
 		component.on_mouse_motion(relative)
 
-
 func disable_collision() -> void:
 	freeze = true
 	sleeping = true
 	collision_layer = 0
 	collision_mask = 0
+
+	for node: Node in find_children("*", "SleepZone", true, false):
+		var zone: Area3D = node as Area3D
+		if zone == null:
+			continue
+
+		if not _sleep_zone_collision_states.has(zone):
+			_sleep_zone_collision_states[zone] = {
+				"monitoring": zone.monitoring,
+				"monitorable": zone.monitorable,
+				"collision_layer": zone.collision_layer,
+				"collision_mask": zone.collision_mask,
+			}
+
+		zone.set_deferred("monitoring", false)
+		zone.set_deferred("monitorable", false)
+		zone.collision_layer = 0
+		zone.collision_mask = 0
 
 
 func enable_collision() -> void:
@@ -179,6 +198,30 @@ func enable_collision() -> void:
 	sleeping = false
 	collision_layer = saved_collision_layer
 	collision_mask = saved_collision_mask
+
+	for node: Node in _sleep_zone_collision_states.keys():
+		if not is_instance_valid(node):
+			continue
+
+		var zone: Area3D = node as Area3D
+		if zone == null:
+			continue
+
+		var saved_state: Dictionary = _sleep_zone_collision_states[node]
+		zone.collision_layer = int(saved_state.get("collision_layer", 0))
+		zone.collision_mask = int(saved_state.get("collision_mask", 0))
+		zone.set_deferred(
+			"monitorable",
+			bool(saved_state.get("monitorable", true))
+		)
+		zone.set_deferred(
+			"monitoring",
+			bool(saved_state.get("monitoring", true))
+		)
+
+	_sleep_zone_collision_states.clear()
+
+
 
 
 func change_contents_weight(weight_delta: float) -> void:

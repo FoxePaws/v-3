@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/scene/pl.tscn" id="22_htxhm"]
 [ext_resource type="PackedScene" uid="uid://do60kcwdw4t1m" path="res://Props/door.tscn" id="25_0odxb"]
 [ext_resource type="PackedScene" uid="uid://cnr5yhrplnrx4" path="res://Props/door_dunamic.tscn" id="26_lswn8"]
+[ext_resource type="PackedScene" uid="uid://bxgrpcyv51wnq" path="res://Props/bed.tscn" id="27_xuqvo"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
 
@@ -290,3 +291,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3680696, 0.0009570122, -5.
 
 [node name="Door2" parent="." unique_id=1172547180 instance=ExtResource("26_lswn8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.89452, -0.00999999, -6.284769)
+
+[node name="Node3D" parent="." unique_id=1277836013 instance=ExtResource("27_xuqvo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0884333, 0.057568252, 3.9666371)

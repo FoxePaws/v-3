@@ -76,7 +76,6 @@ func add_item(item_instance: ItemInstance, index: int = -1) -> bool:
 	changed.emit()
 	return true
 
-
 func remove_item(item_instance: ItemInstance) -> bool:
 	var index: int = items.find(item_instance)
 	if index < 0:
@@ -92,6 +91,8 @@ func remove_item(item_instance: ItemInstance) -> bool:
 	item_instance.current_holder = null
 	item_instance.current_hand = null
 	item_instance.visible = true
+	item_instance.enable_collision()
+
 	changed.emit()
 	return true
 

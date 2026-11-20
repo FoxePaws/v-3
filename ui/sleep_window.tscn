@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://djgux8bn7y1pi"]
+
+[ext_resource type="Script" uid="uid://cn51sg3tornoi" path="res://Props/sleep_window.gd" id="1_efche"]
+
+[node name="Control" type="Control" unique_id=411274753]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_efche")
+
+[node name="Panel" type="Panel" parent="." unique_id=584702634]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 292.0
+offset_right = 782.0
+offset_bottom = 453.0
+
+[node name="SleepButton" type="Button" parent="Panel" unique_id=2064734875]
+layout_mode = 0
+offset_left = 317.0
+offset_top = 98.0
+offset_right = 373.0
+offset_bottom = 129.0
+text = "Спать"
+
+[node name="CancelButton" type="Button" parent="Panel" unique_id=569466158]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 96.0
+offset_right = 125.0
+offset_bottom = 127.0
+text = "Отмена "
+
+[node name="Description" type="Label" parent="Panel" unique_id=876111882]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 40.0
+offset_right = 411.0
+offset_bottom = 81.0
+
+[node name="Label" type="Label" parent="." unique_id=140856829]
+layout_mode = 0
+offset_left = 507.0
+offset_top = 301.0
+offset_right = 610.0
+offset_bottom = 324.0
+text = "Лечь спать ?"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=623254292]

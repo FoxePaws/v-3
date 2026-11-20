@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://egyy02bo6vhc"]
+
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/core/status_effect_data.gd" id="1_gmv8b"]
+
+[resource]
+script = ExtResource("1_gmv8b")
+effect_id = &"sleep_bed"
+display_name = "sleep_bed"
+description = "sleep_bed"
+duration_world_seconds = 43200.0

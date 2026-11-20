@@ -7,6 +7,7 @@ extends VBoxContainer
 @onready var sprint_speed_label: Label = $SprintSpeedLabel
 @onready var jump_velocity_label: Label = $JumpVelocityLabel
 @onready var weight_label: Label = $WeightLabel
+@onready var sleepiness_bar: StatBarUI = $"../NeedsBars/SleepinessBar"
 
 @onready var satiety_bar: StatBarUI = \
 	$"../NeedsBars/SatietyBar"
@@ -60,12 +61,13 @@ func _refresh_stats(
 		_stats.max_carry_weight,
 	]
 
-
 func _refresh_needs(
 	_current_satiety: float = 0.0,
 	_max_satiety: float = 0.0,
 	_current_thirst: float = 0.0,
-	_max_thirst: float = 0.0
+	_max_thirst: float = 0.0,
+	_current_sleepiness: float = 0.0,
+	_max_sleepiness: float = 0.0
 ) -> void:
 	if _stats == null:
 		return
@@ -79,4 +81,9 @@ func _refresh_needs(
 		"ЖАЖДА",
 		_stats.current_thirst,
 		_stats.max_thirst
+	)
+	sleepiness_bar.set_stat(
+		"СОНЛИВОСТЬ",
+		_stats.current_sleepiness,
+		_stats.max_sleepiness
 	)

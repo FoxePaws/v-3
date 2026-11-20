@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://bxgrpcyv51wnq"]
+
+[ext_resource type="Script" uid="uid://ydwi1xuujw6n" path="res://Props/sleep_zone.gd" id="1_xqjo8"]
+[ext_resource type="Resource" uid="uid://egyy02bo6vhc" path="res://items/moods/sleep_bed.tres" id="2_31urs"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_onkwe"]
+size = Vector3(1.0803223, 0.5045166, 2.086914)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nb5cy"]
+size = Vector3(1.0568848, 0.49682617, 2.0959473)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sqlk1"]
+size = Vector3(1.1181641, 0.8724365, 0.10168457)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tacmf"]
+size = Vector3(1.1181641, 0.70684814, 0.10168457)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_onkwe"]
+radius = 0.18701172
+height = 0.99609375
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_31urs"]
+radius = 0.7954902
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+
+[node name="Node3D" type="Node3D" unique_id=1277836013]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1945112276]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=72781122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2033081, 0)
+shape = SubResource("BoxShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=1149530582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19421387, 0)
+mesh = SubResource("BoxMesh_nb5cy")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="StaticBody3D" unique_id=690647608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37078857, 1.0883179)
+mesh = SubResource("BoxMesh_sqlk1")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="StaticBody3D" unique_id=1307753650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28838795, -1.102101)
+mesh = SubResource("BoxMesh_tacmf")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="StaticBody3D" unique_id=1274076854]
+transform = Transform3D(-0.0021101658, -0.9999978, 0, 0.9999978, -0.0021101658, 0, 0, 0, 1, 0, 0.53905135, 0.91516954)
+mesh = SubResource("CapsuleMesh_onkwe")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=522563935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0071080327, 0.3067475, 0.013669848)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_xqjo8")
+sleep_effect = ExtResource("2_31urs")
+surface_description = "Кровать"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1205011647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20002365, 0.19005835, 0.275669)
+shape = SubResource("SphereShape3D_31urs")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D" unique_id=793669136]
+visible = false
+mesh = SubResource("SphereMesh_onkwe")

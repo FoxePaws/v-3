@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://fvmitk8ktl20"]
+
+[ext_resource type="Script" uid="uid://ydwi1xuujw6n" path="res://Props/sleep_zone.gd" id="1_xqjo8"]
+[ext_resource type="Resource" uid="uid://egyy02bo6vhc" path="res://items/moods/sleep_bed.tres" id="2_31urs"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+
+[node name="Area3D" type="Area3D" unique_id=522563935]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_xqjo8")
+sleep_effect = ExtResource("2_31urs")
+surface_description = "Кровать"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1205011647]
+shape = SubResource("SphereShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=793669136]
+mesh = SubResource("SphereMesh_onkwe")
