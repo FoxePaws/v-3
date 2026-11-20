@@ -47,3 +47,4 @@ script = ExtResource("1_fi0d4")
 satiety_restoration = 20.0
 thirst_restoration = 20.0
 durability_cost = 10.0
+sleepiness_restoration = -20.0

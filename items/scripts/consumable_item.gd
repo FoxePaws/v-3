@@ -2,10 +2,10 @@ class_name ConsumableItem
 extends ItemComponent
 
 @export_category("Restoration")
-@export_range(0.0, 10000.0, 0.1) var satiety_restoration: float = 0.0
-@export_range(0.0, 10000.0, 0.1) var thirst_restoration: float = 0.0
-@export_range(0.0, 10000.0, 0.1) var durability_cost: float = 1.0
-@export_range(0.0, 10000.0, 0.1) var sleepiness_restoration: float = 0.0
+@export_range(-1000.0, 10000.0, 0.1) var satiety_restoration: float = 0.0
+@export_range(-1000.0, 10000.0, 0.1) var thirst_restoration: float = 0.0
+@export_range(-1000.0, 10000.0, 0.1) var durability_cost: float = 1.0
+@export_range(-1000.0, 10000.0, 0.1) var sleepiness_restoration: float = 0.0
 
 func on_primary_action() -> void:
 	if item == null or item.current_hand == null:
