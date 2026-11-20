@@ -5,6 +5,7 @@ extends Area3D
 @export var grip_marker: Marker3D
 @export var action: Node
 
+@export_range(-1.0, 1.0, 2.0) var mouse_y_sign: float = 1.0
 
 func _ready() -> void:
 	if grip_marker == null:

@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://cvomvx5cwii6e"]
+
+[ext_resource type="Script" uid="uid://t7gmbrxtltga" path="res://items/actions/act/door_hand_action.gd" id="1_7ww84"]
+[ext_resource type="Script" uid="uid://dxaj1oevgnwv" path="res://items/actions/interaction_handle_3d.gd" id="2_wwaun"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_onkwe"]
+radius = 0.2
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+radius = 0.2
+height = 0.4
+radial_segments = 8
+rings = 6
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_nb5cy"]
+radius = 0.2
+
+[node name="DoorHandAction" type="Node3D" unique_id=378262478]
+script = ExtResource("1_7ww84")
+
+[node name="HandleFront" type="Marker3D" parent="." unique_id=773078667]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2381765)
+
+[node name="Marker3D" type="Marker3D" parent="HandleFront" unique_id=1623177006]
+
+[node name="Area3D" type="Area3D" parent="HandleFront" unique_id=935472012 node_paths=PackedStringArray("grip_marker", "action")]
+script = ExtResource("2_wwaun")
+grip_marker = NodePath("../Marker3D")
+action = NodePath("../..")
+mouse_y_sign = -1.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HandleFront/Area3D" unique_id=377182606]
+shape = SubResource("SphereShape3D_onkwe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HandleFront/Area3D" unique_id=1620590581]
+mesh = SubResource("SphereMesh_onkwe")
+
+[node name="HandleBack" type="Marker3D" parent="." unique_id=674767892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.22560948)
+
+[node name="Marker3D" type="Marker3D" parent="HandleBack" unique_id=922197331]
+
+[node name="Area3D" type="Area3D" parent="HandleBack" unique_id=1102017243 node_paths=PackedStringArray("grip_marker", "action")]
+script = ExtResource("2_wwaun")
+grip_marker = NodePath("../Marker3D")
+action = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HandleBack/Area3D" unique_id=1089406859]
+shape = SubResource("SphereShape3D_nb5cy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HandleBack/Area3D" unique_id=459078662]
+mesh = SubResource("SphereMesh_onkwe")
