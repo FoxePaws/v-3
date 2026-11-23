@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="StatusEffectData" format=3 uid="uid://xfwcejtvadoq"]
+
+[ext_resource type="Script" uid="uid://b3ov17df7bee4" path="res://items/core/status_effect_data.gd" id="1_b0gfc"]
+
+[resource]
+script = ExtResource("1_b0gfc")
+effect_id = &"sleepines1"
+display_name = "sleepines1"
+description = "sleepines1"
+duration_world_seconds = -1.0
+modifiers = Dictionary[String, float]({
+"jump_velocity_multiplier": 0.9,
+"max_stamina_multiplier": 0.8,
+"max_willpower_multiplier": 0.9,
+"sprint_speed_multiplier": 0.8,
+"stamina_recovery_multiplier": 0.8,
+"walk_speed_multiplier": 0.9,
+"willpower_recovery_multiplier": 0.9
+})

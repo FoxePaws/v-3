@@ -9,5 +9,6 @@ display_name = "vbb2"
 description = "vbb2"
 duration_world_seconds = -1.0
 modifiers = Dictionary[String, float]({
-"max_willpower_multiplier": 0.9
+"max_willpower_multiplier": 0.9,
+"sleepiness_change_per_world_second_add": -0.002
 })

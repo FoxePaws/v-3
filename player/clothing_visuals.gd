@@ -1,7 +1,6 @@
 class_name ClothingVisuals
 extends Node
 
-@export var skeleton: Skeleton3D
 # Ключ — clothing_visual_id, значение — путь от Skeleton3D до меша.
 @export var visual_paths: Dictionary[StringName, NodePath] = {}
 
@@ -9,12 +8,9 @@ var visuals: Dictionary = {}
 
 
 func _ready() -> void:
-	if skeleton == null:
-		push_error("ClothingVisuals: назначьте Skeleton3D в Inspector")
-		return
 
 	for visual_id in visual_paths:
-		var visual := skeleton.get_node_or_null(visual_paths[visual_id]) as Node3D
+		var visual := get_node_or_null(visual_paths[visual_id]) as Node3D
 		if visual == null:
 			push_warning("Не найден меш одежды для ID: %s" % visual_id)
 			continue

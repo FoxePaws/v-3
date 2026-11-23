@@ -18,16 +18,13 @@ func on_primary_action() -> void:
 	var stats: PlayerStats = player.stats
 
 	var can_restore_satiety: bool = (
-		satiety_restoration > 0.0
-		and stats.current_satiety < stats.max_satiety
+		 stats.current_satiety < stats.max_satiety
 	)
 	var can_restore_thirst: bool = (
-		thirst_restoration > 0.0
-		and stats.current_thirst < stats.max_thirst
+		 stats.current_thirst < stats.max_thirst
 	)
 	var can_restore_sleepiness: bool = (
-		sleepiness_restoration > 0.0
-		and stats.current_sleepiness < stats.max_sleepiness
+		stats.current_sleepiness < stats.max_sleepiness
 	)
 
 	if (

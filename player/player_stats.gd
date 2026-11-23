@@ -349,8 +349,7 @@ func _get_need_change_rate(
 
 
 func restore_sleepiness(base_amount: float) -> void:
-	if base_amount <= 0.0:
-		return
+
 
 	var previous_value: float = current_sleepiness
 	current_sleepiness = clampf(
@@ -508,8 +507,6 @@ func _set_need_effect(
 
 
 func restore_satiety(base_amount: float) -> void:
-	if base_amount <= 0.0:
-		return
 
 	var previous_value: float = current_satiety
 	current_satiety = clampf(
@@ -527,8 +524,6 @@ func restore_satiety(base_amount: float) -> void:
 
 
 func restore_thirst(base_amount: float) -> void:
-	if base_amount <= 0.0:
-		return
 
 	var previous_value: float = current_thirst
 	current_thirst = clampf(
@@ -620,15 +615,13 @@ func consume_stamina(base_cost: float) -> bool:
 
 
 func restore_willpower(amount: float) -> void:
-	if amount <= 0.0:
-		return
+
 	current_willpower = minf(current_willpower + amount, max_willpower)
 	_emit_resources_changed()
 
 
 func restore_stamina(amount: float) -> void:
-	if amount <= 0.0:
-		return
+
 	current_stamina = minf(current_stamina + amount, max_stamina)
 	_emit_resources_changed()
 
