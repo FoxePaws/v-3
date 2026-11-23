@@ -12,7 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://drjtvawg4ta0c" path="res://Props/static_bodylove_3d.tscn" id="7_272bh"]
 [ext_resource type="PackedScene" uid="uid://dlxtblj4bs1oo" path="res://items/actions/act/pivot_rotation_hand_action.tscn" id="8_1u8w0"]
 [ext_resource type="PackedScene" uid="uid://bjym28001jhqc" path="res://items/actions/act/local_z_hand_action.tscn" id="9_d13ii"]
-[ext_resource type="PackedScene" uid="uid://cvjsh0peu0wkd" path="res://player/playermal.scn" id="10_4c57u"]
 [ext_resource type="PackedScene" uid="uid://lhuyyarhg5ve" path="res://items/scene/Sw.tscn" id="10_ryguw"]
 [ext_resource type="PackedScene" uid="uid://dmo1ghbwifhf6" path="res://items/scene/sponge.tscn" id="11_d13ii"]
 [ext_resource type="PackedScene" uid="uid://oo6qsa1hu3tj" path="res://items/scene/flas.tscn" id="12_1u8w0"]
@@ -26,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://boxl2ab0qwxes" path="res://items/scene/pl.tscn" id="22_htxhm"]
 [ext_resource type="PackedScene" uid="uid://do60kcwdw4t1m" path="res://Props/door.tscn" id="25_0odxb"]
 [ext_resource type="PackedScene" uid="uid://cnr5yhrplnrx4" path="res://Props/door_dunamic.tscn" id="26_lswn8"]
+[ext_resource type="PackedScene" uid="uid://dcv7nk0md4kjy" path="res://player/playermal.tscn" id="27_a6jrf"]
 [ext_resource type="PackedScene" uid="uid://bxgrpcyv51wnq" path="res://Props/bed.tscn" id="27_xuqvo"]
 
 [sub_resource type="Gradient" id="Gradient_074og"]
@@ -259,9 +259,6 @@ item_scene = ExtResource("14_lswn8")
 [node name="bodylove" parent="." unique_id=1890260861 instance=ExtResource("7_272bh")]
 transform = Transform3D(0.7230918, -0.69075197, 0, 0.69075197, 0.7230918, 0, 0, 0, 1, -4.2001705, 0.6435559, 8.317532)
 
-[node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("10_4c57u")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
 [node name="ItemSpawner6" parent="." unique_id=2120406206 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0825243, 0.124922335, -5.4139047)
 item_scene = ExtResource("17_a6jrf")
@@ -294,3 +291,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.89452, -0.00999999, -6.284
 
 [node name="Node3D" parent="." unique_id=1277836013 instance=ExtResource("27_xuqvo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0884333, 0.057568252, 3.9666371)
+
+[node name="Playermal" parent="." unique_id=1530685651 instance=ExtResource("27_a6jrf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2607565, 1.0049932, 0.22112274)
