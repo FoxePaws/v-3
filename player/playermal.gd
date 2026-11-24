@@ -165,17 +165,6 @@ func recalculate_equipment_stats() -> void:
 
 
 
-func _add_equipment_modifier(
-	modifiers: Dictionary,
-	key: String,
-	value: float
-) -> void:
-	if is_zero_approx(value):
-		return
-
-	var default_value: float = 1.0 if key.ends_with("_multiplier") else 0.0
-	modifiers[key] = float(modifiers.get(key, default_value)) + value
-
 
 func _physics_process(delta: float) -> void:
 	_handle_body_state()
