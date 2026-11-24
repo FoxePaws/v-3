@@ -87,7 +87,8 @@ var hand_move_mode: bool = false
 
 @onready var visual_root: Node3D = $Root
 @onready var camera_pivot: Node3D = $Root/CameraPivot
-@onready var camera: Camera3D = $Root/CameraPivot/Camera3D
+@onready var camera: Camera3D = $Root/CameraPivot/of/Camera3D
+@onready var camera3p: Camera3D = $Root/CameraPivot/of/Camera3D/SpringArm3D/Camera3p
 
 @onready var right_hand: HandController = (
 	$Root/R_Hand_Base/RightHand
@@ -107,6 +108,8 @@ var base_walk_speed: float
 var base_sprint_speed: float
 var protection: float = 0.0
 var warmth: float = 0.0
+
+var cam : bool = false
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -194,6 +197,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		inventory_ui.toggle_player_ui()
 		get_viewport().set_input_as_handled()
 		return
+
+	if event.is_action_pressed("cam"):
+		if cam == false:
+			camera3p.set_current(true)
+			camera.set_current(false)
+			cam = true
+			return
+		else:
+			camera.set_current(true)
+			camera3p.set_current(false)
+			cam = false
+			
+
 
 	if event.is_action_pressed("interact"):
 		if not inventory_ui.is_ui_open():
@@ -774,6 +790,8 @@ func _update_body_rotation(delta: float, is_moving: bool) -> void:
 	)
 
 	var dead_zone: float = deg_to_rad(camera_dead_zone)
+
+	
 	if is_moving:
 		dead_zone = 0.0
 

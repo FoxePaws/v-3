@@ -29,7 +29,7 @@
 [ext_resource type="Resource" uid="uid://cix7i7fk0o2cx" path="res://items/moods/sleep_gr.tres" id="30_tcnrj"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_nb5cy"]
-radius = 0.2
+radius = 0.25
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nb5cy"]
 radius = 0.4
@@ -1111,7 +1111,7 @@ walk_speed = 3.0
 sprint_speed = 6.0
 crouch_speed = 1.5
 air_control_enabled = false
-camera_dead_zone = 30.0
+camera_dead_zone = 55.0
 vertical_dead_zone_lower = -20.0
 vertical_dead_zone_upper = 20.0
 lying_vertical_dead_zone_lower = -89.0
@@ -1125,9 +1125,9 @@ crouch_root_offset = -0.3
 script = ExtResource("2_uyb8k")
 
 [node name="CeilingCheck" type="ShapeCast3D" parent="." unique_id=648986264]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6726841, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.62606645, -0.05916819)
 shape = SubResource("SphereShape3D_nb5cy")
-target_position = Vector3(0, 1.5, 0)
+target_position = Vector3(0, 1.2, 0)
 max_results = 8
 collision_mask = 8
 
@@ -2342,7 +2342,7 @@ settings/0/amount = 1.0
 settings/0/apply_bone_name = "Spine"
 settings/0/apply_bone = 14
 settings/0/reference_type = 1
-settings/0/reference_node = NodePath("../../../../CameraPivot/Camera3D/look")
+settings/0/reference_node = NodePath("../../../../CameraPivot/of/Camera3D/look")
 settings/0/copy = 2
 settings/0/axes = 2
 settings/0/invert = 0
@@ -2355,7 +2355,7 @@ settings/0/amount = 1.0
 settings/0/apply_bone_name = "Chest"
 settings/0/apply_bone = 15
 settings/0/reference_type = 1
-settings/0/reference_node = NodePath("../../../../CameraPivot/Camera3D/look")
+settings/0/reference_node = NodePath("../../../../CameraPivot/of/Camera3D/look")
 settings/0/copy = 2
 settings/0/axes = 2
 settings/0/invert = 0
@@ -2368,7 +2368,7 @@ settings/0/amount = 1.0
 settings/0/apply_bone_name = "Neck"
 settings/0/apply_bone = 24
 settings/0/reference_type = 1
-settings/0/reference_node = NodePath("../../../../CameraPivot/Camera3D/look")
+settings/0/reference_node = NodePath("../../../../CameraPivot/of/Camera3D/look")
 settings/0/copy = 2
 settings/0/axes = 2
 settings/0/invert = 0
@@ -2421,7 +2421,7 @@ settings/0/amount = 1.0
 settings/0/apply_bone_name = "Head"
 settings/0/apply_bone = 25
 settings/0/reference_type = 1
-settings/0/reference_node = NodePath("../../../../CameraPivot/Camera3D/look")
+settings/0/reference_node = NodePath("../../../../CameraPivot/of/Camera3D/look")
 settings/0/copy = 2
 settings/0/axes = 7
 settings/0/invert = 0
@@ -2430,7 +2430,7 @@ settings/0/additive = false
 [node name="head" type="LookAtModifier3D" parent="Root/Mal/Armature/Skeleton3D" unique_id=1795088184]
 visible = false
 active = false
-target_node = NodePath("../../../../CameraPivot/Camera3D/look")
+target_node = NodePath("../../../../CameraPivot/of/Camera3D/look")
 bone_name = "Head"
 bone = 25
 relative = true
@@ -2547,8 +2547,8 @@ height = 0.2
 
 [node name="Tail spring" type="SpringBoneSimulator3D" parent="Root/Mal/Armature/Skeleton3D" unique_id=1359818897]
 setting_count = 1
-settings/0/root_bone_name = "TailRoot"
-settings/0/root_bone = 115
+settings/0/root_bone_name = "Tail.001"
+settings/0/root_bone = 117
 settings/0/end_bone_name = "Tail.005"
 settings/0/end_bone = 121
 settings/0/extend_end_bone = false
@@ -2557,27 +2557,23 @@ settings/0/individual_config = false
 settings/0/rotation_axis = 3
 settings/0/radius/value = 0.02
 settings/0/radius/damping_curve = null
-settings/0/stiffness/value = 1.0
+settings/0/stiffness/value = 0.5
 settings/0/stiffness/damping_curve = null
 settings/0/drag/value = 0.3
 settings/0/drag/damping_curve = null
 settings/0/gravity/value = 0.3
 settings/0/gravity/damping_curve = null
 settings/0/gravity/direction = Vector3(0, -1, 0)
-settings/0/joints/0/bone_name = "TailRoot"
-settings/0/joints/0/bone = 115
-settings/0/joints/1/bone_name = "TailWag"
-settings/0/joints/1/bone = 116
-settings/0/joints/2/bone_name = "Tail.001"
-settings/0/joints/2/bone = 117
-settings/0/joints/3/bone_name = "Tail.002"
-settings/0/joints/3/bone = 118
-settings/0/joints/4/bone_name = "Tail.003"
-settings/0/joints/4/bone = 119
-settings/0/joints/5/bone_name = "Tail.004"
-settings/0/joints/5/bone = 120
-settings/0/joints/6/bone_name = "Tail.005"
-settings/0/joints/6/bone = 121
+settings/0/joints/0/bone_name = "Tail.001"
+settings/0/joints/0/bone = 117
+settings/0/joints/1/bone_name = "Tail.002"
+settings/0/joints/1/bone = 118
+settings/0/joints/2/bone_name = "Tail.003"
+settings/0/joints/2/bone = 119
+settings/0/joints/3/bone_name = "Tail.004"
+settings/0/joints/3/bone = 120
+settings/0/joints/4/bone_name = "Tail.005"
+settings/0/joints/4/bone = 121
 settings/0/enable_all_child_collisions = false
 settings/0/collision_count = 0
 
@@ -2683,26 +2679,36 @@ mesh = SubResource("CapsuleMesh_nb5cy")
 [node name="CameraPivot" type="Node3D" parent="Root" unique_id=1858352272]
 transform = Transform3D(1, 0, 0, 0, 0.9999999, 0, 0, 0, 0.9999999, 0, 0.225, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Root/CameraPivot" unique_id=361342548]
-transform = Transform3D(0.99999994, 0, 0, 0, 1.0000001, 0, 0, 0, 1.0000001, 0, 0.49999994, -0.059977658)
+[node name="of" type="Marker3D" parent="Root/CameraPivot" unique_id=1185480901]
+transform = Transform3D(1, 0, 0, 0, 0.99999946, -8.940697e-08, 0, 8.940697e-08, 0.9999993, 0, 0.36051092, -6.5945924e-09)
+
+[node name="Camera3D" type="Camera3D" parent="Root/CameraPivot/of" unique_id=361342548]
+transform = Transform3D(1, 0, 0, 0, 1.0000007, 8.9406996e-08, 0, -8.9406996e-08, 1.0000008, 0, 0.090501726, -0.030234538)
 cull_mask = 1048565
+current = true
 fov = 80.0
 
-[node name="look" type="Marker3D" parent="Root/CameraPivot/Camera3D" unique_id=1349443746]
+[node name="look" type="Marker3D" parent="Root/CameraPivot/of/Camera3D" unique_id=1349443746]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="RHandCollisionCast" type="ShapeCast3D" parent="Root/CameraPivot/Camera3D" unique_id=1070797418]
+[node name="RHandCollisionCast" type="ShapeCast3D" parent="Root/CameraPivot/of/Camera3D" unique_id=1070797418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.16100001, -0.03864935)
 shape = SubResource("SphereShape3D_vvqjq")
 target_position = Vector3(0, 0, -0.5)
 
-[node name="LHandCollisionCast" type="ShapeCast3D" parent="Root/CameraPivot/Camera3D" unique_id=1349017284]
+[node name="LHandCollisionCast" type="ShapeCast3D" parent="Root/CameraPivot/of/Camera3D" unique_id=1349017284]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, -0.16100001, -0.03864935)
 shape = SubResource("SphereShape3D_vvqjq")
 target_position = Vector3(0, 0, -0.5)
 
-[node name="of" type="Marker3D" parent="Root/CameraPivot" unique_id=1185480901]
-transform = Transform3D(1, 0, 0, 0, 0.99999946, -8.940697e-08, 0, 8.940697e-08, 0.9999993, 0, 0.36051092, -6.5945924e-09)
+[node name="ppvo" type="Node3D" parent="Root/CameraPivot/of/Camera3D" unique_id=433856093]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.36877167, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Root/CameraPivot/of/Camera3D" unique_id=221275073]
+transform = Transform3D(0.7588565, 6.478453e-14, 0.651258, -6.478453e-14, 1, -2.398798e-14, -0.651258, -2.3988e-14, 0.7588564, 0.3, -0.31470615, 0.29914588)
+
+[node name="Camera3p" type="Camera3D" parent="Root/CameraPivot/of/Camera3D/SpringArm3D" unique_id=1263306561]
+transform = Transform3D(0.7584427, -6.483238e-14, -0.65173966, 6.483242e-14, 1, -2.4029098e-14, 0.65173966, -2.4029173e-14, 0.75844276, -7.4505806e-08, -5.9604645e-08, 0.7570792)
 
 [node name="Marker3D" type="Marker3D" parent="Root/CameraPivot/of" unique_id=1003879680]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12582883, 0.21241856)
@@ -2719,7 +2725,7 @@ position_spring_strength = 67.0
 position_spring_damping = 12.0
 held_item_point = NodePath("HeldItemPoint")
 heavy_support_point = NodePath("HeldItemPoint")
-hand_collision_cast = NodePath("../../CameraPivot/Camera3D/RHandCollisionCast")
+hand_collision_cast = NodePath("../../CameraPivot/of/Camera3D/RHandCollisionCast")
 camera_vertical_offset = -0.2
 collision_margin = 0.1
 
@@ -2749,7 +2755,7 @@ script = ExtResource("16_ygcp7")
 is_right_hand = false
 held_item_point = NodePath("HeldItemPoint")
 heavy_support_point = NodePath("HeldItemPoint")
-hand_collision_cast = NodePath("../../CameraPivot/Camera3D/LHandCollisionCast")
+hand_collision_cast = NodePath("../../CameraPivot/of/Camera3D/LHandCollisionCast")
 camera_vertical_offset = -0.2
 collision_margin = 0.1
 
@@ -2797,7 +2803,7 @@ script = ExtResource("21_ovmv5")
 base_willpower_recovery = 0.3
 base_stamina_recovery = 2.0
 recovery_delay = 2.75
-satiety_loss_per_world_second = 0.0007999999999999999
+satiety_loss_per_world_second = 0.00079999999999999
 thirst_loss_per_world_second = 0.0007
 needs_update_interval = 1.0
 hunger_mild_effect = ExtResource("22_cwjas")
@@ -2806,7 +2812,7 @@ hunger_severe_effect = ExtResource("24_shu34")
 thirst_mild_effect = ExtResource("25_ebx0b")
 thirst_moderate_effect = ExtResource("26_hw57a")
 thirst_severe_effect = ExtResource("27_dau61")
-base_sleepiness_change_per_world_second = 0.001999999993131496
+base_sleepiness_change_per_world_second = 0.00199999999313149
 
 [node name="Sleep Controller" type="Node3D" parent="." unique_id=2087765711]
 script = ExtResource("28_p2xix")
