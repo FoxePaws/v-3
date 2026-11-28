@@ -1,4 +1,4 @@
-class_name Player
+#class_name Player
 extends CharacterBody3D
 
 
@@ -110,35 +110,35 @@ var protection: float = 0.0
 var warmth: float = 0.0
 
 var cam : bool = false
-
-func _ready() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	inventory_ui.setup(self)
-	right_hand.player = self
-	right_hand.is_right_hand = true
-
-	left_hand.player = self
-	left_hand.is_right_hand = false
-
-	# Правая рука активна при старте.
-	right_hand.set_active(true, false)
-	left_hand.set_active(false, false)
-	active_hand = right_hand
-
-	base_walk_speed = walk_speed
-	base_sprint_speed = sprint_speed
-	equipment.player = self
-
-	stats.base_walk_speed = walk_speed
-	stats.base_sprint_speed = sprint_speed
-	stats.base_jump_velocity = jump_velocity
-	stats.recalculate_stats()
-	# Остальной код вашего _ready() оставьте.
-	# После загрузки визуальных узлов заполните clothing_visuals.
-	recalculate_equipment_stats()
-	_apply_body_collision_shapes()
-	hud.bind_stats(stats)
-
+#
+#func _ready() -> void:
+	#Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	#inventory_ui.setup(self)
+	#right_hand.player = self
+	#right_hand.is_right_hand = true
+#
+	#left_hand.player = self
+	#left_hand.is_right_hand = false
+#
+	## Правая рука активна при старте.
+	#right_hand.set_active(true, false)
+	#left_hand.set_active(false, false)
+	#active_hand = right_hand
+#
+	#base_walk_speed = walk_speed
+	#base_sprint_speed = sprint_speed
+	#equipment.player = self
+#
+	#stats.base_walk_speed = walk_speed
+	#stats.base_sprint_speed = sprint_speed
+	#stats.base_jump_velocity = jump_velocity
+	#stats.recalculate_stats()
+	## Остальной код вашего _ready() оставьте.
+	## После загрузки визуальных узлов заполните clothing_visuals.
+	#recalculate_equipment_stats()
+	#_apply_body_collision_shapes()
+	#hud.bind_stats(stats)
+#
 
 func recalculate_equipment_stats() -> void:
 	if stats == null:

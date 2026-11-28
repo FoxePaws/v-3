@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dcv7nk0md4kjy"]
 
-[ext_resource type="Script" uid="uid://betn61fmokkll" path="res://player/playermal.gd" id="1_r5vex"]
+[ext_resource type="Script" uid="uid://0ar1sq3m14jy" path="res://player/playermal2.gd" id="1_38rkx"]
 [ext_resource type="Script" uid="uid://d3ecy8tsdcx1v" path="res://player/hand_interaction_controller.gd" id="2_uyb8k"]
 [ext_resource type="ArrayMesh" uid="uid://cxj83hmkyuiwh" path="res://player/body.res" id="3_38rkx"]
 [ext_resource type="ArrayMesh" uid="uid://cugjrmau6bwhm" path="res://player/head.res" id="4_dyjhi"]
@@ -24,6 +24,7 @@
 [ext_resource type="Resource" uid="uid://p7ypwj6lnvau" path="res://items/moods/thirst1.tres" id="25_ebx0b"]
 [ext_resource type="Resource" uid="uid://dqkyvtxxea4qy" path="res://items/moods/thirst2.tres" id="26_hw57a"]
 [ext_resource type="Resource" uid="uid://v1jj35n0drwc" path="res://items/moods/thirst3.tres" id="27_dau61"]
+[ext_resource type="Script" uid="uid://op8ons0gc564" path="res://player/procedural_leg_controller.gd" id="28_dyjhi"]
 [ext_resource type="Script" uid="uid://dmukutqo1t3du" path="res://player/sleep_controller.gd" id="28_p2xix"]
 [ext_resource type="PackedScene" uid="uid://djgux8bn7y1pi" path="res://ui/sleep_window.tscn" id="29_lhgmv"]
 [ext_resource type="Resource" uid="uid://cix7i7fk0o2cx" path="res://items/moods/sleep_gr.tres" id="30_tcnrj"]
@@ -39,8 +40,9 @@ height = 1.0800781
 radius = 0.3
 height = 1.8139648
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_sqlk1"]
-radius = 0.2
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5i8rw"]
+radius = 0.23388672
+height = 1.1279297
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sqlk1"]
 radius = 0.2
@@ -1104,22 +1106,22 @@ ring_segments = 4
 rings = 8
 ring_segments = 4
 
-[node name="Playermal" type="CharacterBody3D" unique_id=1530685651]
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_onkwe"]
+radius = 0.01
+height = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_onkwe"]
+radius = 0.1
+height = 0.2
+
+[node name="Playermal" type="RigidBody3D" unique_id=682005100 node_paths=PackedStringArray("camera", "camera_pivot", "visual_root", "ground_ray_left", "ground_ray_right")]
 collision_layer = 2
-script = ExtResource("1_r5vex")
-walk_speed = 3.0
-sprint_speed = 6.0
-crouch_speed = 1.5
-air_control_enabled = false
-camera_dead_zone = 55.0
-vertical_dead_zone_lower = -20.0
-vertical_dead_zone_upper = 20.0
-lying_vertical_dead_zone_lower = -89.0
-lying_vertical_dead_zone_upper = 0.0
-vertical_body_follow_speed = 2.0
-min_body_pitch = -0.7
-max_body_pitch = 0.7
-crouch_root_offset = -0.3
+script = ExtResource("1_38rkx")
+camera = NodePath("Root/CameraPivot/of/Camera3D")
+camera_pivot = NodePath("Root/CameraPivot")
+visual_root = NodePath("Root")
+ground_ray_left = NodePath("procedural_leg/LeftRay")
+ground_ray_right = NodePath("procedural_leg/RightRay")
 
 [node name="HandInteractionController" type="Node3D" parent="." unique_id=1599996718]
 script = ExtResource("2_uyb8k")
@@ -1133,20 +1135,22 @@ collision_mask = 8
 
 [node name="CrouchingShape" type="CollisionShape3D" parent="." unique_id=975323947]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.46, 0)
+visible = false
 shape = SubResource("CapsuleShape3D_nb5cy")
 disabled = true
 
 [node name="StandingShape" type="CollisionShape3D" parent="." unique_id=751413057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.093, -0.050700404)
+visible = false
 shape = SubResource("CapsuleShape3D_onkwe")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=192586031]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7249999, -0.05997765)
-shape = SubResource("SphereShape3D_sqlk1")
-disabled = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28896475, -0.05997765)
+shape = SubResource("CapsuleShape3D_5i8rw")
 
 [node name="LyingShape" type="CollisionShape3D" parent="." unique_id=1477242909]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.7999464, -3.1210323e-08)
+visible = false
 shape = SubResource("CapsuleShape3D_sqlk1")
 disabled = true
 
@@ -2669,7 +2673,7 @@ parameters/ProneLocomotion/blend_position = Vector2(0, 0)
 [node name="Node3D" type="Node3D" parent="Root/Mal" unique_id=1999697189 node_paths=PackedStringArray("player", "animation_tree")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("15_icpfl")
-player = NodePath("../../..")
+player = NodePath("")
 animation_tree = NodePath("../AnimationTree")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Root" unique_id=695457770]
@@ -2818,6 +2822,56 @@ base_sleepiness_change_per_world_second = 0.00199999999313149
 script = ExtResource("28_p2xix")
 sleep_window_scene = ExtResource("29_lhgmv")
 default_sleep_effect = ExtResource("30_tcnrj")
+
+[node name="procedural_leg" type="Node3D" parent="." unique_id=1878109639 node_paths=PackedStringArray("player", "left_orbit_axis", "left_orbit_marker", "left_ground_ray", "left_ik_target", "right_orbit_axis", "right_orbit_marker", "right_ground_ray", "right_ik_target")]
+script = ExtResource("28_dyjhi")
+player = NodePath("..")
+left_orbit_axis = NodePath("LeftAxis")
+left_orbit_marker = NodePath("LeftAxis/LeftTarget")
+left_ground_ray = NodePath("LeftRay")
+left_ik_target = NodePath("LeftIK")
+right_orbit_axis = NodePath("RightAxis")
+right_orbit_marker = NodePath("RightAxis/RightTarget")
+right_ground_ray = NodePath("RightRay")
+right_ik_target = NodePath("RightIK")
+
+[node name="RightRay" type="RayCast3D" parent="procedural_leg" unique_id=1255277290]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, -0.1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="procedural_leg/RightRay" unique_id=744272369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48786238, 0)
+mesh = SubResource("CapsuleMesh_onkwe")
+
+[node name="LeftRay" type="RayCast3D" parent="procedural_leg" unique_id=533436585]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, -0.1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="procedural_leg/LeftRay" unique_id=1671538098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48786238, 0)
+mesh = SubResource("CapsuleMesh_onkwe")
+
+[node name="RightAxis" type="Node3D" parent="procedural_leg" unique_id=2032470087]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, -1, 0)
+
+[node name="RightTarget" type="Marker3D" parent="procedural_leg/RightAxis" unique_id=1780443340]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="procedural_leg/RightAxis/RightTarget" unique_id=1579240344]
+mesh = SubResource("SphereMesh_onkwe")
+
+[node name="LeftAxis" type="Node3D" parent="procedural_leg" unique_id=105293449]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, -1, 0)
+
+[node name="LeftTarget" type="Marker3D" parent="procedural_leg/LeftAxis" unique_id=1282505549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="procedural_leg/LeftAxis/LeftTarget" unique_id=1063367643]
+mesh = SubResource("SphereMesh_onkwe")
+
+[node name="RightIK" type="Marker3D" parent="procedural_leg" unique_id=880608962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, -1, 0)
+
+[node name="LeftIK" type="Marker3D" parent="procedural_leg" unique_id=1446451663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, -1, 0)
 
 [editable path="InventoryUI"]
 [editable path="InventoryUI/PlayerWindow/GridContainer/Head"]
